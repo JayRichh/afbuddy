@@ -1,0 +1,172 @@
+<template>
+  <div class="geo-container">
+    <form @submit.prevent="emitData">
+      <div class="input-group">
+        <label for="timezone">TimeZone:</label>
+        <input
+          type="text"
+          id="timezone"
+          placeholder="Enter TimeZone"
+          v-model="timezone"
+          aria-label="Time Zone"
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="locale">Locale:</label>
+        <input
+          type="text"
+          id="locale"
+          placeholder="Enter Locale"
+          v-model="locale"
+          aria-label="Locale"
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="latitude">Latitude:</label>
+        <input
+          type="text"
+          id="latitude"
+          placeholder="Enter Latitude"
+          v-model="latitude"
+          aria-label="Latitude"
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="longitude">Longitude:</label>
+        <input
+          type="text"
+          id="longitude"
+          placeholder="Enter Longitude"
+          v-model="longitude"
+          aria-label="Longitude"
+        />
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="defaultGeo" v-model="useDefault" />
+        <label for="defaultGeo">Use Browser's Default Geolocation</label>
+      </div>
+
+      <button type="submit">Spoof Location</button>
+    </form>
+
+    <p v-if="feedbackMessage" class="feedback">{{ feedbackMessage }}</p>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref } from "vue";
+
+export default defineComponent({
+  data() {
+    return {
+      timezone: "",
+      locale: "",
+      latitude: "",
+      longitude: "",
+      useDefault: false,
+      feedbackMessage: "",
+    };
+  },
+  methods: {
+    emitData() {
+      this.$emit("spoofLocation", {
+        timezone: this.timezone,
+        locale: this.locale,
+        latitude: this.latitude,
+        longitude: this.longitude,
+        useDefault: this.useDefault,
+      });
+      this.feedbackMessage = "Location spoofed successfully!";
+    },
+  },
+});
+</script>
+
+<style scoped lang="scss">
+.geo-container {
+  padding: 5px 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  margin: 0;
+  width: calc(100% - 20px);
+}
+
+.title {
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+input[type="text"] {
+  padding: 0.5rem;
+  border: 2px solid #b2ebf2;
+  border-radius: 4px;
+  color: #333;
+  transition: border-color 0.3s ease;
+  /* placeholder-color: #888; */
+}
+
+input[type="text"]:focus {
+  border-color: #00bcd4;
+  outline: none;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: #b2ebf2;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+}
+
+input[type="checkbox"]:checked::before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: #ffd3b6;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+label {
+  color: #888;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background: linear-gradient(45deg, #ffd3b6, #b2ebf2);
+  color: #333;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: linear-gradient(45deg, #ffb299, #80d8ff);
+}
+</style>

@@ -1,0 +1,7 @@
+node_modules
+dist
+.cache
+coverage
+.parcel-cache
+.env
+.env.local
