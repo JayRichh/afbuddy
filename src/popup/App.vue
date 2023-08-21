@@ -60,6 +60,7 @@ import Geolocations from "./components/Geolocations.vue";
 import UserAgents from "./components/UserAgents.vue";
 import Info from "./components/Info.vue";
 import Tooltip from "./components/Tooltip.vue";
+import DoomPlayer from "./components/DoomPlayer.vue";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
 function calculateRotation() {
@@ -96,6 +97,7 @@ export default defineComponent({
     UserAgents,
     Info,
     Tooltip,
+    DoomPlayer
   },
   computed: {
     sunMoonStyles(): Record<string, string> {

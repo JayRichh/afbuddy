@@ -88,6 +88,14 @@ export default defineComponent({
         },
         {
           id: "6",
+          componentName: "DoomPlayer",
+          tooltip: "Doom",
+          iconSrc: require("../../../assets/icons/doom.png"),
+          altText: "doom-icon",
+          ariaLabel: "Doom",
+        },
+        {
+          id: "7",
           componentName: "Info",
           tooltip: "Info",
           iconSrc: require("../../../assets/icons/information.png"),
