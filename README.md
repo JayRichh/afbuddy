@@ -23,8 +23,7 @@ AF Buddy offers a suite of web tools to enhance the development experience and t
 <h2>🛠️ Features</h2> 
 
 - **Web Tools**: A wide array of functionalities for web development, including code controls, player integration, and geolocation services.
-- **Compatibility**: Seamless integration across all URLs, , browsers, and devices.
-- **Permissions Management**: Tailored permissions for a user-friendly experience.
+- **Compatibility**: Seamless integration across all URLs, browsers, and devices.
 - **Customizable Settings**: Personalize your development environment with adjustable themes, layouts, and preferences.
 - **Interactive Navigation**: A dynamic navigation bar that adapts to user needs, providing quick access to essential tools and features.
 - **Multi-Language Support**: Offers localization and internationalization, making the tool accessible to a global audience.
