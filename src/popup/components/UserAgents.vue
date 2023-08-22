@@ -61,11 +61,11 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .user-agent-container {
-  padding: 5px 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   height: 100%;
+  padding: 0 10px;
   margin: 0;
-  width: calc(100% - 20px);
+  width: 100%;
 }
 
 .input-group {

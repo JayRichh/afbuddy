@@ -75,23 +75,20 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 });
 
-chrome.runtime.onMessage.addListener(
-  (
-    request: { contentScriptQuery: string; url: string },
-    sender,
-    sendResponse
-  ) => {
-    if (request.contentScriptQuery === "getdata") {
-      const url = request.url;
-      fetch(url)
-        .then((response) => response.text())
-        .then((response) => sendResponse(response))
-        .catch((error) => console.log("Error:", error));
-      return true; // Will respond asynchronously.
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  if (request.contentScriptQuery === "getdata") {
+    try {
+      const response = await fetch(request.url);
+      const data = await response.text();
+      console.log("Data fetched:", data)
+      sendResponse(data);
+    } catch (error) {
+      console.log("Error fetching data:", error);
     }
-    return false;
+    return true;
   }
-);
+  return false;
+});
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request === "getWeatherData") {

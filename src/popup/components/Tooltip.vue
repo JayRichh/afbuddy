@@ -17,21 +17,19 @@ import {
   ref,
   onMounted,
   watch,
-  nextTick,
   Ref,
   onBeforeUnmount,
 } from "vue";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
-export interface TooltipRefType {
-  editorInstance: Ref<monaco.editor.IStandaloneCodeEditor | null>;
-}
-
-export interface IStandaloneThemeData {
-  base: string;
-  inherit: boolean;
-  rules: monaco.editor.ITokenThemeRule[];
-  colors: monaco.editor.IColors;
+interface Props {
+  content: string;
+  themeData: monaco.editor.IStandaloneThemeData;
+  x: number;
+  y: number;
+  visible: boolean;
+  theme: string;
+  isCodeEditorPreview: boolean;
 }
 
 export default defineComponent({
@@ -42,28 +40,32 @@ export default defineComponent({
     },
     themeData: {
       type: Object as () => monaco.editor.IStandaloneThemeData,
-      required: false,
       default: () => ({}),
     },
-    x: Number,
-    y: Number,
-    text: String,
-    visible: Boolean,
+    x: {
+      type: Number,
+      required: true,
+    },
+    y: {
+      type: Number,
+      required: true,
+    },
+    visible: {
+      type: Boolean,
+      required: true,
+    },
     theme: {
       type: String,
-      required: false,
-      default: "",
+      default: "vs-dark", // Defaulting to a known Monaco theme
     },
     isCodeEditorPreview: {
       type: Boolean,
-      required: false,
       default: false,
     },
   },
-  setup(props) {
+  setup(props: Props) {
     const monacoContainer = ref<HTMLElement | null>(null);
-
-    let editorInstance: Ref<monaco.editor.IStandaloneCodeEditor | null> = ref(
+    const editorInstance = ref<monaco.editor.IStandaloneCodeEditor | null>(
       null
     );
 
@@ -74,8 +76,10 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      if (props.visible) {
-        if (props.isCodeEditorPreview && monacoContainer.value) {
+      if (props.visible && props.isCodeEditorPreview && monacoContainer.value) {
+        if (editorInstance.value) {
+          editorInstance.value.setValue(props.content);
+        } else {
           editorInstance.value = monaco.editor.create(monacoContainer.value, {
             value: props.content,
             language: "javascript",
@@ -83,12 +87,11 @@ export default defineComponent({
             fontSize: 8,
             lineNumbers: "off",
           });
+        }
 
-          // Apply the theme data if available
-          if (Object.keys(props.themeData).length > 0) {
-            monaco.editor.defineTheme(props.theme, props.themeData);
-            monaco.editor.setTheme(props.theme); // Set theme after defining.
-          }
+        if (Object.keys(props.themeData).length > 0) {
+          monaco.editor.defineTheme(props.theme, props.themeData);
+          monaco.editor.setTheme(props.theme);
         }
       }
     });
@@ -105,10 +108,9 @@ export default defineComponent({
             lineNumbers: "off",
           });
 
-          // Apply the theme data if available
           if (Object.keys(props.themeData).length > 0) {
             monaco.editor.defineTheme(props.theme, props.themeData);
-            monaco.editor.setTheme(props.theme); // Set theme after defining.
+            monaco.editor.setTheme(props.theme);
           }
         }
       }

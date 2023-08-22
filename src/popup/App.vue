@@ -34,7 +34,7 @@
           <span class="title">{{ formatTitle(currentComponent) }}</span>
           <img
             class="paintbrush"
-            :class="{ spin: spinBrush }"
+            :class="{ spin: spinBrush, speedUp: speedUpBrush }"
             src="../../assets/icons/logo-bg-full.png"
             alt="Icon"
             @click="handleBrushClick"
@@ -62,16 +62,7 @@ import Info from "./components/Info.vue";
 import Tooltip from "./components/Tooltip.vue";
 import DoomPlayer from "./components/DoomPlayer.vue";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-
-function calculateRotation() {
-  const now = new Date();
-  const hours = now.getUTCHours();
-
-  let sunRotation = (hours / 24) * 360;
-  let moonRotation = (((hours + 12) % 24) / 24) * 360;
-
-  return { sunRotation, moonRotation };
-}
+import { calculateRotation } from "../utils/calculationUtils";
 
 interface Data {
   currentComponent: string;
@@ -97,7 +88,7 @@ export default defineComponent({
     UserAgents,
     Info,
     Tooltip,
-    DoomPlayer
+    DoomPlayer,
   },
   computed: {
     sunMoonStyles(): Record<string, string> {
@@ -118,11 +109,19 @@ export default defineComponent({
   },
   setup() {
     const spinBrush = ref(false);
+    const speedUpBrush = ref(false);
+
     const handleBrushClick = () => {
       spinBrush.value = !spinBrush.value;
+      if (spinBrush.value) {
+        speedUpBrush.value = true;
+        setTimeout(() => {
+          speedUpBrush.value = false;
+        }, 1000); // Reset after 1 second
+      }
     };
 
-    return { spinBrush, handleBrushClick };
+    return { spinBrush, speedUpBrush, handleBrushClick };
   },
   data() {
     const rotationData = calculateRotation();
@@ -152,6 +151,12 @@ export default defineComponent({
       } else {
         document.body.style.backgroundImage = "url(../../assets/moon.svg)";
       }
+    },
+    sunRotation() {
+      this.rotateSunOrMoon();
+    },
+    moonRotation() {
+      this.rotateSunOrMoon();
     },
   },
   methods: {
@@ -240,23 +245,6 @@ export default defineComponent({
 
 <style scoped lang="scss">
 /* Global Image Styles */
-.sun,
-.moon {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform-origin: 50% 100%;
-}
-
-.sun {
-  transition: transform 0.5s;
-  transform: rotate(var(--sun-rotation-deg) deg);
-}
-
-.moon {
-  transition: transform 0.5s;
-  transform: rotate(var(--moon-rotation-deg) deg);
-}
 .cloud1,
 .cloud2 {
   position: absolute;
@@ -286,60 +274,65 @@ export default defineComponent({
   }
 }
 
-img {
-  height: 3rem;
-  width: 3rem;
-}
-
-img:hover {
-  transform: scale(1.02);
-}
-
-img:active {
-  transform: scale(0.98);
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(75, 75, 75, 0.8) rgba(50, 50, 50, 0.6);
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-track {
-    background: rgba(50, 50, 50, 0.6);
-    border-radius: 3px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: rgba(75, 75, 75, 0.8);
-    border-radius: 3px;
-    &:hover {
-      background-color: rgba(85, 85, 85, 0.9);
-    }
-  }
-}
-
 .container {
   display: flex;
   height: 100%;
   width: 100%;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  background-color: #f6f8fa;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  position: relative;
+  opacity: 0.85;
+
+  .sun {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform-origin: 50% 100%;
+    transition: transform 0.5s;
+    transform: rotate(var(--sun-rotation-deg) deg);
+  }
+
+  .moon {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform-origin: 50% 100%;
+    transition: transform 0.5s;
+    transform: rotate(var(--moon-rotation-deg) deg);
+  }
 }
 
 .navbar-container {
-  width: 38px;
-  max-width: 36px;
-  height: 100%;
-  background-color: #f6f8fa;
+  width: 50px;
+  height: 100vh !important;
+  margin: 0;
+  padding: 5px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  background: linear-gradient(to bottom, #222, #444);
   overflow-y: hidden;
+  overflow-x: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .app-container {
   display: flex;
   flex-direction: column;
-  background-color: #f6f8fa;
+  align-items: center;
+  justify-content: start;
   width: 100%;
   height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
+  background-color: rgba(246, 248, 250, 0.9);
+  margin: 0;
+  padding: 0;
   flex: 1;
 }
 
@@ -347,11 +340,14 @@ img:active {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font: 1.2rem monospace;
-  font-weight: 500;
   width: 100%;
+  height: auto;
   background-color: #f6f8fa;
   border-bottom: 1px solid #e0e0e0;
+  flex: 1;
+  box-sizing: border-box;
+  margin: 0; 
+  padding: 0;
 }
 
 .title-icon-wrapper {
@@ -359,24 +355,82 @@ img:active {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  height: 100%;
+  padding: 1rem 0;
+  margin: 0;
 }
 
 .paintbrush {
-  margin: 0 15px 0 0;
   transform-origin: center;
-  &:hover {
-    cursor: pointer;
-    animation: rotate 2s linear infinite;
-  }
+  z-index: 10000 !important;
+  width: 64px;
+  height: 64px;
+  opacity: 0.8;
+  transition: transform 0.5s ease-out;
+  animation: rotate 2s linear infinite;
+  animation-play-state: paused;
+  margin: 0.5rem 0 1rem 1rem;
+
   &.spin {
+    animation-play-state: running;
+  }
+
+  .speedUp {
+    animation: spinAndRubberBand 1s linear infinite;
+    opacity: 1;
+  }
+
+  &:hover {
+    animation: rockBrush 1.5s ease-in-out infinite;
+    cursor: pointer;
+    opacity: calc(0.8 + 0.2 * var(--speed));
+  }
+
+  &:active {
     animation: throwBrush 1s ease forwards;
+    cursor: pointer;
+    opacity: 1;
   }
 }
 
 .title {
-  font-family: "Arial", sans-serif;
+  font: 1.3rem monospace;
+  letter-spacing: 0.075rem;
+  margin: 0;
+  padding: 1rem 0.5rem 1rem 0.5rem;
+  border-radius: 8px 0 0 8px;
+  background-color: #f6f8fa;
+  color: #333;
   font-weight: bold;
-  margin-left: 10px;
+  text-transform: uppercase;
+  border-right: 1px solid #e0e0e0;
+  flex: 1;
+  width: calc(100% - 150px);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes rockBrush {
+  0% {
+    transform: rotate(-5deg);
+  }
+  25% {
+    transform: rotate(10deg);
+  }
+  50% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 @keyframes spinAndRubberBand {
@@ -431,6 +485,7 @@ button {
   padding: 0.5rem 1rem;
   background-color: #007bff;
   color: white;
+
   &:hover {
     background-color: #0056b3;
   }
@@ -441,9 +496,12 @@ input[type="number"] {
   padding: 0.5rem;
   border: 1px solid #ced4da;
   border-radius: 4px;
+  width: 100%;
+
   &:hover {
     border-color: #80bdff;
   }
+
   &:focus {
     border-color: #80bdff;
     outline: 0;
@@ -453,6 +511,7 @@ input[type="number"] {
 
 select option {
   padding: 0.5rem 1rem;
+
   &:hover {
     background-color: #80bdff;
     color: white;

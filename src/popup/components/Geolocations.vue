@@ -6,7 +6,7 @@
         <input
           type="text"
           id="timezone"
-          placeholder="Enter TimeZone"
+          placeholder="Asia/Kolkata"
           v-model="timezone"
           aria-label="Time Zone"
         />
@@ -17,7 +17,7 @@
         <input
           type="text"
           id="locale"
-          placeholder="Enter Locale"
+          placeholder="en-US"
           v-model="locale"
           aria-label="Locale"
         />
@@ -28,7 +28,7 @@
         <input
           type="text"
           id="latitude"
-          placeholder="Enter Latitude"
+          placeholder="19.0760"
           v-model="latitude"
           aria-label="Latitude"
         />
@@ -39,7 +39,7 @@
         <input
           type="text"
           id="longitude"
-          placeholder="Enter Longitude"
+          placeholder="72.8777"
           v-model="longitude"
           aria-label="Longitude"
         />
@@ -47,7 +47,9 @@
 
       <div class="checkbox-group">
         <input type="checkbox" id="defaultGeo" v-model="useDefault" />
-        <label for="defaultGeo">Use Browser's Default Geolocation</label>
+        <label 
+        style="cursor: pointer;font-size: 1rem;"
+        for="defaultGeo">Use Browser's Default Geolocation</label>
       </div>
 
       <button type="submit">Spoof Location</button>
@@ -88,17 +90,23 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .geo-container {
-  padding: 5px 10px;
+  padding: 0.5rem 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   height: 100%;
+  width: 100%;
   margin: 0;
-  width: calc(100% - 20px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-x: hidden;
 }
 
 .title {
   font-size: 1.5rem;
   text-align: center;
-  margin-bottom: 1rem;
+  margin: 0;
+  padding: 0;
   color: #333;
 }
 
@@ -107,15 +115,15 @@ export default defineComponent({
   flex-direction: column;
   gap: 0.5rem;
   margin-bottom: 1rem;
+
 }
 
 input[type="text"] {
-  padding: 0.5rem;
+  padding: 0 0.5rem;
   border: 2px solid #b2ebf2;
   border-radius: 4px;
   color: #333;
   transition: border-color 0.3s ease;
-  /* placeholder-color: #888; */
 }
 
 input[type="text"]:focus {

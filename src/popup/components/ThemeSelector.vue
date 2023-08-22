@@ -7,6 +7,7 @@
     :isCodeEditorPreview="true"
     :themeData="themeCache[selectedTheme] || {}"
     :theme="selectedTheme"
+    :visible="showTooltip"
   ></Tooltip>
   <div class="theme-selector-container">
     <label for="theme-select" class="theme-label">Select Theme:</label>
@@ -25,10 +26,10 @@
 
     <div class="button-group">
       <button @click="applySelectedTheme" class="primary-btn">
-        Apply Theme
+        Apply
       </button>
       <button @click="setDefaultTheme" class="secondary-btn">
-        Default Theme
+        Default
       </button>
     </div>
   </div>
@@ -53,7 +54,7 @@ interface Data {
   tooltipX: number;
   tooltipY: number;
   themeCache: Record<string, monaco.editor.IStandaloneThemeData>;
-  themeList: string[];
+  themeListArr: string[];
 }
 
 export default defineComponent({
@@ -73,12 +74,13 @@ export default defineComponent({
       tooltipX: 0,
       tooltipY: 0,
       themeCache: {},
-      themeList: themeList,
+      themeListArr: [],
     };
   },
   async mounted() {
-    this.themes = themeList;
+    this.themes = JSON.parse(JSON.stringify(themeList));
     console.log(this.themes);
+    console.log({ EventTarget });
 
     chrome.storage.local.get("selectedTheme", (data) => {
       if (data && data.selectedTheme) {
@@ -98,9 +100,8 @@ export default defineComponent({
       if (target && target.value) {
         const cachedTheme = this.themeCache[target.value];
         let url = chrome.runtime.getURL(
-          `/popup/utils/themes/${encodeURIComponent(target.value)}.json`
+          `/assets/themes/${encodeURIComponent(target.value)}.json`
         );
-        console.log(url);
 
         if (cachedTheme) {
           this.$emit("showThemeTooltip", {
@@ -109,12 +110,10 @@ export default defineComponent({
             theme: target.value,
             themeData: cachedTheme,
           });
-          console.log("cached theme found");
           return;
         }
 
         const response: string = await new Promise((resolve) => {
-          console.log("sending message");
           chrome.runtime.sendMessage(
             { contentScriptQuery: "getdata", url: url },
             (response: string) => {
@@ -139,6 +138,7 @@ export default defineComponent({
         }
       }
     },
+
     adjustTooltipPosition(event: MouseEvent): void {
       this.tooltipX = event.clientX + 10;
       this.tooltipY = event.clientY + 10;
@@ -162,7 +162,7 @@ export default defineComponent({
     async applyTooltipTheme(theme: string): Promise<void> {
       console.log("theme:", theme);
       let url = chrome.runtime.getURL(
-        `/popup/utils/themes/${encodeURIComponent(theme)}.json`
+        `/assets/themes/${encodeURIComponent(theme)}.json`
       );
       console.log(url);
 
@@ -198,13 +198,14 @@ export default defineComponent({
         console.error("Error fetching theme data. Error: ", error);
       }
     },
-    applySelectedTheme() {
-      this.applyTooltipTheme(this.selectedTheme);
-
-      this.setToStorage("selectedTheme", this.selectedTheme);
-
-      this.$emit("applySelectedTheme", this.selectedTheme);
-      this.$emit("applyTooltipTheme", this.selectedTheme);
+    async applySelectedTheme() {
+      try {
+        await this.setToStorage("selectedTheme", this.selectedTheme);
+        this.$emit("applySelectedTheme", this.selectedTheme);
+        this.$emit("applyTooltipTheme", this.selectedTheme);
+      } catch (error) {
+        console.error("Error applying selected theme. Error: ", error);
+      }
     },
     getFromStorage(key: string): Promise<any> {
       return new Promise((resolve) => {
@@ -227,7 +228,8 @@ export default defineComponent({
     loadCode() {
       chrome.runtime.sendMessage({ action: "loadCode" });
     },
-    setToStorage(key: string, value: any): Promise<boolean> {
+
+    async setToStorage(key: string, value: any): Promise<boolean> {
       return new Promise((resolve, reject) => {
         chrome.storage.local.set({ [key]: value }, () => {
           if (chrome.runtime.lastError) {
@@ -242,7 +244,18 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+template {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 button {
   padding: 10px 20px;
   border: none;
@@ -269,7 +282,13 @@ button:active {
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: 2em;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 10px;
+  box-sizing: border-box;
+  gap: 10px;
+  
 }
 
 select {
@@ -286,6 +305,16 @@ select {
   background-repeat: no-repeat;
   background-position: 95% center;
   padding-right: 35px;
+  cursor: pointer;
+}
+
+option {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px lightgray solid;
+  background-color: #f3f3f3;
+  transition: box-shadow 0.3s ease-in-out;
+  cursor: pointer;
 }
 
 select:hover {
@@ -308,25 +337,48 @@ label {
 
 .theme-label {
   text-transform: uppercase;
-  font-size: 0.8em;
   font-weight: bold;
+  padding: 0;
   margin-bottom: 0;
   color: #555;
-  padding: 0;
-  position: relative;
-  top: -1.5em;
-  left: 0.5em;
+  display: block;
+  text-align: left;
+
 }
 
 .primary-btn {
   background-color: #4caf50; /* Green background */
   color: white;
   margin-right: 10px;
+  &::after {
+    content: "✓";
+  }
+
+  &::hover {
+    transform: scale(1.02) translateY(-1px) translateX(1px) !important;
+  }
+
+  &::active {
+    transform: scale(0.98) !important;
+  }
 }
 
 .secondary-btn {
   background-color: #ff5722; /* Orange background */
   color: white;
+
+  &::after {
+    content: "x";
+  }
+
+  &::hover {
+    animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    transform: scale(1.02) translateY(-1px) translateX(1px) !important;
+  }
+
+  &::active {
+    transform: scale(0.98) !important;
+  }
 }
 
 .button-group {

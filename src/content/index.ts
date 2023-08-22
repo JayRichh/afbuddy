@@ -43,7 +43,7 @@ chrome.runtime.onMessage.addListener((message) => {
 
   try {
     switch (message.action) {
-      case "applyTheme": {
+      case "applyTooltipTheme": {
         if (message.themeData && message.themeData.name) {
           console.log("Applying theme:", message.themeName);
           const themeDataString = JSON.stringify(message.themeData);
