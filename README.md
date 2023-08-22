@@ -49,7 +49,7 @@ AF Buddy provides:
 | Axios             | v0.27.2 |
 | Monaco Editor     | v0.41.0 |
 
-<br>
+
 ## Installation Guide 📥
 Follow these steps:
 1. Visit [Chrome Web Store](link-to-chrome-web-store).
@@ -57,26 +57,24 @@ Follow these steps:
 3. Click 'Add to Chrome'.
 4. Confirm the installation.
 5. Enjoy the extension!
-
 <br>
 ## Usage Guide 📘
 Refer to the [project documentation](link-to-documentation) for detailed instructions and examples.
 
-<br>
+
 ## Development and Build Process 🧪
 - **Build Scripts**: Component-specific build scripts using Parcel.
 - **Linting**: ESLint with TypeScript support for code quality.
 - **Continuous Integration**: Automated build and deployment process.
 
-<br>
+
 ## License Information 📜
 MIT License.
 
-<br>
+
 ## Internationalization 🌍
 AF Buddy supports multiple languages, including English and Norwegian. To switch the front-facing text to Norwegian, follow these steps:
 1. Open the extension settings.
 2. Navigate to the 'Language' section.
 3. Select 'Norwegian' from the dropdown menu.
 4. Click 'Save' to apply the changes.
-
