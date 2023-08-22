@@ -6,7 +6,7 @@
 
 <p align="center">
   <h1 style="font-family: Arial, sans-serif; color: #333; display: inline;">
-  <img src="/assets/icons/logo-bg-32.png" alt="image" />
+  <img src="/assets/icons/logo-bg-48.png" alt="image" />
     <span> AF Buddy: The Appframe developers toolkit. </span>  
   </h1>
 </p>
