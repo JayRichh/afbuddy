@@ -13,16 +13,15 @@
 ## Introduction
 AF Buddy offers a suite of web tools to enhance the development experience and to build reliable and versitile web apps. It's designed with modern technologies, ensuring a robust and seamless experience.
 
+<h2>🛠️ Features</h2> 
 
-## Features 🛠️
-AF Buddy provides:
 - **Web Tools**: A wide array of functionalities for web development, including code controls, player integration, and geolocation services.
 - **Compatibility**: Seamless integration across all URLs, , browsers, and devices.
 - **Permissions Management**: Tailored permissions for a user-friendly experience.
 - **Customizable Settings**: Personalize your development environment with adjustable themes, layouts, and preferences.
 - **Interactive Navigation**: A dynamic navigation bar that adapts to user needs, providing quick access to essential tools and features.
 - **Multi-Language Support**: Offers localization and internationalization, making the tool accessible to a global audience.
-<br>
+
 
 <details>
 <summary><i>Table of Contents:</i></summary>
@@ -38,7 +37,9 @@ AF Buddy provides:
 
 </details>
 
-## Technology Stack 💻
+
+<h2>💻 Technology Stack</h2> 
+
 | Technology        | Version |
 |-------------------|---------|
 | React             | v18.2.0 |
@@ -50,29 +51,34 @@ AF Buddy provides:
 | Monaco Editor     | v0.41.0 |
 
 
-## Installation Guide 📥
+<h2>📥 Installation Guide</h2> 
+
 Follow these steps:
 1. Visit [Chrome Web Store](link-to-chrome-web-store).
 2. Search for 'AfBuddy'.
 3. Click 'Add to Chrome'.
 4. Confirm the installation.
 5. Enjoy the extension!
-<br>
-## Usage Guide 📘
+
+
+<h2>📘 Usage Guide</h2> 
+
 Refer to the [project documentation](link-to-documentation) for detailed instructions and examples.
 
 
-## Development and Build Process 🧪
-- **Build Scripts**: Component-specific build scripts using Parcel.
+<h2>🧪 Development and Build Process</h2> 
+
 - **Linting**: ESLint with TypeScript support for code quality.
 - **Continuous Integration**: Automated build and deployment process.
 
 
-## License Information 📜
-MIT License.
+<h2>📜 License</h2> 
+
+MIT.
 
 
-## Internationalization 🌍
+<h2>🌍 Internationalization</h2> 
+
 AF Buddy supports multiple languages, including English and Norwegian. To switch the front-facing text to Norwegian, follow these steps:
 1. Open the extension settings.
 2. Navigate to the 'Language' section.
