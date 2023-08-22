@@ -1,7 +1,7 @@
 <p align="center">
   
-  <img src="https://github.com/JayRichh/afbuddy/assets/18374849/f3ebe93a-df30-4fe0-90e9-839735522217" alt="image" />
-  
+  <img src="https://github.com/JayRichh/afbuddy/assets/18374849/d4187421-6c7d-457d-8505-75c7c2a5e9aa" alt="image" />
+
 </p>
 
 <p align="center">
