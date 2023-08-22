@@ -343,10 +343,9 @@ export default defineComponent({
   width: 100%;
   height: auto;
   background-color: #f6f8fa;
-  border-bottom: 1px solid #e0e0e0;
   flex: 1;
   box-sizing: border-box;
-  margin: 0; 
+  margin: 0;
   padding: 0;
 }
 
@@ -356,7 +355,7 @@ export default defineComponent({
   justify-content: space-between;
   width: 100%;
   height: 100%;
-  padding: 1rem 0;
+  padding: 0;
   margin: 0;
 }
 
@@ -365,11 +364,12 @@ export default defineComponent({
   z-index: 10000 !important;
   width: 64px;
   height: 64px;
-  opacity: 0.8;
+  opacity: 1;
   transition: transform 0.5s ease-out;
   animation: rotate 2s linear infinite;
   animation-play-state: paused;
-  margin: 0.5rem 0 1rem 1rem;
+  margin: 0.4rem 0.5rem 0 0;
+  padding: 0;
 
   &.spin {
     animation-play-state: running;
@@ -396,14 +396,13 @@ export default defineComponent({
 .title {
   font: 1.3rem monospace;
   letter-spacing: 0.075rem;
-  margin: 0;
-  padding: 1rem 0.5rem 1rem 0.5rem;
+  margin: 0.5rem 0 0.5rem 0.5rem;
+  padding: 0;
   border-radius: 8px 0 0 8px;
   background-color: #f6f8fa;
   color: #333;
   font-weight: bold;
   text-transform: uppercase;
-  border-right: 1px solid #e0e0e0;
   flex: 1;
   width: calc(100% - 150px);
   height: 100%;
@@ -413,6 +412,24 @@ export default defineComponent({
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  position: relative;
+}
+
+.title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #5a6b7c;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.title:hover::after {
+  transform: scaleX(1);
 }
 
 @keyframes rockBrush {
@@ -475,7 +492,6 @@ export default defineComponent({
 
 label {
   font-weight: 500;
-  margin-bottom: 0.5rem;
 }
 
 button {

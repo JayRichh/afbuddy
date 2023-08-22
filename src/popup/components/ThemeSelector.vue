@@ -288,7 +288,6 @@ button:active {
   padding: 10px;
   box-sizing: border-box;
   gap: 10px;
-  
 }
 
 select {
@@ -296,16 +295,21 @@ select {
   outline: none;
   border-radius: 5px;
   border: 1px lightgray solid;
+  background-color: #f3f3f3;
+  transition: box-shadow 0.3s ease-in-out;
+  cursor: pointer;
+  width: 80%;
+  max-width: 300px;
+  box-sizing: border-box;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #555;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-color: #f3f3f3;
-  transition: box-shadow 0.3s ease-in-out;
   background-image: url("../../../assets/dropdown-arrow.svg");
   background-repeat: no-repeat;
   background-position: 95% center;
-  padding-right: 35px;
-  cursor: pointer;
 }
 
 option {
@@ -315,6 +319,8 @@ option {
   background-color: #f3f3f3;
   transition: box-shadow 0.3s ease-in-out;
   cursor: pointer;
+  width: 100%;
+  max-width: 300px;
 }
 
 select:hover {
@@ -343,22 +349,24 @@ label {
   color: #555;
   display: block;
   text-align: left;
-
 }
 
 .primary-btn {
   background-color: #4caf50; /* Green background */
   color: white;
   margin-right: 10px;
-  &::after {
-    content: "✓";
-  }
+  padding: 10px 25px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-right: 10px;
 
-  &::hover {
+  &:hover {
     transform: scale(1.02) translateY(-1px) translateX(1px) !important;
   }
 
-  &::active {
+  &:active {
     transform: scale(0.98) !important;
   }
 }
@@ -366,17 +374,19 @@ label {
 .secondary-btn {
   background-color: #ff5722; /* Orange background */
   color: white;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-left: 10px;
 
-  &::after {
-    content: "x";
-  }
-
-  &::hover {
+  &:hover {
     animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     transform: scale(1.02) translateY(-1px) translateX(1px) !important;
   }
 
-  &::active {
+  &:active {
     transform: scale(0.98) !important;
   }
 }
@@ -385,6 +395,6 @@ label {
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-top: 20px;
+  margin: 10px 0px;
 }
 </style>
