@@ -9,11 +9,23 @@
 [![Languages](https://img.shields.io/badge/%20Languages%20-%20English%20|%20Norwegian-ffeb3b?style=flat-square&logo=languages&logoColor=black)](link-to-languages)<br>
 [![Awards](https://img.shields.io/badge/%20Awards%20-%20Best%20Development%20Buddy%20|%20Rubber%20Duck-gold?style=flat-square&logo=award&logoColor=black)](link-to-award)
 
+
 ## Introduction
 AF Buddy offers a suite of web tools to enhance the development experience and to build reliable and versitile web apps. It's designed with modern technologies, ensuring a robust and seamless experience.
 
-<details open>
-<summary>Table of Contents:</summary>
+
+## Features 🛠️
+AF Buddy provides:
+- **Web Tools**: A wide array of functionalities for web development, including code controls, player integration, and geolocation services.
+- **Compatibility**: Seamless integration across all URLs, , browsers, and devices.
+- **Permissions Management**: Tailored permissions for a user-friendly experience.
+- **Customizable Settings**: Personalize your development environment with adjustable themes, layouts, and preferences.
+- **Interactive Navigation**: A dynamic navigation bar that adapts to user needs, providing quick access to essential tools and features.
+- **Multi-Language Support**: Offers localization and internationalization, making the tool accessible to a global audience.
+<br>
+
+<details>
+<summary><i>Table of Contents:</i></summary>
 
 1. [Introduction](#introduction)
 2. [Features](#features)
@@ -26,13 +38,6 @@ AF Buddy offers a suite of web tools to enhance the development experience and t
 
 </details>
 
-## Features 🛠️
-AF Buddy provides:
-- **Web Tools**: A wide array of functionalities for web development.
-- **Compatibility**: Seamless integration across all URLs.
-- **Permissions Management**: Tailored permissions for a user-friendly experience.
-- **Customizable Settings**: Personalize your development environment.
-
 ## Technology Stack 💻
 | Technology        | Version |
 |-------------------|---------|
@@ -44,6 +49,7 @@ AF Buddy provides:
 | Axios             | v0.27.2 |
 | Monaco Editor     | v0.41.0 |
 
+<br>
 ## Installation Guide 📥
 Follow these steps:
 1. Visit [Chrome Web Store](link-to-chrome-web-store).
@@ -52,17 +58,21 @@ Follow these steps:
 4. Confirm the installation.
 5. Enjoy the extension!
 
+<br>
 ## Usage Guide 📘
 Refer to the [project documentation](link-to-documentation) for detailed instructions and examples.
 
+<br>
 ## Development and Build Process 🧪
 - **Build Scripts**: Component-specific build scripts using Parcel.
 - **Linting**: ESLint with TypeScript support for code quality.
 - **Continuous Integration**: Automated build and deployment process.
 
+<br>
 ## License Information 📜
 MIT License.
 
+<br>
 ## Internationalization 🌍
 AF Buddy supports multiple languages, including English and Norwegian. To switch the front-facing text to Norwegian, follow these steps:
 1. Open the extension settings.
