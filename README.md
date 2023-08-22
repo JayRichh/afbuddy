@@ -1,8 +1,12 @@
 <p align="center">
-  <img src="assets/icons/logo-bg-128.png">
+  
+  ![image](https://github.com/JayRichh/afbuddy/assets/18374849/f3ebe93a-df30-4fe0-90e9-839735522217)
+  
 </p>
 
-# AF Buddy: The Appframe developers toolkit. 
+<p align="center">
+  <h1 style="font-family: Arial, sans-serif; color: #333;">AF Buddy: The Appframe developers toolkit.</h1>
+</p>
 
 [![Features](https://img.shields.io/badge/%20Features%20-%20Web%20Styling%20|%20Themes%20|%20Save/Load%20Snippets%20|%20User--Agents%20|%20Geolocation-007bff?style=flat-square&logo=features&logoColor=white)](link-to-features)<br>
 [![Stack](https://img.shields.io/badge/%20Tech%20-%20React%20|%20Vue%20|%20TypeScript-4caf50?style=flat-square&logo=technology&logoColor=white)](link-to-technologies)<br>
