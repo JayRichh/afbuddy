@@ -12,7 +12,11 @@
         isActive(item.componentName) ? 'active' : '',
         item.selected ? 'selected' : '',
       ]"
-      @mouseover="hoverMouse($event, item.ariaLabel)"
+      @mouseover="
+        hoverMouse($event, item.ariaLabel);
+        magneticPullEffect($event, item.ariaLabel);
+      "
+      @mouseout="resetIcon(item.ariaLabel)"
       @mousedown="startDrag($event, item.ariaLabel)"
     >
       <div class="icon-mask" :id="`${item.ariaLabel}Mask`">
@@ -138,6 +142,35 @@ export default defineComponent({
   },
 
   methods: {
+    magneticPullEffect(event: MouseEvent, ariaLabel: string): void {
+      const iconContainer = document.getElementById(ariaLabel);
+      if (!iconContainer || this.isDragging) return;
+
+      const distance = this.calculateDistance(event, ariaLabel);
+      const scale = 1 + distance / 100;
+
+      gsap.to(iconContainer, 0.3, {
+        scale: scale,
+        ease: Power2.easeOut,
+      });
+    },
+
+    calculateDistance(event: MouseEvent, ariaLabel: string): number {
+      const iconContainer = document.getElementById(ariaLabel);
+      if (!iconContainer) return 0;
+
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
+      const iconX =
+        iconContainer.getBoundingClientRect().left +
+        iconContainer.offsetWidth / 2;
+      const iconY =
+        iconContainer.getBoundingClientRect().top +
+        iconContainer.offsetHeight / 2;
+
+      return Math.sqrt((mouseX - iconX) ** 2 + (mouseY - iconY) ** 2);
+    },
+
     resetIcon(ariaLabel: string) {
       const iconContainer = document.getElementById(ariaLabel);
       if (iconContainer) {
@@ -167,7 +200,8 @@ export default defineComponent({
       this.draggedIcon = ariaLabel;
 
       const onMouseMove = (event: MouseEvent) => {
-        const { clipWidth, navbarRight } = this.calculateClipWidthAndNavbarRight(event, ariaLabel);
+        const { clipWidth, navbarRight } =
+          this.calculateClipWidthAndNavbarRight(event, ariaLabel);
         gsap.to(iconContainer, 0.7, {
           x: event.clientX - navbarRight,
           y: event.clientY - 20,
@@ -193,8 +227,12 @@ export default defineComponent({
     clipIcons(ariaLabel: string, clipWidth: number): void {
       if (this.isDragging && ariaLabel === this.draggedIcon) {
         const iconContainer = document.getElementById(ariaLabel);
-        const whiteIcon = iconContainer?.querySelector(".white-icon") as HTMLElement;
-        const blackIcon = iconContainer?.querySelector(".black-icon") as HTMLElement;
+        const whiteIcon = iconContainer?.querySelector(
+          ".white-icon"
+        ) as HTMLElement;
+        const blackIcon = iconContainer?.querySelector(
+          ".black-icon"
+        ) as HTMLElement;
 
         gsap.to(whiteIcon, 0.7, {
           clipPath: `inset(0 0 0 ${50 + clipWidth}px)`,
@@ -219,7 +257,10 @@ export default defineComponent({
       const navbarLeft = iconContainer.getBoundingClientRect().left + 50; // 50px from left edge
       const navbarRight = iconContainer.getBoundingClientRect().right;
       const offsetX = event.clientX - initialX;
-      const clipWidth = Math.min(offsetX, 40); // Clip up to 40px
+      const clipWidth = Math.min(
+        Math.max(0, navbarRight - navbarLeft + offsetX),
+        100
+      );
 
       return { clipWidth, navbarRight };
     },
