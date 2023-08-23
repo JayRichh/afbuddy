@@ -76,12 +76,12 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  if (request.contentScriptQuery === "getdata") {
+  if (request.action === "getdata") {
     try {
       const response = await fetch(request.url);
       const data = await response.text();
-      console.log("Data fetched:", data)
-      sendResponse(data);
+      console.log("Data fetched:", data);
+      sendResponse({ themeData: data });
     } catch (error) {
       console.log("Error fetching data:", error);
     }

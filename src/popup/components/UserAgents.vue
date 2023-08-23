@@ -66,17 +66,21 @@ export default defineComponent({
   padding: 0 10px;
   margin: 0;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  box-sizing: border-box;
 }
 
 .input-group {
   display: flex;
-  flex-direction: column;
-  padding: 0;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-button:hover {
-  background: linear-gradient(45deg, #ffb299, #80d8ff);
-}
 .feedback-message {
   margin-top: 1rem;
   color: #4caf50;
@@ -95,6 +99,17 @@ select {
   background: url("../../../assets/dropdown-arrow.svg") no-repeat right 0.5rem
     center;
   padding-right: 2rem;
+  background-size: 1rem;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+option {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
 }
 
 .button-group {
@@ -114,6 +129,10 @@ button {
 
 button:active {
   transform: scale(0.98);
+}
+
+button:hover {
+  background: linear-gradient(45deg, #ffb299, #80d8ff);
 }
 
 .agent-card {

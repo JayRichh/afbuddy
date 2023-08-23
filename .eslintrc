@@ -31,7 +31,7 @@
     {
       "files": ["src/**/*.test.ts"],
       "env": {
-        "jest": true
+        "jest": false
       }
     }
   ],

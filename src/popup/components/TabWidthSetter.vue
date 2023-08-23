@@ -36,11 +36,17 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .tab-width-container {
-  padding: 5px 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   height: 100%;
+  width: 100%;
+  padding: 1rem;
   margin: 0;
-  width: calc(100% - 20px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  box-sizing: border-box;
 }
 
 .title {

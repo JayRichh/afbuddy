@@ -45,19 +45,7 @@ chrome.runtime.onMessage.addListener((message) => {
     switch (message.action) {
       case "applyTooltipTheme": {
         if (message.themeData && message.themeData.name) {
-          console.log("Applying theme:", message.themeName);
           const themeDataString = JSON.stringify(message.themeData);
-          console.log(
-            "Theme data:",
-            themeDataString.replace(/"([^"]+)":/g, "$1:") // Remove quotes around keys
-          );
-
-          console.log("Defining theme:", message.themeData.name);
-          console.log(
-            iframe,
-            `editor.defineTheme('${message.themeData.name}', ${themeDataString});`
-          );
-          // NOTE: Ensure themeData.name and themeDataString are safe to use!
           evalInIframe(
             iframe,
             `editor.defineTheme('${message.themeData.name}', ${themeDataString});`
@@ -82,7 +70,7 @@ chrome.runtime.onMessage.addListener((message) => {
       case "saveCode": {
         try {
           const codeToSave = evalInIframe(iframe, `editor.getValue()`);
-          chrome.storage.local.set({ savedCode: codeToSave }, function() {
+          chrome.storage.local.set({ savedCode: codeToSave }, function () {
             if (chrome.runtime.lastError) {
               console.error("Error saving code:", chrome.runtime.lastError);
             } else {

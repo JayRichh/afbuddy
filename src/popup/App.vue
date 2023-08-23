@@ -10,18 +10,17 @@
       v-if="showTooltip"
       :x="tooltipX"
       :y="tooltipY"
-      :text="tooltipText"
+      :content="tooltipText"
       :visible="showTooltip"
       :theme="theme"
       :themeData="themeData"
       :isCodeEditorPreview="!!theme"
-      :content="tooltipText"
     />
     <div
       class="navbar-container"
       @mouseover="handleMouseOver"
       @mousemove="adjustTooltipPosition"
-      @mouseout="handleMouseOut"
+      @mouseout="handleIconMouseOut"
     >
       <Navbar
         @changeComponent="handleComponentChange"
@@ -33,6 +32,7 @@
         <div class="title-icon-wrapper">
           <span class="title">{{ formatTitle(currentComponent) }}</span>
           <img
+            id="iconToChangeColor"
             class="paintbrush"
             :class="{ spin: spinBrush, speedUp: speedUpBrush }"
             src="../../assets/icons/logo-bg-full.png"
@@ -42,6 +42,7 @@
         </div>
       </div>
       <component
+        class="app-content"
         :is="currentComponent"
         v-bind="$attrs"
         @changeComponent="handleComponentChange"
@@ -78,6 +79,7 @@ interface Data {
   sunRotation: number;
   moonRotation: number;
 }
+
 export default defineComponent({
   components: {
     Navbar,
@@ -123,7 +125,7 @@ export default defineComponent({
 
     return { spinBrush, speedUpBrush, handleBrushClick };
   },
-  data() {
+  data(): Data {
     const rotationData = calculateRotation();
     return {
       currentComponent: "ThemeSelector",
@@ -173,6 +175,18 @@ export default defineComponent({
         this.tooltipX = event.pageX;
         this.tooltipY = event.pageY;
       }
+    },
+    handleIconMouseOver() {
+      const icon = document.getElementById(
+        "iconToChangeColor"
+      ) as HTMLImageElement;
+      icon.style.filter = "invert(1)";
+    },
+    handleIconMouseOut() {
+      const icon = document.getElementById(
+        "iconToChangeColor"
+      ) as HTMLImageElement;
+      icon.style.filter = "invert(0)";
     },
     handleComponentChange(componentName: string) {
       this.currentComponent = componentName;
@@ -274,51 +288,73 @@ export default defineComponent({
   }
 }
 
-.container {
-  display: flex;
-  height: 100%;
+.app-content {
   width: 100%;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  background-color: #f6f8fa;
+  height: calc(100% - 60px);
+  max-height: calc(100% - 60px);
   margin: 0;
   padding: 0;
   flex: 1;
   position: relative;
-  opacity: 0.85;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
-  .sun {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform-origin: 50% 100%;
-    transition: transform 0.5s;
-    transform: rotate(var(--sun-rotation-deg) deg);
-  }
+.container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  width: 100%;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  background-color: rgba(246, 248, 250, 0.9);
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
 
+  .sun,
   .moon {
     position: absolute;
     bottom: 0;
     left: 50%;
     transform-origin: 50% 100%;
     transition: transform 0.5s;
-    transform: rotate(var(--moon-rotation-deg) deg);
+    transform: rotate(var(--sun-rotation-deg) deg);
+    z-index: 10001;
   }
 }
 
 .navbar-container {
   width: 50px;
+  max-width: 50px;
   height: 100vh !important;
   margin: 0;
-  padding: 5px 0 0 0;
+  padding: 5px 0 5px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: start;
-  background: linear-gradient(to bottom, #222, #444);
+  background: linear-gradient(to bottom, #1c1c1c, #454545);
   overflow-y: hidden;
-  overflow-x: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  position: relative;
+  z-index: 9999 !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .app-container {
@@ -326,27 +362,41 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   justify-content: start;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background-color: rgba(246, 248, 250, 0.9);
+  width: calc(100% - 50px);
+  height: 100vh !important;
   margin: 0;
   padding: 0;
   flex: 1;
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  background-color: rgba(246, 248, 250, 0.9);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  height: auto;
-  background-color: #f6f8fa;
+  height: 60px;
+  max-height: 60px;
   flex: 1;
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  z-index: 10002;
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  width: calc(100% - 50px);
 }
 
 .title-icon-wrapper {
@@ -361,15 +411,18 @@ export default defineComponent({
 
 .paintbrush {
   transform-origin: center;
-  z-index: 10000 !important;
+  z-index: 10000;
   width: 64px;
   height: 64px;
   opacity: 1;
-  transition: transform 0.5s ease-out;
   animation: rotate 2s linear infinite;
   animation-play-state: paused;
   margin: 0.4rem 0.5rem 0 0;
   padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
 
   &.spin {
     animation-play-state: running;
@@ -377,11 +430,10 @@ export default defineComponent({
 
   .speedUp {
     animation: spinAndRubberBand 1s linear infinite;
-    opacity: 1;
   }
 
   &:hover {
-    animation: rockBrush 1.5s ease-in-out infinite;
+    animation: rockBrush 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
     cursor: pointer;
     opacity: calc(0.8 + 0.2 * var(--speed));
   }
@@ -389,7 +441,7 @@ export default defineComponent({
   &:active {
     animation: throwBrush 1s ease forwards;
     cursor: pointer;
-    opacity: 1;
+    transform: scaleY(1) scaleX(1);
   }
 }
 
@@ -409,10 +461,6 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  position: relative;
 }
 
 .title::after {
@@ -462,31 +510,31 @@ export default defineComponent({
 
 @keyframes throwBrush {
   0% {
-    transform: translateY(0) scaleX(-1);
+    transform: translateY(0) scaleX(1) scaleY(1);
   }
   10% {
-    transform: translateY(10px) scaleX(-1);
+    transform: translateY(10px) scaleX(1) scaleY(1);
   }
   20% {
-    transform: translateY(-10px) rotate(180deg) scaleX(-1);
+    transform: translateY(-10px) rotate(180deg) scaleX(1) scaleY(1);
   }
   60% {
-    transform: translateY(0) rotate(360deg) scaleX(-1);
+    transform: translateY(0) rotate(360deg) scaleX(1) scaleY(1);
   }
   70%,
   80%,
   90% {
-    transform: translateY(10px) rotate(360deg - 15deg) scaleX(-1);
+    transform: translateY(10px) rotate(360deg - 15deg) scaleX(1) scaleY(1);
   }
   75%,
   85% {
-    transform: translateY(0) rotate(360deg + 15deg) scaleX(-1);
+    transform: translateY(0) rotate(360deg + 15deg) scaleX(1) scaleY(1);
   }
   95% {
-    transform: translateY(0) rotate(365deg) scaleX(-1);
+    transform: translateY(0) rotate(365deg) scaleX(1) scaleY(1);
   }
   100% {
-    transform: translateY(0) rotate(360deg) scaleX(-1);
+    transform: translateY(0) rotate(360deg) scaleX(1) scaleY(1);
   }
 }
 
@@ -512,7 +560,8 @@ input[type="number"] {
   padding: 0.5rem;
   border: 1px solid #ced4da;
   border-radius: 4px;
-  width: 100%;
+  background-size: 1rem;
+  background-color: #fff;
 
   &:hover {
     border-color: #80bdff;
