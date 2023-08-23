@@ -1,8 +1,15 @@
 <p align="center">
-  <img src="assets/icons/logo-bg-128.png">
+  
+  <img src="https://github.com/JayRichh/afbuddy/assets/18374849/d4187421-6c7d-457d-8505-75c7c2a5e9aa" alt="image" />
+
 </p>
 
-# AF Buddy: The Appframe developers toolkit. 
+<p align="center">
+  <h1 style="font-family: Arial, sans-serif; color: #333; display: inline;">
+  <img src="/assets/icons/logo-bg-48.png" alt="image" />
+    <span> AF Buddy: The Appframe developers toolkit. </span>  
+  </h1>
+</p>
 
 [![Features](https://img.shields.io/badge/%20Features%20-%20Web%20Styling%20|%20Themes%20|%20Save/Load%20Snippets%20|%20User--Agents%20|%20Geolocation-007bff?style=flat-square&logo=features&logoColor=white)](link-to-features)<br>
 [![Stack](https://img.shields.io/badge/%20Tech%20-%20React%20|%20Vue%20|%20TypeScript-4caf50?style=flat-square&logo=technology&logoColor=white)](link-to-technologies)<br>
@@ -16,8 +23,7 @@ AF Buddy offers a suite of web tools to enhance the development experience and t
 <h2>🛠️ Features</h2> 
 
 - **Web Tools**: A wide array of functionalities for web development, including code controls, player integration, and geolocation services.
-- **Compatibility**: Seamless integration across all URLs, , browsers, and devices.
-- **Permissions Management**: Tailored permissions for a user-friendly experience.
+- **Compatibility**: Seamless integration across all URLs, browsers, and devices.
 - **Customizable Settings**: Personalize your development environment with adjustable themes, layouts, and preferences.
 - **Interactive Navigation**: A dynamic navigation bar that adapts to user needs, providing quick access to essential tools and features.
 - **Multi-Language Support**: Offers localization and internationalization, making the tool accessible to a global audience.
