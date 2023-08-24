@@ -12,14 +12,15 @@
         isActive(item.componentName) ? 'active' : '',
         item.selected ? 'selected' : '',
       ]"
-      @mouseover="
-        hoverMouse($event, item.ariaLabel);
-        magneticPullEffect($event, item.ariaLabel);
-      "
-      @mouseout="resetIcon(item.ariaLabel)"
+      @mouseover="hoverMouse($event, item.ariaLabel)"
+      @mousemove="magneticPullEffect($event, item.ariaLabel)"
       @mousedown="startDrag($event, item.ariaLabel)"
     >
-      <div class="icon-mask" :id="`${item.ariaLabel}Mask`">
+      <div
+        class="icon-mask"
+        :id="`${item.ariaLabel}-mask`"
+        @mouseleave="onIconMouseLeave"
+      >
         <img
           :src="item.iconSrc"
           :alt="item.altText"
@@ -32,6 +33,33 @@
         />
       </div>
     </a>
+    <div class="crazy-mode-toggle">
+      <input
+        type="checkbox"
+        id="crazy-mode-checkbox"
+        v-model="crazyModeEnabled"
+        @change="toggleCrazyMode"
+      />
+      <label for="crazy-mode-checkbox">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          class="checkbox-svg"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <rect
+              x="1"
+              y="1"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+            />
+          </svg>
+        </svg>
+        Crazy Mode
+      </label>
+    </div>
   </nav>
 </template>
 
@@ -40,8 +68,9 @@ import { defineComponent, onMounted, ref } from "vue";
 import Tooltip from "./Tooltip.vue";
 import { gsap, Power2, Elastic } from "gsap";
 import { CSSPlugin } from "gsap/CSSPlugin";
+import { ExpoScaleEase, RoughEase, SlowMo } from "gsap/EasePack";
 
-gsap.registerPlugin(CSSPlugin);
+gsap.registerPlugin(CSSPlugin, ExpoScaleEase, RoughEase, SlowMo);
 
 interface NavItem {
   id: number | string;
@@ -57,6 +86,7 @@ interface NavItem {
 interface NavbarData {
   draggedIcon: string | null;
   isDragging: boolean;
+  crazyModeEnabled: boolean;
   navItems: NavItem[];
 }
 
@@ -69,10 +99,44 @@ export default defineComponent({
     currentComponent: String,
   },
 
+  setup(props) {
+    const position = ref({ x: 0, y: 0 });
+    const crazyModeEnabled = ref(false);
+
+    const onMouseMove = (event: MouseEvent) => {
+      const offsetX = Math.min(
+        Math.max(event.clientX - position.value.x, -5),
+        50
+      );
+      const offsetY = Math.min(
+        Math.max(event.clientY - position.value.y, -5),
+        20
+      );
+
+      position.value.x += offsetX;
+      position.value.y += offsetY;
+    };
+
+    const onIconMouseLeave = (event: Event) => {
+      const target = event.target as HTMLElement;
+
+      gsap.to(target, {
+        x: 0, // original X position
+        y: 0, // original Y position
+        scale: 1,
+        ease: ExpoScaleEase.config(1, 1.5, Power2.easeOut),
+        duration: 1,
+      });
+    };
+
+    return { position, onMouseMove, onIconMouseLeave, crazyModeEnabled };
+  },
+
   data(): NavbarData {
     return {
       draggedIcon: null,
       isDragging: false,
+      crazyModeEnabled: false,
       navItems: [
         {
           id: "1",
@@ -141,18 +205,71 @@ export default defineComponent({
     };
   },
 
+  mounted() {
+    onMounted(() => {
+      this.$nextTick(() => {
+        this.navItems.forEach((item) => {
+          const iconContainer = document.getElementById(item.ariaLabel);
+          if (iconContainer) {
+            iconContainer.addEventListener("click", (event) => {
+              this.handleClick(item.componentName, item.ariaLabel);
+            });
+          }
+        });
+      });
+    });
+  },
+
   methods: {
+    magneticPullCrazyEffect(event: MouseEvent, ariaLabel: string): void {
+      const iconElement = document.getElementById(ariaLabel);
+      const maskElement = document.getElementById(`${ariaLabel}-mask`);
+
+      if (iconElement && maskElement) {
+        gsap.to([iconElement, maskElement], {
+          x: (event.clientX - iconElement.getBoundingClientRect().left) * 0.2,
+          y: (event.clientY - iconElement.getBoundingClientRect().top) * 0.2,
+          ease: RoughEase.ease.config({
+            strength: 1,
+            points: 20,
+            taper: "none",
+            randomize: true,
+          }),
+          duration: 1,
+        });
+      }
+    },
     magneticPullEffect(event: MouseEvent, ariaLabel: string): void {
       const iconContainer = document.getElementById(ariaLabel);
       if (!iconContainer || this.isDragging) return;
 
-      const distance = this.calculateDistance(event, ariaLabel);
-      const scale = 1 + distance / 100;
+      const hoverArea = 0.8; // 80% of icon size - 20% is the stick zone moite
+      const cursor = { x: event.clientX, y: event.clientY - window.scrollY };
+      const width = iconContainer.offsetWidth;
+      const height = iconContainer.offsetHeight;
+      const offset = iconContainer.getBoundingClientRect();
+      const elPos = { x: offset.left + width / 2, y: offset.top + height / 2 };
+      const x = cursor.x - elPos.x;
+      const y = cursor.y - elPos.y;
+      const dist = Math.sqrt(x * x + y * y);
+      const mutHover = dist < width * hoverArea;
 
-      gsap.to(iconContainer, 0.3, {
-        scale: scale,
-        ease: Power2.easeOut,
-      });
+      if (mutHover) {
+        gsap.to(iconContainer, 0.4, {
+          x: x * 1.2, //  stick zone moite
+          y: y * 1.2,
+          rotation: x * 0.05,
+          ease: Power2.easeOut,
+        });
+      } else {
+        gsap.to(iconContainer, 0.7, {
+          x: 0,
+          y: 0,
+          scale: 1,
+          rotation: 0,
+          ease: Elastic.easeOut.config(1.2, 0.4),
+        });
+      }
     },
 
     calculateDistance(event: MouseEvent, ariaLabel: string): number {
@@ -171,19 +288,29 @@ export default defineComponent({
       return Math.sqrt((mouseX - iconX) ** 2 + (mouseY - iconY) ** 2);
     },
 
-    resetIcon(ariaLabel: string) {
-      const iconContainer = document.getElementById(ariaLabel);
-      if (iconContainer) {
-        gsap.to(iconContainer, 0.7, {
+    resetIcon(ariaLabel: string): void {
+      const iconElement = document.getElementById(ariaLabel);
+      const maskElement = document.getElementById(`${ariaLabel}-mask`);
+
+      if (iconElement && maskElement) {
+        gsap.to([iconElement, maskElement], {
           x: 0,
           y: 0,
           scale: 1,
           rotation: 0,
           ease: Elastic.easeOut.config(1.2, 0.4),
+          duration: 0.7,
         });
       }
+    },
 
-      this.clipIcons(ariaLabel, 0);
+    toggleCrazyMode(): void {
+      this.crazyModeEnabled = !this.crazyModeEnabled;
+      if (!this.crazyModeEnabled) {
+        this.navItems.forEach((item) => {
+          this.resetIcon(item.ariaLabel);
+        });
+      }
     },
 
     hoverMouse(event: MouseEvent, ariaLabel: string): void {
@@ -266,11 +393,15 @@ export default defineComponent({
     },
 
     handleClick(componentName: string, ariaLabel: string) {
+      // this.animateIcon(ariaLabel); no
       this.showComponent(componentName);
       this.navItems.forEach((item) => {
-        item.selected = item.componentName === componentName;
+        if (item.componentName === componentName) {
+          item.selected = true;
+        } else {
+          item.selected = false;
+        }
       });
-      this.animateIcon(ariaLabel);
     },
 
     showComponent(componentName: string) {
@@ -302,57 +433,18 @@ export default defineComponent({
     },
 
     isActive(componentName: string) {
-      return this.currentComponent === componentName ? "active" : "";
+      return componentName === this.currentComponent;
     },
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.nav-item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  margin: 0;
-  width: 40px;
-  height: auto;
-  z-index: 10000;
-  overflow-x: visible;
-  overflow-y: visible;
-  transition: transform 0.3s ease;
-  cursor: pointer;
-  filter: brightness(1.8) drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
-
-  &:hover {
-    transform: scale(1.1);
-    filter: brightness(1) drop-shadow(0 0 4px rgba(197, 242, 177, 0.8));
-  }
-
-  &.initial-glow {
-    filter: invert(1) brightness(2.5)
-      drop-shadow(0 0 14px rgba(255, 255, 255, 0.8));
-  }
-
-  > img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 45px;
-    height: 100%;
-    object-fit: contain;
-    z-index: 190000;
-    padding: auto;
-    margin: auto;
-  }
-}
-
 .navbar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: start;
+  justify-content: center;
   height: 100%;
   width: 50px;
   max-width: 50px;
@@ -369,7 +461,14 @@ export default defineComponent({
     margin-top: 5px;
   }
 
+  &:last-child {
+    position: absolute;
+    bottom: 0;
+  }
+
   .icon-container {
+    display: inline-block;
+    text-decoration: none;
     position: relative;
     width: 100%;
     max-width: 50px;
@@ -389,6 +488,22 @@ export default defineComponent({
     left: 0;
     right: 0;
     bottom: 0;
+    filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
+    transition: filter 0.3s ease;
+    z-index: 100000000;
+
+    &:hover {
+      cursor: pointer;
+      filter: brightness(1.5) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
+      transform: scale(1.1);
+      transition: filter 0.3s ease;
+    }
+
+    &:active {
+      filter: drop-shadow(0 0 5px white) blur(1px);
+      transform: scale(0.9);
+      transition: filter 0.3s ease;
+    }
   }
 
   .masked-icon {
@@ -396,14 +511,43 @@ export default defineComponent({
     width: 100%;
     height: 100%;
     object-fit: contain;
+    z-index: 1000000000;
   }
 
   .black-icon {
-    z-index: 999999999;
+    z-index: 100000000;
   }
 
   .white-icon {
     z-index: 1000000000;
+  }
+
+  .crazy-mode-toggle {
+    display: flex;
+    align-items: center;
+    color: #fff; // White text color for dark background
+
+    input[type="checkbox"] {
+      display: none;
+
+      &:checked + label .checkbox-svg {
+        fill: #fff; // White fill when checked
+      }
+    }
+
+    label {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .checkbox-svg {
+      fill: transparent;
+      stroke: #fff; // White stroke
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+    }
   }
 
   @keyframes paintbrushFlick {
@@ -540,12 +684,26 @@ export default defineComponent({
     animation: infoAwesome 3s cubic-bezier(0.42, 0, 0.58, 1);
   }
   a.selected {
-    animation: pulseGlow 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px #ffc3a0) drop-shadow(0 0 10px #ffafbd)
+      drop-shadow(0 0 10px #d4a5a5) drop-shadow(0 0 10px #392343);
+    animation: GradientShadow 3s ease infinite;
+  }
 
-    &:hover {
-      transform-origin: center;
-      transform: scale(1);
-      filter: brightness(3) drop-shadow(0 0 14px rgba(197, 242, 177, 0.8));
+  @keyframes GradientShadow {
+    0% {
+      filter: drop-shadow(0 0 10px #ffc3a0);
+    }
+    25% {
+      filter: drop-shadow(0 0 10px #ffafbd);
+    }
+    50% {
+      filter: drop-shadow(0 0 10px #d4a5a5);
+    }
+    75% {
+      filter: drop-shadow(0 0 10px #392343);
+    }
+    100% {
+      filter: drop-shadow(0 0 10px #ffc3a0);
     }
   }
 }

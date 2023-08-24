@@ -26,11 +26,13 @@
 <script lang="ts">
 import {
   defineComponent,
-  ref,
   computed,
   onMounted,
   watch,
   onBeforeUnmount,
+  ref,
+  toRefs,
+  Prop,
 } from "vue";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
@@ -141,6 +143,14 @@ export default defineComponent({
     onMounted(() => {
       if (props.visible && props.isCodeEditorPreview) {
         createEditor();
+      }
+      if (props.content) {
+        const navItem = document.querySelector(
+          ".nav-item[data-tooltip='" + props.content + "']"
+        );
+        if (navItem) {
+          navItem.textContent = props.content;
+        }
       }
     });
 

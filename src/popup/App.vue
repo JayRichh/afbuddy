@@ -17,7 +17,7 @@
       :isCodeEditorPreview="!!theme"
     />
     <div
-      class="navbar-container"
+      class="navbar-container hide-scrollbar"
       @mouseover="handleMouseOver"
       @mousemove="adjustTooltipPosition"
       @mouseout="handleIconMouseOut"
@@ -27,10 +27,26 @@
         :currentComponent="currentComponent"
       />
     </div>
-    <div class="app-container">
+    <div class="app-container hide-scrollbar">
       <div class="app-header">
         <div class="title-icon-wrapper">
-          <span class="title">{{ formatTitle(currentComponent) }}</span>
+          <div
+            class="title-wrapper"
+            ref="titleWrapper"
+            @mouseenter="handleMouseEnter"
+            @mouseleave="handleMouseLeave"
+            @click="handleTitleClick"
+          >
+            <span class="title">{{ formatTitle(currentComponent) }}</span>
+            <svg
+              class="underline"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 1000 100"
+              ref="underlineSVG"
+            >
+              <path class="underline-path" ref="underlinePath"></path>
+            </svg>
+          </div>
           <img
             id="iconToChangeColor"
             class="paintbrush"
@@ -42,7 +58,7 @@
         </div>
       </div>
       <component
-        class="app-content"
+        class="app-content hide-scrollbar"
         :is="currentComponent"
         v-bind="$attrs"
         @changeComponent="handleComponentChange"
@@ -52,7 +68,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from "vue";
+import { defineComponent, ref, onMounted, computed } from "vue";
 import Navbar from "./components/Navbar.vue";
 import ThemeSelector from "./components/ThemeSelector.vue";
 import TabWidthSetter from "./components/TabWidthSetter.vue";
@@ -64,6 +80,12 @@ import Tooltip from "./components/Tooltip.vue";
 import DoomPlayer from "./components/DoomPlayer.vue";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { calculateRotation } from "../utils/calculationUtils";
+import { TimelineMax, Power2, Elastic } from "gsap";
+import { ExpoScaleEase, RoughEase, SlowMo } from "gsap/EasePack";
+import Draggable from "gsap/Draggable";
+import { gsap } from "gsap";
+
+gsap.registerPlugin(ExpoScaleEase, RoughEase, SlowMo, Draggable);
 
 interface Data {
   currentComponent: string;
@@ -74,8 +96,6 @@ interface Data {
   tooltipY: number;
   theme: string;
   themeData: monaco.editor.IStandaloneThemeData;
-  // weatherData: any;
-  // temperature: any;
   sunRotation: number;
   moonRotation: number;
 }
@@ -91,6 +111,132 @@ export default defineComponent({
     Info,
     Tooltip,
     DoomPlayer,
+  },
+  setup() {
+    const sunRotation = ref(0);
+    const moonRotation = ref(0);
+    const spinBrush = ref(false);
+    const speedUpBrush = ref(false);
+
+    const underlineDuration = 0.5;
+    const waveHeight = 50;
+    const waveLength = 250;
+    const tl = new TimelineMax({ paused: true });
+
+    const titleWrapper = ref<HTMLElement | null>(null);
+    const underlineSVG = ref<SVGSVGElement | null>(null);
+    const underlinePath = ref<SVGPathElement | null>(null);
+
+    const handleBrushClick = () => {
+      spinBrush.value = !spinBrush.value;
+      if (spinBrush.value) {
+        speedUpBrush.value = true;
+        setTimeout(() => {
+          speedUpBrush.value = false;
+        }, 1000);
+      }
+    };
+
+    onMounted(() => {
+      gsap.set(underlinePath.value, {
+        opacity: 0,
+        attr: { d: "M0,50 Q500,50 1000,50" },
+      });
+
+      Draggable.create(underlineSVG.value, {
+        type: "x,y",
+        bounds: titleWrapper.value,
+        edgeResistance: 0.65,
+        throwProps: true,
+        maxDuration: 0.2,
+        zIndexBoost: false,
+        onDragStart() {
+          gsap.to(".underline-path", 0.3, {
+            attr: { "stroke-width": 10 },
+            ease: Elastic.easeInOut.config(2, 0.3),
+          });
+        },
+        onRelease() {
+          gsap.to(".underline-path", 0.3, {
+            attr: { "stroke-width": 6 },
+            ease: Elastic.easeInOut.config(2, 0.3),
+          });
+        },
+        onDrag() {
+          const x = this.x;
+          const y = this.y;
+          const path = `M0,50 Q${x},${y} 1000,50`;
+          gsap.to(underlinePath.value, 0.3, {
+            attr: { d: path },
+            ease: Elastic.easeInOut.config(2, 0.3),
+          });
+        },
+        onComplete() {
+          gsap.to(".underline-path", 0.3, {
+            attr: { "stroke-width": 6 },
+            ease: Elastic.easeInOut.config(2, 0.3),
+          });
+        },
+      });
+    });
+
+    const handleMouseEnter = () => {
+      gsap.to(underlinePath.value, 0.6, {
+        opacity: 1,
+        attr: { d: "M0,60 Q500,50 1000,60", "stroke-width": 6 },
+        ease: Elastic.easeOut.config(2, 0.3),
+      });
+    };
+
+    const handleMouseLeave = () => {
+      gsap.to(underlinePath.value, 1, {
+        opacity: 0,
+        attr: { d: "M0,50 Q500,50 1000,50" },
+        ease: Elastic.easeOut.config(1, 0.5),
+        delay: 2,
+      });
+    };
+
+    const handleTitleClick = () => {
+      gsap.fromTo(
+        underlinePath.value,
+        { attr: { d: "M0,50 Q500,100 1000,50" } },
+        {
+          attr: { d: "M0,50 Q500,0 1000,50" },
+          ease: Elastic.easeOut.config(1, 0.3),
+          duration: 0.5,
+        }
+      );
+    };
+
+    return {
+      titleWrapper,
+      underlinePath,
+      handleMouseEnter,
+      handleMouseLeave,
+      handleTitleClick,
+      spinBrush,
+      speedUpBrush,
+      handleBrushClick,
+      sunRotation,
+      moonRotation,
+      underlineSVG,
+    };
+  },
+  data(): Data {
+    const rotationData = calculateRotation();
+    return {
+      currentComponent: "ThemeSelector",
+      scriptContentForTooltip: "",
+      showTooltip: false,
+      tooltipText: "",
+      tooltipX: 0,
+      tooltipY: 0,
+      theme: "",
+      themeData: {} as monaco.editor.IStandaloneThemeData,
+      sunRotation: rotationData.sunRotation,
+      moonRotation: rotationData.moonRotation,
+    };
   },
   computed: {
     sunMoonStyles(): Record<string, string> {
@@ -109,37 +255,6 @@ export default defineComponent({
       return hours < 6 || hours >= 18;
     },
   },
-  setup() {
-    const spinBrush = ref(false);
-    const speedUpBrush = ref(false);
-
-    const handleBrushClick = () => {
-      spinBrush.value = !spinBrush.value;
-      if (spinBrush.value) {
-        speedUpBrush.value = true;
-        setTimeout(() => {
-          speedUpBrush.value = false;
-        }, 1000); // Reset after 1 second
-      }
-    };
-
-    return { spinBrush, speedUpBrush, handleBrushClick };
-  },
-  data(): Data {
-    const rotationData = calculateRotation();
-    return {
-      currentComponent: "ThemeSelector",
-      scriptContentForTooltip: "",
-      showTooltip: false,
-      tooltipText: "",
-      tooltipX: 0,
-      tooltipY: 0,
-      theme: "",
-      themeData: {} as monaco.editor.IStandaloneThemeData,
-      sunRotation: rotationData.sunRotation,
-      moonRotation: rotationData.moonRotation,
-    };
-  },
   mounted() {
     this.listenForKonamiCode();
     const rotationData = calculateRotation();
@@ -147,13 +262,6 @@ export default defineComponent({
     this.moonRotation = rotationData.moonRotation;
   },
   watch: {
-    displaySun(newValue) {
-      if (newValue) {
-        document.body.style.backgroundImage = "url(../../assets/sun.svg)";
-      } else {
-        document.body.style.backgroundImage = "url(../../assets/moon.svg)";
-      }
-    },
     sunRotation() {
       this.rotateSunOrMoon();
     },
@@ -196,12 +304,6 @@ export default defineComponent({
         .replace(/([A-Z])/g, " $1")
         .replace(/^./, (str) => str.toUpperCase());
     },
-    // displayWeather() {
-    //   if (this.weatherData.hourly.temperature) {
-    //     document.body.style.backgroundImage =
-    //       "url(../../assets/rain-clouds.svg)";
-    //   }
-    // },
     showScriptTooltip(data: any) {
       this.scriptContentForTooltip = data.content;
       this.tooltipX = data.x;
@@ -258,69 +360,21 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-/* Global Image Styles */
-.cloud1,
-.cloud2 {
-  position: absolute;
-  top: 50px;
-  width: 50px;
-  height: 18px;
-}
-
-.cloud1 {
-  left: -150px;
-  animation: moveclouds 25s linear infinite;
-  background: url(../../assets/cloud1.svg) no-repeat;
-}
-
-.cloud2 {
-  left: -195px;
-  animation: moveclouds 30s linear infinite;
-  background: url(../../assets/cloud2.svg) no-repeat;
-}
-
-@keyframes moveclouds {
-  0% {
-    left: -250px;
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
-  100% {
-    left: 100%;
-  }
-}
-
-.app-content {
-  width: 100%;
-  height: calc(100% - 60px);
-  max-height: calc(100% - 60px);
-  margin: 0;
-  padding: 0;
-  flex: 1;
-  position: relative;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 .container {
   display: flex;
   height: 100%;
   width: 100%;
-  width: 100%;
-  overflow-y: hidden;
-  overflow-x: hidden;
+  overflow: hidden;
   background-color: rgba(246, 248, 250, 0.9);
-  margin: 0;
-  padding: 0;
-  flex: 1;
   position: relative;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   z-index: 0;
 
   .sun,
@@ -330,73 +384,81 @@ export default defineComponent({
     left: 50%;
     transform-origin: 50% 100%;
     transition: transform 0.5s;
-    transform: rotate(var(--sun-rotation-deg) deg);
     z-index: 10001;
   }
+}
+.celestial-body {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  z-index: 9999;
+  transform-origin: bottom;
+  transition: transform 0.5s;
+}
+.sun {
+  transform: rotate(calc(90deg + var(--sun-rotation-deg))) translateX(80%);
+}
+
+.moon {
+  transform: rotate(calc(90deg + var(--moon-rotation-deg))) translateX(80%);
 }
 
 .navbar-container {
   width: 50px;
   max-width: 50px;
-  height: 100vh !important;
-  margin: 0;
-  padding: 5px 0 5px 0;
+  height: 100vh;
+  padding: 5px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: start;
   background: linear-gradient(to bottom, #1c1c1c, #454545);
-  overflow-y: hidden;
-  overflow-x: auto;
   position: relative;
-  z-index: 9999 !important;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  z-index: 9999;
 }
 
 .app-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: start;
+  display: inline-block;
+  flex: 1;
   width: calc(100% - 50px);
-  height: 100vh !important;
-  margin: 0;
-  padding: 0;
-  flex: 1;
-  position: relative;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  background-color: rgba(246, 248, 250, 0.9);
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-.app-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 60px;
-  max-height: 60px;
-  flex: 1;
-  margin: 0;
-  padding: 0;
-  z-index: 10002;
+  min-width: calc(100% - 50px);
+  height: 100vh;
   background-color: transparent;
-  position: absolute;
-  top: 0;
-  width: calc(100% - 50px);
+  position: relative;
+  z-index: 0;
+
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    max-height: 60px;
+    flex: 1;
+    z-index: 10002;
+    background-color: transparent;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 100%;
+    padding: 0.5rem;
+  }
+
+  .app-content {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    align-items: stretch;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: calc(100vh - 60px);
+    overflow: hidden;
+    background-color: transparent;
+    position: relative;
+    z-index: 0;
+  }
 }
 
 .title-icon-wrapper {
@@ -409,28 +471,24 @@ export default defineComponent({
   margin: 0;
 }
 
+.title-wrapper {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+
 .paintbrush {
   transform-origin: center;
   z-index: 10000;
   width: 64px;
   height: 64px;
   opacity: 1;
-  animation: rotate 2s linear infinite;
-  animation-play-state: paused;
   margin: 0.4rem 0.5rem 0 0;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: opacity 0.3s ease;
-
-  &.spin {
-    animation-play-state: running;
-  }
-
-  .speedUp {
-    animation: spinAndRubberBand 1s linear infinite;
-  }
 
   &:hover {
     animation: rockBrush 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
@@ -441,15 +499,22 @@ export default defineComponent({
   &:active {
     animation: throwBrush 1s ease forwards;
     cursor: pointer;
-    transform: scaleY(1) scaleX(1);
+  }
+
+  &.spin {
+    animation-play-state: running;
+  }
+
+  &.speedUp {
+    animation: spinAndRubberBand 1s linear infinite;
   }
 }
 
 .title {
-  font: 1.3rem monospace;
+  font: 1.2rem monospace;
   letter-spacing: 0.075rem;
-  margin: 0.5rem 0 0.5rem 0.5rem;
-  padding: 0;
+  margin: 0;
+  padding: 1rem 0 0.75rem 0;
   border-radius: 8px 0 0 8px;
   background-color: #f6f8fa;
   color: #333;
@@ -461,25 +526,29 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 2;
+  transition: color 0.3s;
 }
 
-.title::after {
-  content: "";
+.underline {
   position: absolute;
-  bottom: 0;
+  bottom: -50px;
   left: 0;
   width: 100%;
-  height: 2px;
-  background-color: #5a6b7c;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
+  height: 100%;
+  z-index: 99999999999;
+  cursor: pointer;
+  transition: stroke 0.3s;
 }
 
-.title:hover::after {
-  transform: scaleX(1);
+.underline-path {
+  stroke: #000;
 }
 
+// Animation Keyframes
 @keyframes rockBrush {
   0% {
     transform: rotate(-5deg);
@@ -535,66 +604,6 @@ export default defineComponent({
   }
   100% {
     transform: translateY(0) rotate(360deg) scaleX(1) scaleY(1);
-  }
-}
-
-label {
-  font-weight: 500;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  background-color: #007bff;
-  color: white;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-}
-
-select,
-input[type="number"] {
-  padding: 0.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  background-size: 1rem;
-  background-color: #fff;
-
-  &:hover {
-    border-color: #80bdff;
-  }
-
-  &:focus {
-    border-color: #80bdff;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-  }
-}
-
-select option {
-  padding: 0.5rem 1rem;
-
-  &:hover {
-    background-color: #80bdff;
-    color: white;
-  }
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-@keyframes rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
   }
 }
 </style>

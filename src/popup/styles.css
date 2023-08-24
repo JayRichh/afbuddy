@@ -12,6 +12,7 @@ html,
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
   position: relative;
   overflow: hidden;
   background: #fff;
@@ -41,4 +42,6 @@ html,
     #fff 50%,
     #fff 100%
   );
+  background-size: 200% 100%;
+  animation: shine 1s linear infinite;
 }
