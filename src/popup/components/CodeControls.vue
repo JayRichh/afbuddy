@@ -101,13 +101,13 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .code-controls-container {
-  padding: 5px 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   height: 100%;
   margin: 0;
-  width: calc(100% - 20px);
-  background-color: #f4f4f4;
-  border-radius: 5px;
+  padding: 0;
+  box-sizing: border-box;
+  width: calc(100% - 50px);
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .button-group {

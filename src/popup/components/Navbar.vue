@@ -1,72 +1,79 @@
 <template>
   <nav class="navbar">
-    <a
+      
+      <a
       v-for="item in navItems"
-      :key="item.id"
-      href="#"
-      @click.stop="handleClick(item.componentName, item.ariaLabel)"
-      :aria-label="item.tooltip"
-      :id="item.ariaLabel"
-      :class="[
-        'nav-item icon-container hitbox',
-        isActive(item.componentName) ? 'active' : '',
-        item.selected ? 'selected' : '',
-      ]"
-      @mouseover="hoverMouse($event, item.ariaLabel)"
-      @mousemove="magneticPullEffect($event, item.ariaLabel)"
-      @mousedown="startDrag($event, item.ariaLabel)"
+  :key="item.id"
+  href="#"
+  @click.stop="handleClick(item.componentName, item.ariaLabel)"
+  :aria-label="item.tooltip"
+  :id="item.ariaLabel"
+  :class="[
+    'nav-item icon-container hitbox',
+    isActive(item.componentName) ? 'active' : '',
+    item.selected ? 'selected' : '',
+  ]"
+  @mouseover="hoverMouse($event, item.ariaLabel)"
+  @mousemove="crazyModeEnabled ? magneticPullCrazyEffect($event, item.ariaLabel) : magneticPullEffect($event, item.ariaLabel)"
+  @mouseleave="onIconMouseLeave"
+>
+  <div
+    class="icon-mask"
+    :id="`${item.ariaLabel}-mask`"
+    @mouseleave="onIconMouseLeave"
+  >
+    <img
+      :src="item.iconSrc"
+      :alt="item.altText"
+      class="masked-icon black-icon"
+    />
+    <img
+      :src="item.iconMaskSrc"
+      :alt="item.altText"
+      class="masked-icon white-icon"
+    />
+  </div>
+</a>
+<div class="crazy-mode-toggle">
+    <input
+      type="checkbox"
+      id="crazy-mode-checkbox"
+      v-model="crazyModeEnabled"
+      @change="toggleCrazyMode"
+      @mouseover="$emit('updateTooltipText', 'Toggle Crazy Mode')"
+      @mouseleave="$emit('updateTooltipText', '')"
+    />
+  <label for="crazy-mode-checkbox">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      class="checkbox-svg"
+      :class="{ 'checked': crazyModeEnabled }"
     >
-      <div
-        class="icon-mask"
-        :id="`${item.ariaLabel}-mask`"
-        @mouseleave="onIconMouseLeave"
-      >
-        <img
-          :src="item.iconSrc"
-          :alt="item.altText"
-          class="masked-icon black-icon"
-        />
-        <img
-          :src="item.iconMaskSrc"
-          :alt="item.altText"
-          class="masked-icon white-icon"
-        />
-      </div>
-    </a>
-    <div class="crazy-mode-toggle">
-      <input
-        type="checkbox"
-        id="crazy-mode-checkbox"
-        v-model="crazyModeEnabled"
-        @change="toggleCrazyMode"
+      <rect
+        x="1"
+        y="1"
+        width="18"
+        height="18"
+        fill="none"
+        stroke="currentColor"
       />
-      <label for="crazy-mode-checkbox">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          class="checkbox-svg"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-            <rect
-              x="1"
-              y="1"
-              width="18"
-              height="18"
-              fill="none"
-              stroke="currentColor"
-            />
-          </svg>
-        </svg>
-        Crazy Mode
-      </label>
-    </div>
+      <path
+        v-if="crazyModeEnabled"
+        d="M5 9l3 3 7-7"
+        stroke="currentColor"
+        fill="none"
+      />
+    </svg>
+  </label>
+</div>
   </nav>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import Tooltip from "./Tooltip.vue";
-import { gsap, Power2, Elastic } from "gsap";
+import { gsap, Power2, Elastic, Bounce } from "gsap";
 import { CSSPlugin } from "gsap/CSSPlugin";
 import { ExpoScaleEase, RoughEase, SlowMo } from "gsap/EasePack";
 
@@ -121,8 +128,8 @@ export default defineComponent({
       const target = event.target as HTMLElement;
 
       gsap.to(target, {
-        x: 0, // original X position
-        y: 0, // original Y position
+        x: 0,
+        y: 0,
         scale: 1,
         ease: ExpoScaleEase.config(1, 1.5, Power2.easeOut),
         duration: 1,
@@ -205,21 +212,6 @@ export default defineComponent({
     };
   },
 
-  mounted() {
-    onMounted(() => {
-      this.$nextTick(() => {
-        this.navItems.forEach((item) => {
-          const iconContainer = document.getElementById(item.ariaLabel);
-          if (iconContainer) {
-            iconContainer.addEventListener("click", (event) => {
-              this.handleClick(item.componentName, item.ariaLabel);
-            });
-          }
-        });
-      });
-    });
-  },
-
   methods: {
     magneticPullCrazyEffect(event: MouseEvent, ariaLabel: string): void {
       const iconElement = document.getElementById(ariaLabel);
@@ -243,7 +235,7 @@ export default defineComponent({
       const iconContainer = document.getElementById(ariaLabel);
       if (!iconContainer || this.isDragging) return;
 
-      const hoverArea = 0.8; // 80% of icon size - 20% is the stick zone moite
+      const hoverArea = 0.8;
       const cursor = { x: event.clientX, y: event.clientY - window.scrollY };
       const width = iconContainer.offsetWidth;
       const height = iconContainer.offsetHeight;
@@ -255,11 +247,25 @@ export default defineComponent({
       const mutHover = dist < width * hoverArea;
 
       if (mutHover) {
-        gsap.to(iconContainer, 0.4, {
-          x: x * 1.2, //  stick zone moite
-          y: y * 1.2,
-          rotation: x * 0.05,
-          ease: Power2.easeOut,
+        const angle = Math.atan2(y, x);
+        const step = 1;
+        const tx = Math.cos(angle) * step * 2  * 0.5;
+        const ty = Math.sin(angle) * step * 2 * 0.5;
+        const scale = 1.15;
+        const rotation = 0.1;
+
+        gsap.to(iconContainer, 0.7, {
+          x: tx,
+          y: ty,
+          scale,
+          rotation,
+          ease: Elastic.easeOut.config(1.2, 0.4),
+          onComplete: () => {
+            gsap.to(iconContainer, 0.5, {
+              scale: 1.05,
+              ease: Bounce.easeOut,
+            });
+          },
         });
       } else {
         gsap.to(iconContainer, 0.7, {
@@ -268,6 +274,12 @@ export default defineComponent({
           scale: 1,
           rotation: 0,
           ease: Elastic.easeOut.config(1.2, 0.4),
+          onComplete: () => {
+            gsap.to(iconContainer, 0.5, {
+              scale: 1,
+              ease: Bounce.easeOut,
+            });
+          },
         });
       }
     },
@@ -313,42 +325,41 @@ export default defineComponent({
       }
     },
 
-    hoverMouse(event: MouseEvent, ariaLabel: string): void {
-      if (!this.isDragging) {
-        this.$emit("showTooltip", ariaLabel);
+    applyMagneticEffect(event: MouseEvent): void {
+      if (this.crazyModeEnabled) {
+        this.navItems.forEach((item: NavItem) => {
+          if (item.ariaLabel) {
+            this.magneticPullCrazyEffect(event, item.ariaLabel);
+          }
+        });
+      } else {
+        this.navItems.forEach((item: NavItem) => {
+          if (item.ariaLabel) {
+            this.magneticPullEffect(event, item.ariaLabel);
+          }
+        });
       }
     },
 
-    startDrag(event: MouseEvent, ariaLabel: string): void {
-      const iconContainer = document.getElementById(ariaLabel);
-      if (!iconContainer) return;
-
-      this.isDragging = true;
-      this.draggedIcon = ariaLabel;
-
-      const onMouseMove = (event: MouseEvent) => {
-        const { clipWidth, navbarRight } =
-          this.calculateClipWidthAndNavbarRight(event, ariaLabel);
-        gsap.to(iconContainer, 0.7, {
-          x: event.clientX - navbarRight,
-          y: event.clientY - 20,
-          scale: 1.2,
-          rotation: 360,
-          ease: Power2.easeOut,
+    mounted() {
+      onMounted(() => {
+        this.$nextTick(() => {
+          this.navItems.forEach((item: NavItem) => {
+            const iconContainer = document.getElementById(item.ariaLabel);
+            if (iconContainer) {
+              iconContainer.addEventListener("mousemove", (event: MouseEvent) => {
+                this.applyMagneticEffect(event);
+              });
+            }
+          });
         });
-        this.clipIcons(ariaLabel, clipWidth);
-      };
+      });
+    },
 
-      const onMouseUp = () => {
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("mouseup", onMouseUp);
-        this.resetIcon(ariaLabel);
-        this.isDragging = false;
-        this.draggedIcon = null;
-      };
-
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseup", onMouseUp);
+    hoverMouse(event: MouseEvent, ariaLabel: string): void {
+      if (!this.isDragging) {
+        this.$emit("updateTooltipText", ariaLabel);
+      }
     },
 
     clipIcons(ariaLabel: string, clipWidth: number): void {
@@ -444,7 +455,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between; 
   height: 100%;
   width: 50px;
   max-width: 50px;
@@ -466,32 +477,14 @@ export default defineComponent({
     bottom: 0;
   }
 
-  .icon-container {
-    display: inline-block;
-    text-decoration: none;
-    position: relative;
-    width: 100%;
-    max-width: 50px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10001;
-    padding: 0;
-    margin: 0;
-  }
 
   .icon-mask {
-    position: absolute;
-    overflow: visible;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
     transition: filter 0.3s ease;
     z-index: 100000000;
-
+    position: relative;
+    width: 50px;
+    height: 50px;
     &:hover {
       cursor: pointer;
       filter: brightness(1.5) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
@@ -525,13 +518,15 @@ export default defineComponent({
   .crazy-mode-toggle {
     display: flex;
     align-items: center;
-    color: #fff; // White text color for dark background
+    color: #fff;
+    position: absolute;
+    bottom: 0;
 
     input[type="checkbox"] {
       display: none;
 
       &:checked + label .checkbox-svg {
-        fill: #fff; // White fill when checked
+        fill: #fff;
       }
     }
 

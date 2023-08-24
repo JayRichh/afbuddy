@@ -54,6 +54,7 @@
     "react-dom": "^18.2.0",
     "styled-components": "^5.3.6",
     "vue": "^3.2.40",
-    "vue-axios": "^3.5.2"
+    "vue-axios": "^3.5.2",
+    "vuetify": "^3.3.14"
   }
 }

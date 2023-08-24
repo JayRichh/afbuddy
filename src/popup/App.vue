@@ -1,11 +1,15 @@
 <template>
-  <div class="container" :style="sunMoonStyles">
-    <div v-if="displaySun" class="sun">
-      <img src="../../assets/sun.svg" alt="Sun" />
+  <div class="container" :style="sunMoonStyles" style="height: 100%; width: 100%;">
+
+    <div class="sun-moon-container">
+      <div v-if="displaySun" class="sun">
+        <img src="../../assets/sun.svg" alt="Sun" />
+      </div>
+      <div v-if="displayMoon" class="moon">
+        <img src="../../assets/moon.svg" alt="Moon" />
+      </div>
     </div>
-    <div v-if="displayMoon" class="moon">
-      <img src="../../assets/moon.svg" alt="Moon" />
-    </div>
+
     <Tooltip
       v-if="showTooltip"
       :x="tooltipX"
@@ -17,7 +21,7 @@
       :isCodeEditorPreview="!!theme"
     />
     <div
-      class="navbar-container hide-scrollbar"
+      class="navbar-wrapper navbar-container"
       @mouseover="handleMouseOver"
       @mousemove="adjustTooltipPosition"
       @mouseout="handleIconMouseOut"
@@ -25,9 +29,10 @@
       <Navbar
         @changeComponent="handleComponentChange"
         :currentComponent="currentComponent"
+        @updateTooltipText="updateTooltipText"
       />
     </div>
-    <div class="app-container hide-scrollbar">
+    <div class="app-container">
       <div class="app-header">
         <div class="title-icon-wrapper">
           <div
@@ -57,12 +62,12 @@
           />
         </div>
       </div>
-      <component
-        class="app-content hide-scrollbar"
+        <component
+        class="app-content "
         :is="currentComponent"
         v-bind="$attrs"
         @changeComponent="handleComponentChange"
-      />
+        />
     </div>
   </div>
 </template>
@@ -148,7 +153,7 @@ export default defineComponent({
         bounds: titleWrapper.value,
         edgeResistance: 0.65,
         throwProps: true,
-        maxDuration: 0.2,
+        maxDuration: 0.3,
         zIndexBoost: false,
         onDragStart() {
           gsap.to(".underline-path", 0.3, {
@@ -270,6 +275,9 @@ export default defineComponent({
     },
   },
   methods: {
+    updateTooltipText(newText: string) {
+      this.tooltipText = newText;
+    },
     rotateSunOrMoon() {
       const { sunRotation, moonRotation } = calculateRotation();
       this.sunRotation = sunRotation;
@@ -277,12 +285,10 @@ export default defineComponent({
     },
     handleMouseOver(event: MouseEvent): void {
       const target = event.target as HTMLElement;
-      if (target.nodeName === "IMG") {
-        this.showTooltip = true;
-        this.tooltipText = target.getAttribute("aria-label") || "";
-        this.tooltipX = event.pageX;
-        this.tooltipY = event.pageY;
-      }
+      this.showTooltip = true;
+      this.tooltipText = target.dataset.tooltip || "";
+      this.tooltipX = event.pageX;
+      this.tooltipY = event.pageY;
     },
     handleIconMouseOver() {
       const icon = document.getElementById(
@@ -374,20 +380,10 @@ export default defineComponent({
   width: 100%;
   overflow: hidden;
   background-color: rgba(246, 248, 250, 0.9);
-  position: relative;
   z-index: 0;
 
-  .sun,
-  .moon {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform-origin: 50% 100%;
-    transition: transform 0.5s;
-    z-index: 10001;
-  }
 }
-.celestial-body {
+.sun-moon-container {
   position: absolute;
   bottom: 50%;
   left: 50%;
@@ -405,27 +401,26 @@ export default defineComponent({
 
 .navbar-container {
   width: 50px;
-  max-width: 50px;
-  height: 100vh;
-  padding: 5px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: start;
+  height: 100%;
+  padding: 0;
   background: linear-gradient(to bottom, #1c1c1c, #454545);
   position: relative;
   z-index: 9999;
+  box-sizing: border-box;
 }
 
 .app-container {
-  display: inline-block;
-  flex: 1;
+  display: flex;
+  flex-direction: row;
+  height: auto;
   width: calc(100% - 50px);
-  min-width: calc(100% - 50px);
-  height: 100vh;
-  background-color: transparent;
-  position: relative;
-  z-index: 0;
+  left: 50px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  overflow: auto;
+  overflow-x: hidden; //this might break things
 
   .app-header {
     display: flex;
@@ -448,12 +443,11 @@ export default defineComponent({
     display: flex;
     flex-direction: row;
     flex: 1;
-    align-items: stretch;
     justify-content: center;
     margin: 0;
     padding: 0;
     width: 100%;
-    height: calc(100vh - 60px);
+    height: 100%;
     overflow: hidden;
     background-color: transparent;
     position: relative;
@@ -514,7 +508,7 @@ export default defineComponent({
   font: 1.2rem monospace;
   letter-spacing: 0.075rem;
   margin: 0;
-  padding: 1rem 0 0.75rem 0;
+  padding: 1rem 0 0.2rem 0;
   border-radius: 8px 0 0 8px;
   background-color: #f6f8fa;
   color: #333;
@@ -535,17 +529,18 @@ export default defineComponent({
 
 .underline {
   position: absolute;
-  bottom: -50px;
+  bottom: -10px;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 99999999999;
   cursor: pointer;
-  transition: stroke 0.3s;
+  transition: stroke 0.3s ease;
 }
 
 .underline-path {
-  stroke: #000;
+  stroke: #fff;
+  transition: stroke 2s ease;
 }
 
 // Animation Keyframes

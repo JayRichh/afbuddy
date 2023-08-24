@@ -1,11 +1,11 @@
 import { createApp } from "vue";
 import App from "./App.vue";
-// import axios from 'axios';
-// import VueAxios from 'vue-axios';
+import { createVuetify } from 'vuetify';
+
+const vuetify = createVuetify();
 
 const app = createApp(App);
 
-// Use axios and vue-axios globally
-// app.use(VueAxios, axios);
+app.use(vuetify);
 
 app.mount("#app");

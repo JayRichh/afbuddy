@@ -169,13 +169,13 @@ export default defineComponent({
     );
 
     watch(
-      () => props.content,
-      (newVal) => {
-        if (newVal && editorInstance.value) {
-          editorInstance.value.setValue(newVal);
-        }
-      }
-    );
+  () => props.content,
+  (newVal) => {
+    if (newVal && editorInstance.value) {
+      editorInstance.value.setValue(newVal);
+    }
+  }
+);
 
     watch(
       () => props.themeData,

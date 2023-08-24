@@ -102,24 +102,20 @@ export default defineComponent({
   overflow-x: hidden;
 }
 
-.title {
-  font-size: 1.5rem;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  color: #333;
-}
-
 .input-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   margin-bottom: 1rem;
+}
 
+label {
+  color: #888;
+  font-size: 1rem;
 }
 
 input[type="text"] {
-  padding: 0 0.5rem;
+  padding: 0.5rem;
   border: 2px solid #b2ebf2;
   border-radius: 4px;
   color: #333;
@@ -160,10 +156,6 @@ input[type="checkbox"]:checked::before {
   transform: translate(-50%, -50%);
 }
 
-label {
-  color: #888;
-}
-
 button {
   padding: 0.5rem 1rem;
   border: none;
@@ -177,4 +169,10 @@ button {
 button:hover {
   background: linear-gradient(45deg, #ffb299, #80d8ff);
 }
+
+.feedback {
+  color: #4caf50;
+  font-weight: bold;
+}
+
 </style>

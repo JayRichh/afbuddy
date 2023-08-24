@@ -1,13 +1,13 @@
 <template>
-  <Tooltip
-    v-if="showTooltip"
-    :x="tooltipX"
-    :y="tooltipY"
-    :theme="selectedTheme.base"
-    :themeData="selectedTheme"
-    :visible="showTooltip"
-  ></Tooltip>
   <div class="theme-selector-container">
+    <Tooltip
+      v-if="showTooltip"
+      :x="tooltipX"
+      :y="tooltipY"
+      :theme="selectedTheme.base"
+      :themeData="selectedTheme"
+      :visible="showTooltip"
+    ></Tooltip>
     <label for="theme-select" class="theme-label">Select Theme:</label>
     <select
       id="theme-select"
@@ -42,7 +42,7 @@ export default defineComponent({
   },
   async setup(props) {
     const { themesArray, themeNamesArray, themeList } = await getThemes();
-    const selectedThemeKey = ref(props.currentTheme || "vs");
+    const selectedThemeKey = ref(props.currentTheme || "active4d");
     const showTooltip = ref(false);
     const tooltipX = ref(0);
     const tooltipY = ref(0);
@@ -52,13 +52,13 @@ export default defineComponent({
       return {
         base: theme.base,
         inherit: theme.inherit,
-        rules: theme.rules.map(rule => ({ ...rule })),
+        rules: theme.rules.map((rule) => ({ ...rule })),
         colors: { ...theme.colors },
       } as monaco.editor.IStandaloneThemeData;
     });
 
     onMounted(() => {
-      console.log("mounted themeselector")
+      console.log("mounted themeselector");
       if (!props.currentTheme) {
         setDefaultTheme();
       }
@@ -85,7 +85,7 @@ export default defineComponent({
     }
 
     function setDefaultTheme() {
-      selectedThemeKey.value = "vs";
+      selectedThemeKey.value = "active4d";
       applySelectedTheme();
     }
 
