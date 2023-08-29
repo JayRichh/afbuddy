@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref } from 'vue';
 
 type Script = {
   id: number;
@@ -52,14 +52,14 @@ export default defineComponent({
     return {
       scripts: [] as Script[],
       hoveredScript: null as Script | null,
-      searchTerm: "",
+      searchTerm: '',
     };
   },
   computed: {
     filteredScripts() {
       if (!this.searchTerm) return this.scripts;
       return this.scripts.filter((script) =>
-        script.content.includes(this.searchTerm)
+        script.content.includes(this.searchTerm),
       );
     },
   },
@@ -67,12 +67,12 @@ export default defineComponent({
     saveToLocalStorage() {
       // Logic to save the current script to localStorage
       // Emit the save-code event to the parent component to get the current script
-      this.$emit("save-code");
+      this.$emit('save-code');
     },
     loadFromLocalStorage() {
       // Logic to load scripts from localStorage
       // Emit the load-code event to the parent component to set the loaded script
-      this.$emit("load-code");
+      this.$emit('load-code');
     },
     deleteScript(script: Script) {
       // Logic to delete the selected script from localStorage and the scripts array
@@ -82,7 +82,7 @@ export default defineComponent({
     },
     showPreview(script: Script, event: MouseEvent) {
       this.hoveredScript = script;
-      this.$emit("show-tooltip", {
+      this.$emit('show-tooltip', {
         content: script.content,
         x: event.pageX,
         y: event.pageY,
@@ -90,10 +90,10 @@ export default defineComponent({
     },
     hidePreview() {
       this.hoveredScript = null;
-      this.$emit("hide-tooltip");
+      this.$emit('hide-tooltip');
     },
     loadScriptIntoMainEditor(script: Script) {
-      this.$emit("load-script-content", script.content);
+      this.$emit('load-script-content', script.content);
     },
   },
 });
@@ -146,7 +146,7 @@ export default defineComponent({
   padding: 0.5rem;
   max-width: 300px;
   z-index: 10;
-  font-family: "Courier New", monospace;
+  font-family: 'Courier New', monospace;
   white-space: pre-wrap;
   text-overflow: ellipsis;
 }

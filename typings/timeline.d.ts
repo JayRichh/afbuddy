@@ -1,13 +1,15 @@
 declare namespace gsap.core {
-
-  type TimelineChild = string | Animation | Callback | Array<string | Animation | Callback>;
+  type TimelineChild =
+    | string
+    | Animation
+    | Callback
+    | Array<string | Animation | Callback>;
 
   interface Labels {
     [key: string]: number;
   }
 
   class Timeline extends Animation {
-
     autoRemoveChildren: boolean;
     labels: Labels;
     smoothChildTiming: boolean;
@@ -104,7 +106,7 @@ declare namespace gsap.core {
      * Makes the timeline's progress jump to the provided label.
      *
      * ```js
-     * tl.currentLabel("myLabel"); 
+     * tl.currentLabel("myLabel");
      * ```
      *
      * @param {string} value
@@ -159,7 +161,12 @@ declare namespace gsap.core {
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/from()
      */
-    from(targets: TweenTarget, duration: number, vars: TweenVars, position?: Position): this;
+    from(
+      targets: TweenTarget,
+      duration: number,
+      vars: TweenVars,
+      position?: Position,
+    ): this;
 
     /**
      * Creates a tween coming FROM the first set of values going TO the second set of values.
@@ -176,7 +183,12 @@ declare namespace gsap.core {
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/fromTo()
      */
-    fromTo(targets: TweenTarget, fromVars: TweenVars, toVars: TweenVars, position?: Position): this;
+    fromTo(
+      targets: TweenTarget,
+      fromVars: TweenVars,
+      toVars: TweenVars,
+      position?: Position,
+    ): this;
 
     /**
      * **Deprecated method signature.** Use the `duration` property instead.
@@ -195,8 +207,14 @@ declare namespace gsap.core {
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/fromTo()
      */
-    fromTo(targets: TweenTarget, duration: number, fromVars: TweenVars, toVars: TweenVars, position?: Position): this;
-    
+    fromTo(
+      targets: TweenTarget,
+      duration: number,
+      fromVars: TweenVars,
+      toVars: TweenVars,
+      position?: Position,
+    ): this;
+
     /**
      * Returns the tween or timeline associated with the provided ID.
      *
@@ -205,7 +223,7 @@ declare namespace gsap.core {
      * ```
      *
      * @param {string} id
-     * @returns {Tween | Timeline} 
+     * @returns {Tween | Timeline}
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/getById()
      */
@@ -227,7 +245,12 @@ declare namespace gsap.core {
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/getChildren()
      */
-    getChildren(nested?: boolean, tweens?: boolean, timelines?: boolean, ignoreBeforeTime?: number): (Tween | Timeline)[]; 
+    getChildren(
+      nested?: boolean,
+      tweens?: boolean,
+      timelines?: boolean,
+      ignoreBeforeTime?: number,
+    ): (Tween | Timeline)[];
 
     /**
      * Returns the tweens of a particular object that are inside this timeline.
@@ -361,7 +384,11 @@ declare namespace gsap.core {
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/shiftChildren()
      */
-    shiftChildren(amount: number, adjustLabels?: boolean, ignoreBeforeTime?: number): this;
+    shiftChildren(
+      amount: number,
+      adjustLabels?: boolean,
+      ignoreBeforeTime?: number,
+    ): this;
 
     /**
      * **Deprecated method.** Use the `.from()` method instead.
@@ -374,23 +401,32 @@ declare namespace gsap.core {
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/from()
      */
-    staggerFrom(targets: TweenTarget, vars: TweenVars, position?: Position): this;
+    staggerFrom(
+      targets: TweenTarget,
+      vars: TweenVars,
+      position?: Position,
+    ): this;
 
-     /**
-      * **Deprecated method.** Use the `.from()` method instead.
-      * 
-      * @deprecated since version 3.0.0
-      * @param {TweenTarget} targets
-      * @param {number} duration - The duration parameter is deprecated. Use the `duration` property instead.
-      * @param {Timeline} vars
-      * @param {Position} position
-      * @returns {Timeline} The timeline
-      * @memberof Timeline
-      * @link https://greensock.com/docs/v3/GSAP/Timeline/from()
-      */
-     staggerFrom(targets: TweenTarget, duration: number, vars: TweenVars, position?: Position): this;
+    /**
+     * **Deprecated method.** Use the `.from()` method instead.
+     *
+     * @deprecated since version 3.0.0
+     * @param {TweenTarget} targets
+     * @param {number} duration - The duration parameter is deprecated. Use the `duration` property instead.
+     * @param {Timeline} vars
+     * @param {Position} position
+     * @returns {Timeline} The timeline
+     * @memberof Timeline
+     * @link https://greensock.com/docs/v3/GSAP/Timeline/from()
+     */
+    staggerFrom(
+      targets: TweenTarget,
+      duration: number,
+      vars: TweenVars,
+      position?: Position,
+    ): this;
 
-     /**
+    /**
      * **Deprecated method.** Use the `.fromTo()` method instead.
      *
      * @deprecated since version 3.0.0
@@ -401,11 +437,16 @@ declare namespace gsap.core {
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/fromTo()
      */
-    staggerFromTo(targets: TweenTarget, fromVars: TweenVars, toVars: TweenVars, position?: Position): this;
+    staggerFromTo(
+      targets: TweenTarget,
+      fromVars: TweenVars,
+      toVars: TweenVars,
+      position?: Position,
+    ): this;
 
     /**
      * **Deprecated method.** Use the `.fromTo()` method instead.
-     * 
+     *
      * @deprecated since version 3.0.0
      * @param {TweenTarget} targets
      * @param {number} duration - The duration parameter is deprecated. Use the `duration` property instead.
@@ -415,7 +456,13 @@ declare namespace gsap.core {
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/fromTo()
      */
-    staggerFromTo(targets: TweenTarget, duration: number, fromVars: TweenVars, toVars: TweenVars, position?: Position): this;
+    staggerFromTo(
+      targets: TweenTarget,
+      duration: number,
+      fromVars: TweenVars,
+      toVars: TweenVars,
+      position?: Position,
+    ): this;
 
     /**
      * **Deprecated method.** Use the `.to()` method instead.
@@ -432,7 +479,7 @@ declare namespace gsap.core {
 
     /**
      * **Deprecated method.** Use the `.to()` method instead.
-     * 
+     *
      * @deprecated since version 3.0.0
      * @param {TweenTarget} targets
      * @param {number} duration - The duration parameter is deprecated. Use the `duration` property instead.
@@ -442,7 +489,12 @@ declare namespace gsap.core {
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/to()
      */
-    staggerTo(targets: TweenTarget, duration: number, vars: TweenVars, position?: Position): this;
+    staggerTo(
+      targets: TweenTarget,
+      duration: number,
+      vars: TweenVars,
+      position?: Position,
+    ): this;
 
     /**
      * Creates a tween going TO the given values.
@@ -462,7 +514,7 @@ declare namespace gsap.core {
 
     /**
      * **Deprecated method signature.** Use the `duration` property instead.
-     * 
+     *
      * ```js
      * tl.to(".class", 1, {x: 100}, 1);
      * ```
@@ -475,10 +527,15 @@ declare namespace gsap.core {
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/to()
      */
-    to(targets: TweenTarget, duration: number, vars: TweenVars, position?: Position): this;
+    to(
+      targets: TweenTarget,
+      duration: number,
+      vars: TweenVars,
+      position?: Position,
+    ): this;
 
     /**
-     * Tween linearly from a particular time or label to another time or label and then stops. 
+     * Tween linearly from a particular time or label to another time or label and then stops.
      *
      * ```js
      * tl.tweenFromTo("myLabel", 5}); // tween from myLabel to the 5 second mark
@@ -491,10 +548,14 @@ declare namespace gsap.core {
      * @memberof Timeline
      * @link https://greensock.com/docs/v3/GSAP/Timeline/tweenFromTo()
      */
-    tweenFromTo(fromPosition: Position, toPosition: Position, vars?: TweenVars): Tween;
+    tweenFromTo(
+      fromPosition: Position,
+      toPosition: Position,
+      vars?: TweenVars,
+    ): Tween;
 
     /**
-     * Tween linearly to a particular time and then stops. 
+     * Tween linearly to a particular time and then stops.
      *
      * ```js
      * tl.tweenTo("myLabel"}); // tween to myLabel

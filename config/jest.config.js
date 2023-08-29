@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: 'jsdom',
   moduleFileExtensions: ['ts', 'js'],
   rootDir: '../src',
-  testMatch: [ '**/__tests__/**/*.test.ts' ],
+  testMatch: ['**/__tests__/**/*.test.ts'],
   testPathIgnorePatterns: ['node_modules', '.cache', 'dist'],
   transformIgnorePatterns: ['node_modules/'],
   transform: {
@@ -19,9 +19,9 @@ module.exports = {
       branches: 100,
       functions: 100,
       lines: 100,
-      statements: 100
+      statements: 100,
     },
   },
   coverageReporters: ['text', 'html'],
-  coverageDirectory: '../coverage/'
+  coverageDirectory: '../coverage/',
 };

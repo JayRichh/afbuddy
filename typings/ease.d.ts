@@ -1,14 +1,13 @@
 declare namespace gsap {
-
   interface EaseFunction {
     (progress: number): number;
   }
-  
+
   interface Ease {
     easeIn: EaseFunction;
     easeOut: EaseFunction;
     easeInOut: EaseFunction;
-  } 
+  }
 
   interface BackConfig extends EaseFunction {
     config(overshoot: number): EaseFunction;
@@ -37,7 +36,11 @@ declare namespace gsap {
   }
 
   interface ExpoScaleEase {
-    config(startingScale: number, endingScale: number, ease?: string | EaseFunction): EaseFunction;
+    config(
+      startingScale: number,
+      endingScale: number,
+      ease?: string | EaseFunction,
+    ): EaseFunction;
   }
 
   interface Linear extends Ease {
@@ -49,8 +52,8 @@ declare namespace gsap {
     points?: number;
     randomize?: boolean;
     strength?: number;
-    taper?: "in" | "out" | "both" | "none";
-    template?: string | EaseFunction
+    taper?: 'in' | 'out' | 'both' | 'none';
+    template?: string | EaseFunction;
   }
 
   interface RoughEaseEase extends EaseFunction {
@@ -63,7 +66,7 @@ declare namespace gsap {
 
   interface RoughEase extends EaseFunction {
     config: RoughEaseConfig;
-    ease: RoughEaseEase;   
+    ease: RoughEaseEase;
   }
 
   interface SlowMoEase extends EaseFunction {
@@ -76,7 +79,7 @@ declare namespace gsap {
 
   interface SlowMo extends EaseFunction {
     config: SlowMoConfig;
-    ease: SlowMoEase;   
+    ease: SlowMoEase;
   }
 
   interface SteppedEase {
@@ -108,7 +111,7 @@ declare const ExpoScaleEase: gsap.ExpoScaleEase;
 declare const RoughEase: gsap.RoughEase;
 declare const SlowMo: gsap.SlowMo;
 
-declare module "gsap/gsap-core" {
+declare module 'gsap/gsap-core' {
   export const Back: gsap.Back;
   export const Bounce: gsap.Ease;
   export const Circ: gsap.Ease;
@@ -129,7 +132,7 @@ declare module "gsap/gsap-core" {
   export const Strong: gsap.Ease;
 }
 
-declare module "gsap/EasePack" {
+declare module 'gsap/EasePack' {
   export const EasePack: gsap.EasePack;
   export const ExpoScaleEase: gsap.ExpoScaleEase;
   export const SlowMo: gsap.SlowMo;
@@ -137,35 +140,35 @@ declare module "gsap/EasePack" {
   export { EasePack as default };
 }
 
-declare module "gsap/src/EasePack" {
-  export * from "gsap/EasePack";
-  export { EasePack as default } from "gsap/EasePack";
+declare module 'gsap/src/EasePack' {
+  export * from 'gsap/EasePack';
+  export { EasePack as default } from 'gsap/EasePack';
 }
 
-declare module "gsap/dist/EasePack" {
-  export * from "gsap/EasePack";
-  export { EasePack as default } from "gsap/EasePack";
+declare module 'gsap/dist/EasePack' {
+  export * from 'gsap/EasePack';
+  export { EasePack as default } from 'gsap/EasePack';
 }
 
-declare module "gsap/all" {
-  export * from "gsap/EasePack";
+declare module 'gsap/all' {
+  export * from 'gsap/EasePack';
 }
 
-declare module "gsap-trial/EasePack" {
-  export * from "gsap/EasePack";
-  export { EasePack as default } from "gsap/EasePack";
+declare module 'gsap-trial/EasePack' {
+  export * from 'gsap/EasePack';
+  export { EasePack as default } from 'gsap/EasePack';
 }
 
-declare module "gsap-trial/src/EasePack" {
-  export * from "gsap/EasePack";
-  export { EasePack as default } from "gsap/EasePack";
+declare module 'gsap-trial/src/EasePack' {
+  export * from 'gsap/EasePack';
+  export { EasePack as default } from 'gsap/EasePack';
 }
 
-declare module "gsap-trial/dist/EasePack" {
-  export * from "gsap/EasePack";
-  export { EasePack as default } from "gsap/EasePack";
+declare module 'gsap-trial/dist/EasePack' {
+  export * from 'gsap/EasePack';
+  export { EasePack as default } from 'gsap/EasePack';
 }
 
-declare module "gsap-trial/all" {
-  export * from "gsap/EasePack";
+declare module 'gsap-trial/all' {
+  export * from 'gsap/EasePack';
 }

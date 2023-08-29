@@ -1,6 +1,5 @@
 <template>
-  <div class="container" :style="sunMoonStyles" style="height: 100%; width: 100%;">
-
+  <div class="container" :style="sunMoonStyles" style="height: 100%; width: 100%">
     <div class="sun-moon-container">
       <div v-if="displaySun" class="sun">
         <img src="../../assets/sun.svg" alt="Sun" />
@@ -20,18 +19,22 @@
       :themeData="themeData"
       :isCodeEditorPreview="!!theme"
     />
+
     <div
       class="navbar-wrapper navbar-container"
       @mouseover="handleMouseOver"
       @mousemove="adjustTooltipPosition"
-      @mouseout="handleIconMouseOut"
+      @mouseout="handleMouseOut"
+      :draggable="isDraggable"
     >
       <Navbar
         @changeComponent="handleComponentChange"
         :currentComponent="currentComponent"
         @updateTooltipText="updateTooltipText"
+        @mouseout="handleMouseOut"
       />
     </div>
+
     <div class="app-container">
       <div class="app-header">
         <div class="title-icon-wrapper">
@@ -42,17 +45,29 @@
             @mouseleave="handleMouseLeave"
             @click="handleTitleClick"
           >
-            <span class="title">{{ formatTitle(currentComponent) }}</span>
+            <span class="title">{{ $t(formatTitle(currentComponent)) }}</span>
             <svg
               class="underline"
               xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 1000 100"
-              ref="underlineSVG"
+              viewBox="0 0 1000 200"
+              ref="underlineRef"
             >
-              <path class="underline-path" ref="underlinePath"></path>
+              <path
+                class="underline-path"
+                ref="underlinePath"
+                stroke-width="10"
+                stroke="url(#gradient)"
+              ></path>
+              <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color: #7ed4e6; stop-opacity: 1" />
+                  <stop offset="100%" style="stop-color: #b493d3; stop-opacity: 1" />
+                </linearGradient>
+              </defs>
             </svg>
           </div>
           <img
+            ref="paintbrushRef"
             id="iconToChangeColor"
             class="paintbrush"
             :class="{ spin: spinBrush, speedUp: speedUpBrush }"
@@ -62,33 +77,34 @@
           />
         </div>
       </div>
-        <component
-        class="app-content "
+      <component
+        class="app-content"
         :is="currentComponent"
         v-bind="$attrs"
         @changeComponent="handleComponentChange"
-        />
+      />
     </div>
   </div>
 </template>
 
+
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from "vue";
-import Navbar from "./components/Navbar.vue";
-import ThemeSelector from "./components/ThemeSelector.vue";
-import TabWidthSetter from "./components/TabWidthSetter.vue";
-import CodeControls from "./components/CodeControls.vue";
-import Geolocations from "./components/Geolocations.vue";
-import UserAgents from "./components/UserAgents.vue";
-import Info from "./components/Info.vue";
-import Tooltip from "./components/Tooltip.vue";
-import DoomPlayer from "./components/DoomPlayer.vue";
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-import { calculateRotation } from "../utils/calculationUtils";
-import { TimelineMax, Power2, Elastic } from "gsap";
-import { ExpoScaleEase, RoughEase, SlowMo } from "gsap/EasePack";
-import Draggable from "gsap/Draggable";
-import { gsap } from "gsap";
+import { defineComponent, ref, onMounted, computed, Component } from 'vue';
+import Navbar from './components/Navbar.vue';
+import ThemeSelector from './components/ThemeSelector.vue';
+import TabManager from './components/TabManager.vue';
+import CodeControls from './components/CodeControls.vue';
+import Geolocation from './components/Geolocation.vue';
+import UserAgents from './components/UserAgents.vue';
+import Info from './components/Info.vue';
+import Tooltip from './components/Tooltip.vue';
+import DoomPlayer from './components/DoomPlayer.vue';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import { calculateDistance, calculateRotation } from '../utils/calculationUtils';
+import { TimelineMax, Power2, Elastic } from 'gsap';
+import { ExpoScaleEase, RoughEase, SlowMo } from 'gsap/EasePack';
+import Draggable from 'gsap/Draggable';
+import { gsap } from 'gsap';
 
 gsap.registerPlugin(ExpoScaleEase, RoughEase, SlowMo, Draggable);
 
@@ -103,151 +119,137 @@ interface Data {
   themeData: monaco.editor.IStandaloneThemeData;
   sunRotation: number;
   moonRotation: number;
+  isDraggable: boolean;
 }
 
 export default defineComponent({
   components: {
     Navbar,
     ThemeSelector,
-    TabWidthSetter,
+    TabManager,
     CodeControls,
-    Geolocations,
+    Geolocation,
     UserAgents,
     Info,
     Tooltip,
     DoomPlayer,
   },
-  setup() {
-    const sunRotation = ref(0);
-    const moonRotation = ref(0);
-    const spinBrush = ref(false);
-    const speedUpBrush = ref(false);
+  props: {
+    currentTheme: {
+      type: String,
+      default: 'active4d',
+    },
+  },
+  setup(props) {
+    const paintbrushRef = ref<HTMLElement | null>(null);
+    const underlineRef = ref<HTMLElement | null>(null);
+    const navbarIconsRef = ref<HTMLElement | null>(null);
+    const checkboxRef = ref<HTMLElement | null>(null);
+    const tooltipContent = ref('');
+    const themesArray = ref([]);
+    const themeNamesArray = ref([]);
+    const themeList = ref([]);
+    const selectedThemeKey = ref(props.currentTheme || 'active4d');
+    const showTooltip = ref(false);
+    const theme = ref('');
+    const themeData = ref({} as monaco.editor.IStandaloneThemeData);
+    const isDraggable = ref(false);
+    const currentComponent = ref('ThemeSelector');
+    const tooltipX = ref(0);
+    const tooltipY = ref(0);
+    const originalPositions = ref<{ [key: string]: { x: number; y: number } }>({});
 
-    const underlineDuration = 0.5;
-    const waveHeight = 50;
-    const waveLength = 250;
-    const tl = new TimelineMax({ paused: true });
+    gsap.registerPlugin(Draggable);
 
-    const titleWrapper = ref<HTMLElement | null>(null);
-    const underlineSVG = ref<SVGSVGElement | null>(null);
-    const underlinePath = ref<SVGPathElement | null>(null);
 
-    const handleBrushClick = () => {
-      spinBrush.value = !spinBrush.value;
-      if (spinBrush.value) {
-        speedUpBrush.value = true;
-        setTimeout(() => {
-          speedUpBrush.value = false;
-        }, 1000);
-      }
-    };
+    const setupDraggable = (element: HTMLElement | null, id: string) => {
+      if (!element) return;
 
-    onMounted(() => {
-      gsap.set(underlinePath.value, {
-        opacity: 0,
-        attr: { d: "M0,50 Q500,50 1000,50" },
-      });
+      originalPositions.value[id] = { x: element.offsetLeft, y: element.offsetTop };
 
-      Draggable.create(underlineSVG.value, {
-        type: "x,y",
-        bounds: titleWrapper.value,
+      Draggable.create(element, {
+        type: 'x,y',
+        bounds: 'body',
         edgeResistance: 0.65,
-        throwProps: true,
-        maxDuration: 0.3,
         zIndexBoost: false,
         onDragStart() {
-          gsap.to(".underline-path", 0.3, {
-            attr: { "stroke-width": 10 },
-            ease: Elastic.easeInOut.config(2, 0.3),
-          });
+          // Implement PID controller logic to magnetize element to mouse here
         },
-        onRelease() {
-          gsap.to(".underline-path", 0.3, {
-            attr: { "stroke-width": 6 },
-            ease: Elastic.easeInOut.config(2, 0.3),
-          });
-        },
-        onDrag() {
-          const x = this.x;
-          const y = this.y;
-          const path = `M0,50 Q${x},${y} 1000,50`;
-          gsap.to(underlinePath.value, 0.3, {
-            attr: { d: path },
-            ease: Elastic.easeInOut.config(2, 0.3),
-          });
-        },
-        onComplete() {
-          gsap.to(".underline-path", 0.3, {
-            attr: { "stroke-width": 6 },
-            ease: Elastic.easeInOut.config(2, 0.3),
-          });
+        onDragEnd() {
+          const distance = calculateDistance(
+            this.x - originalPositions.value[id].x,
+            this.y - originalPositions.value[id].y,
+            0,
+            0
+          );
+
+          if (distance > 20) {
+            gsap.to(this.target, {
+              x: originalPositions.value[id].x,
+              y: originalPositions.value[id].y,
+              duration: 0.5,
+              ease: 'power1.out',
+            });
+          } else {
+            originalPositions.value[id] = { x: this.x, y: this.y };
+          }
         },
       });
+    };
+
+    const handleTooltip = (event: MouseEvent, content: string) => {
+      tooltipX.value = event.clientX;
+      tooltipY.value = event.clientY;
+      tooltipContent.value = content;
+    };
+
+    onMounted(async () => {
+      const themes = await getThemes();
+      themesArray.value = themes.themesArray;
+      themeNamesArray.value = themes.themeNamesArray;
+      themeList.value = themes.themeList;
+      console.log('mounted themeselector');
+
+      setupDraggable(paintbrushRef.value, 'paintbrush');
+      setupDraggable(underlineRef.value, 'underline');
+      setupDraggable(navbarIconsRef.value, 'navbarIcons');
+      setupDraggable(checkboxRef.value, 'checkbox');
+
+      if (!props.currentTheme) {
+        setDefaultTheme();
+      }
     });
 
-    const handleMouseEnter = () => {
-      gsap.to(underlinePath.value, 0.6, {
-        opacity: 1,
-        attr: { d: "M0,60 Q500,50 1000,60", "stroke-width": 6 },
-        ease: Elastic.easeOut.config(2, 0.3),
-      });
-    };
-
-    const handleMouseLeave = () => {
-      gsap.to(underlinePath.value, 1, {
-        opacity: 0,
-        attr: { d: "M0,50 Q500,50 1000,50" },
-        ease: Elastic.easeOut.config(1, 0.5),
-        delay: 2,
-      });
-    };
-
-    const handleTitleClick = () => {
-      gsap.fromTo(
-        underlinePath.value,
-        { attr: { d: "M0,50 Q500,100 1000,50" } },
-        {
-          attr: { d: "M0,50 Q500,0 1000,50" },
-          ease: Elastic.easeOut.config(1, 0.3),
-          duration: 0.5,
-        }
-      );
-    };
-
     return {
-      titleWrapper,
-      underlinePath,
-      handleMouseEnter,
-      handleMouseLeave,
-      handleTitleClick,
-      spinBrush,
-      speedUpBrush,
-      handleBrushClick,
-      sunRotation,
-      moonRotation,
-      underlineSVG,
+      paintbrushRef,
+      underlineRef,
+      navbarIconsRef,
+      checkboxRef,
+      tooltipX,
+      tooltipY,
+      tooltipContent,
+      themesArray,
+      themeNamesArray,
+      themeList,
+      selectedThemeKey,
+      handleTooltip,
     };
   },
+
   data(): Data {
-    const rotationData = calculateRotation();
     return {
-      currentComponent: "ThemeSelector",
-      scriptContentForTooltip: "",
+      currentComponent: 'ThemeSelector',
       showTooltip: false,
-      tooltipText: "",
-      tooltipX: 0,
-      tooltipY: 0,
-      theme: "",
+      theme: '',
       themeData: {} as monaco.editor.IStandaloneThemeData,
-      sunRotation: rotationData.sunRotation,
-      moonRotation: rotationData.moonRotation,
+      isDraggable: false,
     };
   },
   computed: {
     sunMoonStyles(): Record<string, string> {
       return {
-        "--sun-rotation-deg": `${this.sunRotation}deg`,
-        "--moon-rotation-deg": `${this.moonRotation}deg`,
+        '--sun-rotation-deg': `${this.sunRotation}deg`,
+        '--moon-rotation-deg': `${this.moonRotation}deg`,
       };
     },
     displaySun(): boolean {
@@ -275,39 +277,39 @@ export default defineComponent({
     },
   },
   methods: {
-    updateTooltipText(newText: string) {
-      this.tooltipText = newText;
-    },
+    const updateTooltipText = (newText: string) => {
+      showTooltip.value = true;
+      tooltipX.value = 100; 
+      tooltipY.value = 100; 
+    };
     rotateSunOrMoon() {
       const { sunRotation, moonRotation } = calculateRotation();
       this.sunRotation = sunRotation;
       this.moonRotation = moonRotation;
     },
-    handleMouseOver(event: MouseEvent): void {
-      const target = event.target as HTMLElement;
-      this.showTooltip = true;
-      this.tooltipText = target.dataset.tooltip || "";
-      this.tooltipX = event.pageX;
-      this.tooltipY = event.pageY;
-    },
-    handleIconMouseOver() {
-      const icon = document.getElementById(
-        "iconToChangeColor"
-      ) as HTMLImageElement;
-      icon.style.filter = "invert(1)";
-    },
-    handleIconMouseOut() {
-      const icon = document.getElementById(
-        "iconToChangeColor"
-      ) as HTMLImageElement;
-      icon.style.filter = "invert(0)";
-    },
+    const handleMouseOver = (event: MouseEvent) => {
+      tooltipX.value = event.clientX;
+      tooltipY.value = event.clientY;
+      showTooltip.value = true;
+    };
+
     handleComponentChange(componentName: string) {
       this.currentComponent = componentName;
+      this.titleText = '';
+      this.typeWriterEffect(this.$t(this.formatTitle(componentName)), 0);
+    },
+    typeWriterEffect(text: string, index: number) {
+      if (index < text.length) {
+        const letter = text.charAt(index);
+        const spanId = `letter-${index}`;
+        this.titleText += `<span id="${spanId}">${letter}</span>`;
+        gsap.fromTo(`#${spanId}`, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.2 });
+        setTimeout(() => this.typeWriterEffect(text, index + 1), 100); // adjust delay as needed
+      }
     },
     formatTitle(componentName: string) {
       return componentName
-        .replace(/([A-Z])/g, " $1")
+        .replace(/([A-Z])/g, ' $1')
         .replace(/^./, (str) => str.toUpperCase());
     },
     showScriptTooltip(data: any) {
@@ -320,8 +322,8 @@ export default defineComponent({
       this.showTooltip = false;
     },
     loadScriptIntoEditor(content: string) {
-      console.log("content:", content);
-      this.$emit("loadScriptIntoEditor", content);
+      console.log('content:', content);
+      this.$emit('loadScriptIntoEditor', content);
     },
     showThemeTooltip(data: any) {
       this.tooltipX = data.x;
@@ -338,25 +340,33 @@ export default defineComponent({
       this.showTooltip = false;
     },
     adjustTooltipPosition(event: MouseEvent) {
-      const navbar = document.querySelector(".navbar-container") as HTMLElement;
+      const navbar = document.querySelector('.navbar-container') as HTMLElement;
       const navbarRect = navbar.getBoundingClientRect();
       const navbarX = navbarRect.left;
       const navbarY = navbarRect.top;
 
       this.tooltipX = event.pageX - navbarX + 10;
       this.tooltipY = event.pageY - navbarY + 10;
+
+      const checkbox = document.querySelector(
+        '.crazy-mode-checkbox',
+      ) as HTMLInputElement;
+      if (checkbox && checkbox.checked) {
+        this.tooltipY += 30;
+      }
     },
     handleMouseOut() {
       this.showTooltip = false;
+      this.isDraggable = false;
     },
     listenForKonamiCode() {
-      let input = "";
-      const secret = "38384040373937396665";
-      window.addEventListener("keyup", (e: KeyboardEvent) => {
-        input += "" + e.keyCode;
+      let input = '';
+      const secret = '38384040373937396665';
+      window.addEventListener('keyup', (e: KeyboardEvent) => {
+        input += '' + e.keyCode;
         if (input === secret) {
           this.activatePixelPerfection();
-          input = "";
+          input = '';
         }
       });
     },
@@ -381,7 +391,6 @@ export default defineComponent({
   overflow: hidden;
   background-color: rgba(246, 248, 250, 0.9);
   z-index: 0;
-
 }
 .sun-moon-container {
   position: absolute;
@@ -467,7 +476,7 @@ export default defineComponent({
 
 .title-wrapper {
   position: relative;
-  display: inline-flex;
+  display: inline-block;
   cursor: pointer;
 }
 
@@ -505,42 +514,41 @@ export default defineComponent({
 }
 
 .title {
-  font: 1.2rem monospace;
   letter-spacing: 0.075rem;
-  margin: 0;
-  padding: 1rem 0 0.2rem 0;
-  border-radius: 8px 0 0 8px;
-  background-color: #f6f8fa;
   color: #333;
-  font-weight: bold;
   text-transform: uppercase;
-  flex: 1;
-  width: calc(100% - 150px);
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
   cursor: pointer;
-  overflow: hidden;
-  z-index: 2;
-  transition: color 0.3s;
+  z-index: 10000;
+  background-color: #0000;
+  flex: 1;
+  width: 100%;
+  height: 2em;
+  margin: 0;
+  padding: 2.5rem 0 0.2rem;
+  font: 700 1.2rem monospace;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: relative;
+  text-align: left;
+  font-size: 20px;
 }
 
 .underline {
-  position: absolute;
-  bottom: -10px;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 99999999999;
+  z-index: 1;
   cursor: pointer;
-  transition: stroke 0.3s ease;
+  scale: calc(1 + 0.1 * var(--speed));
+  background-color: #0000;
+  width: 100%;
+  transition: stroke 0.3s;
+  position: relative;
+  bottom: 0;
+  left: 0;
 }
 
 .underline-path {
-  stroke: #fff;
-  transition: stroke 2s ease;
+  fill: none;
+  stroke-linecap: round;
 }
 
 // Animation Keyframes

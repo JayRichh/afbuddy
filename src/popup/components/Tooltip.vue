@@ -33,8 +33,8 @@ import {
   ref,
   toRefs,
   Prop,
-} from "vue";
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+} from 'vue';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 interface Props {
   content: string;
@@ -73,7 +73,7 @@ export default defineComponent({
     },
     theme: {
       type: String,
-      default: "GitHub",
+      default: 'GitHub',
     },
     isCodeEditorPreview: {
       type: Boolean,
@@ -83,36 +83,36 @@ export default defineComponent({
   setup(props: Props) {
     const monacoContainer = ref<HTMLElement | null>(null);
     const editorInstance = ref<monaco.editor.IStandaloneCodeEditor | null>(
-      null
+      null,
     );
 
     const tooltipSize = computed(() => {
-      return props.isCodeEditorPreview ? "200px" : "100px";
+      return props.isCodeEditorPreview ? '200px' : '100px';
     });
 
     const createEditor = () => {
       if (monacoContainer.value) {
         const config = {
           value: props.content,
-          language: "javascript",
+          language: 'javascript',
           theme: props.theme,
           fontSize: 20,
           lineHeight: 30,
-          lineNumbers: "off",
+          lineNumbers: 'off',
           minimap: { enabled: false },
           overviewRulerLanes: 0,
           mouseWheelZoom: false,
-          cursorStyle: "line",
-          cursorBlinking: "blink",
-          renderWhitespace: "none",
-          wordWrap: "on",
+          cursorStyle: 'line',
+          cursorBlinking: 'blink',
+          renderWhitespace: 'none',
+          wordWrap: 'on',
           automaticLayout: true,
           folding: false,
           readOnly: true,
           lineDecorationsWidth: 0,
           scrollbar: {
-            vertical: "hidden",
-            horizontal: "hidden",
+            vertical: 'hidden',
+            horizontal: 'hidden',
             useShadows: false,
           },
           glyphMargin: false,
@@ -121,7 +121,7 @@ export default defineComponent({
 
         editorInstance.value = monaco.editor.create(
           monacoContainer.value,
-          config
+          config,
         );
         applyTheme();
       }
@@ -146,7 +146,7 @@ export default defineComponent({
       }
       if (props.content) {
         const navItem = document.querySelector(
-          ".nav-item[data-tooltip='" + props.content + "']"
+          ".nav-item[data-tooltip='" + props.content + "']",
         );
         if (navItem) {
           navItem.textContent = props.content;
@@ -165,17 +165,17 @@ export default defineComponent({
             createEditor();
           }
         }
-      }
+      },
     );
 
     watch(
-  () => props.content,
-  (newVal) => {
-    if (newVal && editorInstance.value) {
-      editorInstance.value.setValue(newVal);
-    }
-  }
-);
+      () => props.content,
+      (newVal) => {
+        if (newVal && editorInstance.value) {
+          editorInstance.value.setValue(newVal);
+        }
+      },
+    );
 
     watch(
       () => props.themeData,
@@ -183,7 +183,25 @@ export default defineComponent({
         if (newVal && Object.keys(newVal).length > 0 && editorInstance.value) {
           applyTheme();
         }
-      }
+      },
+    );
+
+    watch(
+      () => props.x,
+      (newVal) => {
+        if (newVal) {
+          const x = newVal;
+        }
+      },
+    );
+
+    watch(
+      () => props.y,
+      (newVal) => {
+        if (newVal) {
+          const y = newVal;
+        }
+      },
     );
 
     return {
@@ -205,10 +223,10 @@ export default defineComponent({
   font-size: 16px;
   line-height: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  font-family: "Montserrat", sans-serif;
+  font-family: 'Montserrat', sans-serif;
 
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     border-width: 5px 5px 5px 5px;
     border-style: solid;

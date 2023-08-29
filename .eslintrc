@@ -5,10 +5,7 @@
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended"
   ],
-  "plugins": [
-    "@typescript-eslint",
-    "react"
-  ],
+  "plugins": ["@typescript-eslint", "react"],
   "env": {
     "browser": true,
     "node": true,
@@ -39,25 +36,19 @@
     "chrome": true
   },
   "rules": {
-    "curly": [
-      "warn",
-      "all"
-    ],
+    "curly": ["warn", "all"],
     "no-console": "warn",
     "@typescript-eslint/member-delimiter-style": "off",
     "@typescript-eslint/type-annotation-spacing": "off",
     "@typescript-eslint/ban-ts-ignore": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/no-namespace":"off",
+    "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/prefer-namespace-keyword": "off",
     "@typescript-eslint/no-empty-function": [
       "error",
       {
-        "allow": [
-          "functions",
-          "arrowFunctions"
-        ]
+        "allow": ["functions", "arrowFunctions"]
       }
     ]
   }

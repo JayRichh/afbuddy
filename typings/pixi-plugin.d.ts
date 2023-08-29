@@ -64,20 +64,17 @@ declare namespace PixiPlugin {
 }
 
 declare namespace gsap {
-
   interface TweenVars {
     pixi?: PixiPlugin.Vars;
   }
 }
 
 declare namespace gsap.plugins {
-
   interface PixiPlugin extends Plugin {
-
     /**
-     * Registers the main PIXI library object with the PixiPlugin so that it can find the 
+     * Registers the main PIXI library object with the PixiPlugin so that it can find the
      * necessary classes/objects. You only need to register it once.
-     * 
+     *
      * ```js
      * PixiPlugin.registerPIXI(PIXI);
      * ```
@@ -90,7 +87,7 @@ declare namespace gsap.plugins {
   }
 
   interface PixiPluginClass extends PixiPlugin {
-    new(): PluginScope & PixiPlugin;
+    new (): PluginScope & PixiPlugin;
     prototype: PluginScope & PixiPlugin;
   }
 
@@ -99,40 +96,40 @@ declare namespace gsap.plugins {
 
 declare const PixiPlugin: gsap.plugins.PixiPlugin;
 
-declare module "gsap/PixiPlugin" {
+declare module 'gsap/PixiPlugin' {
   export const PixiPlugin: gsap.plugins.PixiPlugin;
   export { PixiPlugin as default };
 }
 
-declare module "gsap/src/PixiPlugin" {
-  export * from "gsap/PixiPlugin";
-  export { PixiPlugin as default } from "gsap/PixiPlugin";
+declare module 'gsap/src/PixiPlugin' {
+  export * from 'gsap/PixiPlugin';
+  export { PixiPlugin as default } from 'gsap/PixiPlugin';
 }
 
-declare module "gsap/dist/PixiPlugin" {
-  export * from "gsap/PixiPlugin";
-  export { PixiPlugin as default } from "gsap/PixiPlugin";
+declare module 'gsap/dist/PixiPlugin' {
+  export * from 'gsap/PixiPlugin';
+  export { PixiPlugin as default } from 'gsap/PixiPlugin';
 }
 
-declare module "gsap/all" {
-  export * from "gsap/PixiPlugin";
+declare module 'gsap/all' {
+  export * from 'gsap/PixiPlugin';
 }
 
-declare module "gsap-trial/PixiPlugin" {
-  export * from "gsap/PixiPlugin";
-  export { PixiPlugin as default } from "gsap/PixiPlugin";
+declare module 'gsap-trial/PixiPlugin' {
+  export * from 'gsap/PixiPlugin';
+  export { PixiPlugin as default } from 'gsap/PixiPlugin';
 }
 
-declare module "gsap-trial/src/PixiPlugin" {
-  export * from "gsap/PixiPlugin";
-  export { PixiPlugin as default } from "gsap/PixiPlugin";
+declare module 'gsap-trial/src/PixiPlugin' {
+  export * from 'gsap/PixiPlugin';
+  export { PixiPlugin as default } from 'gsap/PixiPlugin';
 }
 
-declare module "gsap-trial/dist/PixiPlugin" {
-  export * from "gsap/PixiPlugin";
-  export { PixiPlugin as default } from "gsap/PixiPlugin";
+declare module 'gsap-trial/dist/PixiPlugin' {
+  export * from 'gsap/PixiPlugin';
+  export { PixiPlugin as default } from 'gsap/PixiPlugin';
 }
 
-declare module "gsap-trial/all" {
-  export * from "gsap/PixiPlugin";
+declare module 'gsap-trial/all' {
+  export * from 'gsap/PixiPlugin';
 }

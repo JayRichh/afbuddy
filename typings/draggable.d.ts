@@ -1,5 +1,4 @@
 declare class Draggable {
-
   static version: string;
   static zIndex: number;
 
@@ -26,8 +25,8 @@ declare class Draggable {
   readonly scrollProxy: any; // TODO: Create interface
   readonly startX: number;
   readonly startY: number;
-  readonly target: HTMLElement | SVGElement;  
-  readonly tween: gsap.core.Tween;  
+  readonly target: HTMLElement | SVGElement;
+  readonly tween: gsap.core.Tween;
   readonly vars: Draggable.Vars;
   readonly x: number;
   readonly y: number;
@@ -36,7 +35,7 @@ declare class Draggable {
 
   /**
    * A more flexible way to create Draggable instances than the constructor.
-   * 
+   *
    * ```js
    * Draggable.create(".myClass", {type: "x,y"});
    * ```
@@ -51,7 +50,7 @@ declare class Draggable {
 
   /**
    * Get the Draggable instance that's associated with a particular DOM element.
-   * 
+   *
    * ```js
    * var draggable = Draggable.get("#myId");
    * ```
@@ -65,7 +64,7 @@ declare class Draggable {
 
   /**
    * Test whether or not the target element overlaps with a particular element or the mouse position, optionally including a threshold.
-   * 
+   *
    * ```js
    * Draggable.hitTest(element1, element2, 20)
    * ```
@@ -77,11 +76,15 @@ declare class Draggable {
    * @memberof Draggable
    * @link https://greensock.com/docs/v3/Plugins/Draggable/static.hitTest()
    */
-  static hitTest(testObject1: Draggable.TestObject, testObject2: Draggable.TestObject, threshold?: number | string): boolean;
+  static hitTest(
+    testObject1: Draggable.TestObject,
+    testObject2: Draggable.TestObject,
+    threshold?: number | string,
+  ): boolean;
 
   /**
    * Returns the time (in seconds) that has elapsed since the last drag ended.
-   * 
+   *
    * ```js
    * Draggable.timeSinceDrag();
    * ```
@@ -91,11 +94,10 @@ declare class Draggable {
    * @link https://greensock.com/docs/v3/Plugins/Draggable/static.timeSinceDrag()
    */
   static timeSinceDrag(): number;
-  
 
   /**
    * Registers a function that should be called each time a particular type of event occurs.
-   * 
+   *
    * ```js
    * draggable.addEventListener("press", myPressFunction);
    * ```
@@ -109,7 +111,7 @@ declare class Draggable {
 
   /**
    * Registers a function that should be called each time a particular type of event occurs.
-   * 
+   *
    * ```js
    * draggable.applyBounds("#dragContainer");
    * draggable.applyBounds({top: 100, left: 0, width: 1000, height: 800});
@@ -121,11 +123,17 @@ declare class Draggable {
    * @memberof Draggable
    * @link https://greensock.com/docs/v3/Plugins/Draggable/applyBounds()
    */
-  applyBounds(bounds: gsap.DOMTarget | Draggable.BoundsMinMax | Draggable.BoundsRectangle | Draggable.BoundsRotation): void;
+  applyBounds(
+    bounds:
+      | gsap.DOMTarget
+      | Draggable.BoundsMinMax
+      | Draggable.BoundsRectangle
+      | Draggable.BoundsRotation,
+  ): void;
 
   /**
    * Disables the Draggable instance so that it cannot be dragged anymore.
-   * 
+   *
    * ```js
    * draggable.disable();
    * ```
@@ -141,7 +149,7 @@ declare class Draggable {
 
   /**
    * Enables the Draggable instance so that it can be dragged.
-   * 
+   *
    * ```js
    * draggable.enable();
    * ```
@@ -180,7 +188,7 @@ declare class Draggable {
   enabled(): boolean;
 
   /**
-   * Force the Draggable to immediately stop interactively dragging. 
+   * Force the Draggable to immediately stop interactively dragging.
    * You must pass it the original mouse or touch event that initiated the stop.
    *
    * ```js
@@ -207,11 +215,13 @@ declare class Draggable {
    * @memberof Draggable
    * @link https://greensock.com/docs/v3/Plugins/Draggable/getDirection()
    */
-  getDirection(from: "start" | "velocity" | gsap.DOMTarget): Draggable.Direction;
+  getDirection(
+    from: 'start' | 'velocity' | gsap.DOMTarget,
+  ): Draggable.Direction;
 
   /**
    * Test whether or not the target element overlaps with a particular element or the mouse position, optionally including a threshold.
-   * 
+   *
    * ```js
    * draggable.hitTest(otherElem, 20);
    * ```
@@ -222,26 +232,32 @@ declare class Draggable {
    * @memberof Draggable
    * @link https://greensock.com/docs/v3/Plugins/Draggable/static.hitTest()
    */
-  hitTest(testObject: Draggable.TestObject, threshold?: number | string): boolean;
+  hitTest(
+    testObject: Draggable.TestObject,
+    threshold?: number | string,
+  ): boolean;
 
   /**
    * Disables the Draggable instance and frees it for garbage collection
    * so that it cannot be dragged anymore.
-   * 
+   *
    * ```js
    * draggable.kill();
    * ```
-   * 
+   *
    * @returns {Draggable} The Draggable instance
    * @memberof Draggable
    * @link https://greensock.com/docs/v3/Plugins/Draggable/kill()
    */
   kill(): this;
 
-  removeEventListener(type: Draggable.CallbackType, callback: gsap.Callback): void;
+  removeEventListener(
+    type: Draggable.CallbackType,
+    callback: gsap.Callback,
+  ): void;
 
   /**
-   * Force the Draggable to start interactively dragging. 
+   * Force the Draggable to start interactively dragging.
    * You must pass it the original mouse or touch event that initiated the start.
    *
    * ```js
@@ -257,7 +273,7 @@ declare class Draggable {
 
   /**
    * Returns the time (in seconds) that has elapsed since the last drag ended.
-   * 
+   *
    * ```js
    * draggable.timeSinceDrag();
    * ```
@@ -270,7 +286,7 @@ declare class Draggable {
 
   /**
    * Updates the Draggable's x/y properties to reflect the target element's current position.
-   * 
+   *
    * ```js
    * Draggable.update();
    * ```
@@ -285,41 +301,40 @@ declare class Draggable {
 }
 
 declare namespace Draggable {
+  type CallbackType =
+    | 'click'
+    | 'drag'
+    | 'dragend'
+    | 'dragstart'
+    | 'move'
+    | 'press'
+    | 'release'
+    | 'throwcomplete'
+    | 'throwupdate';
 
-  type CallbackType = 
-    | "click" 
-    | "drag" 
-    | "dragend" 
-    | "dragstart" 
-    | "move" 
-    | "press" 
-    | "release"
-    | "throwcomplete"
-    | "throwupdate";
+  type Direction =
+    | 'down'
+    | 'left'
+    | 'left-down'
+    | 'left-up'
+    | 'up'
+    | 'right'
+    | 'right-down'
+    | 'right-up';
 
-  type Direction = 
-    | "down"
-    | "left"
-    | "left-down"
-    | "left-up"
-    | "up"
-    | "right"
-    | "right-down"
-    | "right-up";
-
-  type DraggableType = 
-    | "left"
-    | "left,top"
-    | "rotation"
-    | "scroll"
-    | "scrollLeft"
-    | "scrollTop"
-    | "top"
-    | "top,left"
-    | "x"
-    | "x,y"
-    | "y"
-    | "y,x";
+  type DraggableType =
+    | 'left'
+    | 'left,top'
+    | 'rotation'
+    | 'scroll'
+    | 'scrollLeft'
+    | 'scrollTop'
+    | 'top'
+    | 'top,left'
+    | 'x'
+    | 'x,y'
+    | 'y'
+    | 'y,x';
 
   type SnapValue = number[] | ((value: number) => number);
   type TestObject = gsap.DOMTarget | Event | Rectangle;
@@ -369,12 +384,15 @@ declare namespace Draggable {
     autoScroll?: number;
     bounds?: gsap.DOMTarget | BoundsMinMax | BoundsRectangle | BoundsRotation;
     callbackScope?: object;
-    clickableTest?: (this: Draggable, element: HTMLElement | SVGElement) => void;
+    clickableTest?: (
+      this: Draggable,
+      element: HTMLElement | SVGElement,
+    ) => void;
     cursor?: string;
     dragClickables?: boolean;
     dragResistance?: number;
     edgeResistance?: number;
-    force3D?: "auto" | boolean;    
+    force3D?: 'auto' | boolean;
     inertia?: boolean | gsap.InertiaVars;
     liveSnap?: boolean | SnapValue | SnapObject;
     lockAxis?: boolean;
@@ -401,10 +419,10 @@ declare namespace Draggable {
     onThrowComplete?: gsap.Callback;
     onThrowCompleteParams?: any[];
     onThrowUpdate?: gsap.Callback;
-    onThrowUpdateParams?: any[];    
+    onThrowUpdateParams?: any[];
     overshootTolerance?: number;
     resistance?: number;
-    snap?: SnapValue | SnapObject;    
+    snap?: SnapValue | SnapObject;
     throwProps?: boolean | gsap.InertiaVars;
     throwResistance?: number;
     trigger?: gsap.DOMTarget;
@@ -413,43 +431,40 @@ declare namespace Draggable {
   }
 }
 
-declare module "gsap/Draggable" {
+declare module 'gsap/Draggable' {
   class _Draggable extends Draggable {}
-  export {
-    _Draggable as Draggable,
-    _Draggable as default
-  }
+  export { _Draggable as Draggable, _Draggable as default };
 }
 
-declare module "gsap/src/Draggable" {
-  export * from "gsap/Draggable";
-  export { Draggable as default } from "gsap/Draggable";
+declare module 'gsap/src/Draggable' {
+  export * from 'gsap/Draggable';
+  export { Draggable as default } from 'gsap/Draggable';
 }
 
-declare module "gsap/dist/Draggable" {
-  export * from "gsap/Draggable";
-  export { Draggable as default } from "gsap/Draggable";
+declare module 'gsap/dist/Draggable' {
+  export * from 'gsap/Draggable';
+  export { Draggable as default } from 'gsap/Draggable';
 }
 
-declare module "gsap/all" {
-  export * from "gsap/Draggable";
+declare module 'gsap/all' {
+  export * from 'gsap/Draggable';
 }
 
-declare module "gsap-trial/Draggable" {
-  export * from "gsap/Draggable";
-  export { Draggable as default } from "gsap/Draggable";
+declare module 'gsap-trial/Draggable' {
+  export * from 'gsap/Draggable';
+  export { Draggable as default } from 'gsap/Draggable';
 }
 
-declare module "gsap-trial/src/Draggable" {
-  export * from "gsap/Draggable";
-  export { Draggable as default } from "gsap/Draggable";
+declare module 'gsap-trial/src/Draggable' {
+  export * from 'gsap/Draggable';
+  export { Draggable as default } from 'gsap/Draggable';
 }
 
-declare module "gsap-trial/dist/Draggable" {
-  export * from "gsap/Draggable";
-  export { Draggable as default } from "gsap/Draggable";
+declare module 'gsap-trial/dist/Draggable' {
+  export * from 'gsap/Draggable';
+  export { Draggable as default } from 'gsap/Draggable';
 }
 
-declare module "gsap-trial/all" {
-  export * from "gsap/Draggable";
+declare module 'gsap-trial/all' {
+  export * from 'gsap/Draggable';
 }

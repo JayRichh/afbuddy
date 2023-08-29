@@ -138,13 +138,14 @@ declare class Observer {
    * @param {number} position
    */
   scrollY(position: number): void;
-
 }
 
 declare namespace Observer {
-
   type ObserverCallback = (self: Observer) => any;
-  type IgnoreCheckCallback = (event: Event, isTouchOrPointer: boolean) => boolean;
+  type IgnoreCheckCallback = (
+    event: Event,
+    isTouchOrPointer: boolean,
+  ) => boolean;
 
   interface ObserverVars {
     allowClicks?: boolean;
@@ -189,43 +190,40 @@ declare namespace Observer {
   }
 }
 
-declare module "gsap/Observer" {
-  class _Observer extends Observer { }
-  export {
-    _Observer as Observer,
-    _Observer as default
-  }
+declare module 'gsap/Observer' {
+  class _Observer extends Observer {}
+  export { _Observer as Observer, _Observer as default };
 }
 
-declare module "gsap/dist/Observer" {
-  export * from "gsap/Observer";
-  export { Observer as default } from "gsap/Observer";
+declare module 'gsap/dist/Observer' {
+  export * from 'gsap/Observer';
+  export { Observer as default } from 'gsap/Observer';
 }
 
-declare module "gsap/src/Observer" {
-  export * from "gsap/Observer";
-  export { Observer as default } from "gsap/Observer";
+declare module 'gsap/src/Observer' {
+  export * from 'gsap/Observer';
+  export { Observer as default } from 'gsap/Observer';
 }
 
-declare module "gsap/all" {
-  export * from "gsap/Observer";
+declare module 'gsap/all' {
+  export * from 'gsap/Observer';
 }
 
-declare module "gsap-trial/Observer" {
-  export * from "gsap/Observer";
-  export { Observer as default } from "gsap/Observer";
+declare module 'gsap-trial/Observer' {
+  export * from 'gsap/Observer';
+  export { Observer as default } from 'gsap/Observer';
 }
 
-declare module "gsap-trial/dist/Observer" {
-  export * from "gsap/Observer";
-  export { Observer as default } from "gsap/Observer";
+declare module 'gsap-trial/dist/Observer' {
+  export * from 'gsap/Observer';
+  export { Observer as default } from 'gsap/Observer';
 }
 
-declare module "gsap-trial/src/Observer" {
-  export * from "gsap/Observer";
-  export { Observer as default } from "gsap/Observer";
+declare module 'gsap-trial/src/Observer' {
+  export * from 'gsap/Observer';
+  export { Observer as default } from 'gsap/Observer';
 }
 
-declare module "gsap-trial/all" {
-  export * from "gsap/Observer";
+declare module 'gsap-trial/all' {
+  export * from 'gsap/Observer';
 }

@@ -1,490 +1,438 @@
 <template>
   <nav class="navbar">
-      
-      <a
-      v-for="item in navItems"
-  :key="item.id"
-  href="#"
-  @click.stop="handleClick(item.componentName, item.ariaLabel)"
-  :aria-label="item.tooltip"
-  :id="item.ariaLabel"
-  :class="[
-    'nav-item icon-container hitbox',
-    isActive(item.componentName) ? 'active' : '',
-    item.selected ? 'selected' : '',
-  ]"
-  @mouseover="hoverMouse($event, item.ariaLabel)"
-  @mousemove="crazyModeEnabled ? magneticPullCrazyEffect($event, item.ariaLabel) : magneticPullEffect($event, item.ariaLabel)"
-  @mouseleave="onIconMouseLeave"
->
-  <div
-    class="icon-mask"
-    :id="`${item.ariaLabel}-mask`"
-    @mouseleave="onIconMouseLeave"
-  >
-    <img
-      :src="item.iconSrc"
-      :alt="item.altText"
-      class="masked-icon black-icon"
-    />
-    <img
-      :src="item.iconMaskSrc"
-      :alt="item.altText"
-      class="masked-icon white-icon"
-    />
-  </div>
-</a>
-<div class="crazy-mode-toggle">
-    <input
-      type="checkbox"
-      id="crazy-mode-checkbox"
-      v-model="crazyModeEnabled"
-      @change="toggleCrazyMode"
-      @mouseover="$emit('updateTooltipText', 'Toggle Crazy Mode')"
-      @mouseleave="$emit('updateTooltipText', '')"
-    />
-  <label for="crazy-mode-checkbox">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      class="checkbox-svg"
-      :class="{ 'checked': crazyModeEnabled }"
+    <a
+      v-for="item in filteredNavItems"
+      :if="shouldShowItem(item)"
+      :key="item.id"
+      ref="iconRefs"
+      :class="{ selected: isActive(item.componentName) }"
+      @click="handleClick($event, item)"
+      @mouseenter="hoverMouse($event, item)"
+      @mouseleave="onIconMouseLeave($event, item)"
+      class="icon-container"
+      :id="item.ariaLabel"
+      :aria-label="item.ariaLabel"
     >
-      <rect
-        x="1"
-        y="1"
-        width="18"
-        height="18"
-        fill="none"
-        stroke="currentColor"
+      <div
+        class="icon-mask"
+        :id="`${item.ariaLabel}-mask`"
+        :aria-label="item.ariaLabel"
+      >
+        <img
+          :src="item.iconSrc"
+          :alt="item.altText"
+          class="masked-icon black-icon"
+        />
+        <img
+          :src="item.iconMaskSrc"
+          :alt="item.altText"
+          class="masked-icon white-icon"
+        />
+      </div>
+    </a>
+    <div class="crazy-mode-toggle">
+      <input
+        ref="crazyModeCheckbox"
+        type="checkbox"
+        class="crazy-mode-checkbox"
+        id="crazy-mode-checkbox"
+        :aria-label="'crazy-mode-checkbox'"
+        v-model="crazyModeEnabled"
+        @change="crazyModeToggle"
       />
-      <path
-        v-if="crazyModeEnabled"
-        d="M5 9l3 3 7-7"
-        stroke="currentColor"
-        fill="none"
-      />
-    </svg>
-  </label>
-</div>
+      <label for="crazy-mode-checkbox">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          class="checkbox-svg"
+          :class="{ checked: crazyModeEnabled }"
+          :style="{ fill: crazyModeEnabled ? 'green' : 'white' }"
+        >
+          <rect
+            x="1"
+            y="1"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+          />
+          <path
+            v-if="crazyModeEnabled"
+            d="M5 9l3 3 7-7"
+            stroke="currentColor"
+            fill="none"
+          />
+        </svg>
+      </label>
+    </div>
   </nav>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
-import Tooltip from "./Tooltip.vue";
-import { gsap, Power2, Elastic, Bounce } from "gsap";
-import { CSSPlugin } from "gsap/CSSPlugin";
-import { ExpoScaleEase, RoughEase, SlowMo } from "gsap/EasePack";
+import { defineComponent, ref, reactive, onMounted, computed } from 'vue';
+import { gsap, Power2, Elastic, Bounce } from 'gsap';
+import { CSSPlugin } from 'gsap/CSSPlugin';
+import { ExpoScaleEase, RoughEase, SlowMo } from 'gsap/EasePack';
+import Draggable from 'gsap/Draggable';
 
-gsap.registerPlugin(CSSPlugin, ExpoScaleEase, RoughEase, SlowMo);
+import { NavItem, NavItems, config, PIDState } from '../../utils/navbarConfig';
+import Tooltip from './Tooltip.vue';
+import { calculateDistance } from '../../utils/calculationUtils';
 
-interface NavItem {
-  id: number | string;
-  componentName: string;
-  tooltip: string;
-  iconSrc: string;
-  iconMaskSrc: string;
-  altText: string;
-  ariaLabel: string;
-  selected?: boolean;
-}
-
-interface NavbarData {
-  draggedIcon: string | null;
-  isDragging: boolean;
-  crazyModeEnabled: boolean;
-  navItems: NavItem[];
-}
+gsap.registerPlugin(CSSPlugin, ExpoScaleEase, RoughEase, SlowMo, Draggable);
 
 export default defineComponent({
   components: {
     Tooltip,
   },
-
   props: {
     currentComponent: String,
   },
 
-  setup(props) {
+  setup(props, { emit }) {
+    // ------------------------------
+    // Variables
+    // ------------------------------
+    const iconRefs = ref<HTMLElement[]>([]);
     const position = ref({ x: 0, y: 0 });
     const crazyModeEnabled = ref(false);
+    const crazyModeCheckbox = ref<HTMLInputElement | null>(null);
+    const showDoomIcon = ref(false);
+    const navItems = reactive<NavItem[]>(NavItems);
 
-    const onMouseMove = (event: MouseEvent) => {
-      const offsetX = Math.min(
-        Math.max(event.clientX - position.value.x, -5),
-        50
-      );
-      const offsetY = Math.min(
-        Math.max(event.clientY - position.value.y, -5),
-        20
-      );
+    let hoveredElement: HTMLElement | null = null;
+    let isDragging = ref(false);
 
-      position.value.x += offsetX;
-      position.value.y += offsetY;
-    };
+    let pidState = new Map<string, PIDState>();
 
-    const onIconMouseLeave = (event: Event) => {
-      const target = event.target as HTMLElement;
+    // ------------------------------
+    // Lifecycle Hooks
+    onMounted(() => {
+      iconRefs.value = iconRefs.value.map((ref) => ref as HTMLElement);
 
-      gsap.to(target, {
-        x: 0,
-        y: 0,
-        scale: 1,
-        ease: ExpoScaleEase.config(1, 1.5, Power2.easeOut),
-        duration: 1,
-      });
-    };
 
-    return { position, onMouseMove, onIconMouseLeave, crazyModeEnabled };
-  },
+  // Make the icons draggable
+  iconRefs.value.forEach((icon) => {
+    const originalPosition = { x: icon.offsetLeft, y: icon.offsetTop };
 
-  data(): NavbarData {
-    return {
-      draggedIcon: null,
-      isDragging: false,
-      crazyModeEnabled: false,
-      navItems: [
-        {
-          id: "1",
-          componentName: "ThemeSelector",
-          iconSrc: require("../../../assets/icons/theme.png"),
-          iconMaskSrc: require("../../../assets/icons/themeWhite.png"),
-          altText: "theme-icon",
-          ariaLabel: "Themes",
-          selected: true,
-        },
-        {
-          id: "2",
-          componentName: "TabWidthSetter",
-          iconSrc: require("../../../assets/icons/formatting.png"),
-          iconMaskSrc: require("../../../assets/icons/formattingWhite.png"),
-          altText: "formatting-icon",
-          ariaLabel: "Formatting",
-          selected: false,
-        },
-        {
-          id: "3",
-          componentName: "CodeControls",
-          iconSrc: require("../../../assets/icons/history.png"),
-          iconMaskSrc: require("../../../assets/icons/historyWhite.png"),
-          altText: "code-icon",
-          ariaLabel: "Code Editor",
-          selected: false,
-        },
-        {
-          id: "4",
-          componentName: "Geolocations",
-          iconSrc: require("../../../assets/icons/geolocation.png"),
-          iconMaskSrc: require("../../../assets/icons/geolocationWhite.png"),
-          altText: "geolocation-icon",
-          ariaLabel: "Geolocation",
-          selected: false,
-        },
-        {
-          id: "5",
-          componentName: "UserAgents",
-          iconSrc: require("../../../assets/icons/userAgent.png"),
-          iconMaskSrc: require("../../../assets/icons/userAgentWhite.png"),
-          altText: "user-agent-icon",
-          ariaLabel: "User Agents",
-          selected: false,
-        },
-        {
-          id: "6",
-          componentName: "DoomPlayer",
-          iconSrc: require("../../../assets/icons/doom.png"),
-          iconMaskSrc: require("../../../assets/icons/doomWhite.png"),
-          altText: "doom-icon",
-          ariaLabel: "Doom",
-          selected: false,
-        },
-        {
-          id: "7",
-          componentName: "Info",
-          iconSrc: require("../../../assets/icons/information.png"),
-          iconMaskSrc: require("../../../assets/icons/informationWhite.png"),
-          altText: "info-icon",
-          ariaLabel: "Info",
-          selected: false,
-        },
-      ] as NavItem[],
-    };
-  },
+    Draggable.create(icon, {
+      type: "x,y",
+      edgeResistance: 0.65,
+      bounds: "body",
+      onDragEnd: function() {
+        const distance = calculateDistance(
+          this.x - originalPosition.x,
+          this.y - originalPosition.y,
+          0,
+          0
+        );
 
-  methods: {
-    magneticPullCrazyEffect(event: MouseEvent, ariaLabel: string): void {
-      const iconElement = document.getElementById(ariaLabel);
-      const maskElement = document.getElementById(`${ariaLabel}-mask`);
-
-      if (iconElement && maskElement) {
-        gsap.to([iconElement, maskElement], {
-          x: (event.clientX - iconElement.getBoundingClientRect().left) * 0.2,
-          y: (event.clientY - iconElement.getBoundingClientRect().top) * 0.2,
-          ease: RoughEase.ease.config({
-            strength: 1,
-            points: 20,
-            taper: "none",
-            randomize: true,
-          }),
-          duration: 1,
-        });
-      }
-    },
-    magneticPullEffect(event: MouseEvent, ariaLabel: string): void {
-      const iconContainer = document.getElementById(ariaLabel);
-      if (!iconContainer || this.isDragging) return;
-
-      const hoverArea = 0.8;
-      const cursor = { x: event.clientX, y: event.clientY - window.scrollY };
-      const width = iconContainer.offsetWidth;
-      const height = iconContainer.offsetHeight;
-      const offset = iconContainer.getBoundingClientRect();
-      const elPos = { x: offset.left + width / 2, y: offset.top + height / 2 };
-      const x = cursor.x - elPos.x;
-      const y = cursor.y - elPos.y;
-      const dist = Math.sqrt(x * x + y * y);
-      const mutHover = dist < width * hoverArea;
-
-      if (mutHover) {
-        const angle = Math.atan2(y, x);
-        const step = 1;
-        const tx = Math.cos(angle) * step * 2  * 0.5;
-        const ty = Math.sin(angle) * step * 2 * 0.5;
-        const scale = 1.15;
-        const rotation = 0.1;
-
-        gsap.to(iconContainer, 0.7, {
-          x: tx,
-          y: ty,
-          scale,
-          rotation,
-          ease: Elastic.easeOut.config(1.2, 0.4),
-          onComplete: () => {
-            gsap.to(iconContainer, 0.5, {
-              scale: 1.05,
-              ease: Bounce.easeOut,
-            });
-          },
-        });
-      } else {
-        gsap.to(iconContainer, 0.7, {
-          x: 0,
-          y: 0,
-          scale: 1,
-          rotation: 0,
-          ease: Elastic.easeOut.config(1.2, 0.4),
-          onComplete: () => {
-            gsap.to(iconContainer, 0.5, {
-              scale: 1,
-              ease: Bounce.easeOut,
-            });
-          },
-        });
-      }
-    },
-
-    calculateDistance(event: MouseEvent, ariaLabel: string): number {
-      const iconContainer = document.getElementById(ariaLabel);
-      if (!iconContainer) return 0;
-
-      const mouseX = event.clientX;
-      const mouseY = event.clientY;
-      const iconX =
-        iconContainer.getBoundingClientRect().left +
-        iconContainer.offsetWidth / 2;
-      const iconY =
-        iconContainer.getBoundingClientRect().top +
-        iconContainer.offsetHeight / 2;
-
-      return Math.sqrt((mouseX - iconX) ** 2 + (mouseY - iconY) ** 2);
-    },
-
-    resetIcon(ariaLabel: string): void {
-      const iconElement = document.getElementById(ariaLabel);
-      const maskElement = document.getElementById(`${ariaLabel}-mask`);
-
-      if (iconElement && maskElement) {
-        gsap.to([iconElement, maskElement], {
-          x: 0,
-          y: 0,
-          scale: 1,
-          rotation: 0,
-          ease: Elastic.easeOut.config(1.2, 0.4),
-          duration: 0.7,
-        });
-      }
-    },
-
-    toggleCrazyMode(): void {
-      this.crazyModeEnabled = !this.crazyModeEnabled;
-      if (!this.crazyModeEnabled) {
-        this.navItems.forEach((item) => {
-          this.resetIcon(item.ariaLabel);
-        });
-      }
-    },
-
-    applyMagneticEffect(event: MouseEvent): void {
-      if (this.crazyModeEnabled) {
-        this.navItems.forEach((item: NavItem) => {
-          if (item.ariaLabel) {
-            this.magneticPullCrazyEffect(event, item.ariaLabel);
-          }
-        });
-      } else {
-        this.navItems.forEach((item: NavItem) => {
-          if (item.ariaLabel) {
-            this.magneticPullEffect(event, item.ariaLabel);
-          }
-        });
-      }
-    },
-
-    mounted() {
-      onMounted(() => {
-        this.$nextTick(() => {
-          this.navItems.forEach((item: NavItem) => {
-            const iconContainer = document.getElementById(item.ariaLabel);
-            if (iconContainer) {
-              iconContainer.addEventListener("mousemove", (event: MouseEvent) => {
-                this.applyMagneticEffect(event);
-              });
-            }
+        if (distance > 20) { // If the distance is more than 20px
+          gsap.to(this.target, { // Animate the icon back to its original position
+            x: originalPosition.x,
+            y: originalPosition.y,
+            duration: 0.5,
+            ease: "power1.out"
           });
-        });
-      });
-    },
-
-    hoverMouse(event: MouseEvent, ariaLabel: string): void {
-      if (!this.isDragging) {
-        this.$emit("updateTooltipText", ariaLabel);
-      }
-    },
-
-    clipIcons(ariaLabel: string, clipWidth: number): void {
-      if (this.isDragging && ariaLabel === this.draggedIcon) {
-        const iconContainer = document.getElementById(ariaLabel);
-        const whiteIcon = iconContainer?.querySelector(
-          ".white-icon"
-        ) as HTMLElement;
-        const blackIcon = iconContainer?.querySelector(
-          ".black-icon"
-        ) as HTMLElement;
-
-        gsap.to(whiteIcon, 0.7, {
-          clipPath: `inset(0 0 0 ${50 + clipWidth}px)`,
-          ease: Power2.easeOut,
-        });
-
-        gsap.to(blackIcon, 0.7, {
-          clipPath: `inset(0 ${50 - clipWidth}px 0 0)`,
-          ease: Power2.easeOut,
-        });
-      }
-    },
-
-    calculateClipWidthAndNavbarRight(
-      event: MouseEvent,
-      ariaLabel: string
-    ): { clipWidth: number; navbarRight: number } {
-      const iconContainer = document.getElementById(ariaLabel);
-      if (!iconContainer) return { clipWidth: 0, navbarRight: 0 };
-
-      const initialX = event.clientX;
-      const navbarLeft = iconContainer.getBoundingClientRect().left + 50; // 50px from left edge
-      const navbarRight = iconContainer.getBoundingClientRect().right;
-      const offsetX = event.clientX - initialX;
-      const clipWidth = Math.min(
-        Math.max(0, navbarRight - navbarLeft + offsetX),
-        100
-      );
-
-      return { clipWidth, navbarRight };
-    },
-
-    handleClick(componentName: string, ariaLabel: string) {
-      // this.animateIcon(ariaLabel); no
-      this.showComponent(componentName);
-      this.navItems.forEach((item) => {
-        if (item.componentName === componentName) {
-          item.selected = true;
-        } else {
-          item.selected = false;
         }
+      }
+    });
+  });
+
+    // ------------------------------
+    // Methods
+    /** @param el - Adds an HTMLElement to iconRefs.
+     */
+    const addIconRef = (el: HTMLElement) => {
+      if (el) {
+        iconRefs.value.push(el);
+      }
+    };
+
+    /** @param componentName - Checks if a component is active.
+     */
+    const isActive = (componentName: string) => {
+      return componentName === props.currentComponent;
+    };
+
+    /** @param componentName - Emits a changeComponent event.
+     */
+    const showComponent = (componentName: string) => {
+      emit('changeComponent', componentName);
+    };
+
+    /** @param item - Checks if an item should be shown
+     */
+    const shouldShowItem = (item: NavItem) => {
+      return item.componentName !== 'DoomPlayer' || showDoomIcon.value;
+    };
+
+    /** @returns {NavItem[]} An array of filtered navigation items.
+     */
+    const filteredNavItems = computed(() => {
+      return navItems.filter(
+        (item) => !item.crazyMode || crazyModeEnabled.value,
+      );
+    });
+
+    /** @param event - The MouseEvent object.
+     * @param item - Handles click event on navigation items.
+     */
+    const handleClick = (event: MouseEvent, item: NavItem) => {
+      event.preventDefault();
+      emit('updateTooltipText', item.ariaLabel);
+
+      navItems.forEach((navItem) => {
+        navItem.selected = navItem.id === item.id;
       });
-    },
+      if (!isDragging.value) {
+        showComponent(item.componentName);
+      }
+    };
 
-    showComponent(componentName: string) {
-      this.$emit("changeComponent", componentName);
-    },
+    /** @param event - The MouseEvent object.
+     * @param item - Handles mouse hover event on navigation items.
+     */
+    const hoverMouse = (event: MouseEvent, item: NavItem) => {
+      const distance = calculateDistance(
+        event.clientX,
+        event.clientY,
+        item.position.x,
+        item.position.y,
+      );
+      if (distance < 50) {
+        applyMagneticEffect(event, item);
+      }
+      const tooltip = document.querySelector('.tooltip') as HTMLElement;
+      if (tooltip) {
+        tooltip.style.visibility = 'visible';
+      }
+    };
 
-    animateIcon(ariaLabel: string) {
-      const icon = this.$el.querySelector(`a[aria-label='${ariaLabel}']`);
+    /** @param event - The MouseEvent object.
+     * @param item - Handles mouse enter event on navigation items.
+     */
+    const onIconMouseEnter = (event: MouseEvent, item: NavItem) => {
+      hoveredElement = event.target as HTMLElement;
+      document.addEventListener('mousemove', (e) =>
+        applyMagneticEffect(e, item),
+      );
+      emit('updateTooltipText', item.ariaLabel);
+    };
+
+    /** @param ariaLabel - Animates an icon.
+     */
+    const animateIcon = (ariaLabel: string) => {
+      const icon = document.querySelector(`a[aria-label='${ariaLabel}']`);
       if (icon) {
-        const animationClass = this.getAnimationClass(ariaLabel);
+        const animationClass = getAnimationClass(ariaLabel);
         icon.classList.add(animationClass);
         setTimeout(() => {
           icon.classList.remove(animationClass);
         }, 3000);
       }
-    },
-
-    getAnimationClass(ariaLabel: string): string {
+    };
+    /**@param ariaLabel - Returns the animation class for an icon.
+     */
+    const getAnimationClass = (ariaLabel: string): string => {
       const animationMap = {
-        Themes: "paintbrushFlick",
-        Formatting: "pyramidRoll",
-        "Code Editor": "wheelSpin",
-        Geolocation: "markerPulse",
-        "User Agents": "magnifyZoom",
-        Doom: "gamePulse",
-        Info: "infoAwesome",
+        Themes: 'paintbrushFlick',
+        Formatting: 'pyramidRoll',
+        'Code Editor': 'wheelSpin',
+        Geolocation: 'markerPulse',
+        'User Agents': 'magnifyZoom',
+        Doom: 'gamePulse',
+        Info: 'infoAwesome',
       } as Record<string, string>;
-      return animationMap[ariaLabel] || "";
-    },
 
-    isActive(componentName: string) {
-      return componentName === this.currentComponent;
-    },
+      return animationMap[ariaLabel] || '';
+    };
+
+    // ------------------------------
+    /** @param event - The MouseEvent object.
+     * @param item - Applies a magnetic effect to an icon.
+     */
+    const applyMagneticEffect = (event: MouseEvent, item: NavItem | string) => {
+      if (!crazyModeEnabled.value) {
+        const ariaLabel = typeof item === 'string' ? item : item.ariaLabel;
+        const icon = document.querySelector(
+          `a[aria-label='${ariaLabel}']`,
+        ) as HTMLElement;
+
+        if (icon) {
+          const rect = icon.getBoundingClientRect();
+          let errorX = event.clientX - rect.left - rect.width / 2;
+          let errorY = event.clientY - rect.top - rect.height / 2;
+          const distance = calculateDistance(errorX, errorY, 0, 0);
+
+          let state = pidState.get(ariaLabel);
+          if (!state) {
+            state = {
+              integralX: 0,
+              integralY: 0,
+              previousErrorX: 0,
+              previousErrorY: 0,
+              originalX: rect.left + rect.width / 2,
+              originalY: rect.top + rect.height / 2,
+              setPointX: rect.left + rect.width / 2,
+              setPointY: rect.top + rect.height / 2,
+            };
+            pidState.set(ariaLabel, state);
+          }
+          const detachThreshold = config.maxDetachDistance;
+          const maxDetachDistance = config.maxDetachDistance;
+          const maxMovement = config.maxMovement;
+          const Kp = config.Kp;
+          const Ki = config.Ki;
+          const Kd = config.Kd;
+
+          if (distance > detachThreshold) {
+            errorX = state.setPointX - rect.left - rect.width / 2;
+            errorY = state.setPointY - rect.top - rect.height / 2;
+          }
+
+          if (distance > maxDetachDistance) {
+            state.setPointX = state.originalX;
+            state.setPointY = state.originalY;
+            icon.style.transform = `translate(${state.originalX}px, ${state.originalY}px) scale(1)`;
+            return;
+          }
+
+          const KpScaled = Kp * (distance / maxDetachDistance); // sticktion
+          const KiScaled = Ki * (distance / maxDetachDistance); // sticktion
+          const KdScaled = Kd * (distance / maxDetachDistance); // sticktion
+
+          if (
+            Math.abs(errorX) > maxMovement ||
+            Math.abs(errorY) > maxMovement
+          ) {
+            state.setPointX = state.originalX;
+            state.setPointY = state.originalY;
+            icon.style.transform = `translate(${state.originalX}px, ${state.originalY}px) scale(1)`;
+            return;
+          }
+
+          const proportionalX = Kp * errorX;
+          const proportionalY = Kp * errorY;
+          state.integralX += Ki * errorX;
+          state.integralY += Ki * errorY;
+          const derivativeX = Kd * (errorX - state.previousErrorX);
+          const derivativeY = Kd * (errorY - state.previousErrorY);
+          const dx = proportionalX + state.integralX + derivativeX;
+          const dy = proportionalY + state.integralY + derivativeY;
+
+          state.previousErrorX = errorX;
+          state.previousErrorY = errorY;
+          state.setPointX += dx;
+          state.setPointY += dy;
+          icon.style.transform = `translate(${state.setPointX}px, ${state.setPointY}px) scale(1.1)`;
+        }
+      }
+    };
+
+    /**  Toggles crazy mode.
+     */
+    const crazyModeToggle = () => {
+      showDoomIcon.value = crazyModeEnabled.value;
+      if (crazyModeEnabled.value) {
+        gsap.to('.icon-container', {
+          scale: 0.8,
+          ease: Elastic.easeOut.config(1, 0.3),
+        });
+      } else {
+        gsap.to('.icon-container', {
+          scale: 0.9,
+          ease: Elastic.easeOut.config(1, 0.3),
+        });
+      }
+    };
+
+    const onIconMouseLeave = (event: MouseEvent, item: NavItem) => {
+      hoveredElement = null;
+      const applyMagneticEffectListener = (e: MouseEvent) =>
+        applyMagneticEffect(e, item);
+      document.addEventListener('mousemove', applyMagneticEffectListener);
+    };
+
+    const resetStyles = () => {
+      const icons = document.querySelectorAll('.icon-container') as NodeListOf<
+        | HTMLElement
+        | SVGElement
+        | Element
+        | any
+        | null
+        | undefined
+        | unknown
+        | never
+        | void
+      >;
+      icons.forEach((icon) => {
+        icon.style.transform = `translate(0px, 0px)`;
+        icon.style.width = `0px`;
+        icon.style.height = `0px`;
+      });
+    };
+
+    return {
+      position,
+      crazyModeEnabled,
+      crazyModeCheckbox,
+      crazyModeToggle,
+      iconRefs,
+      addIconRef,
+      navItems,
+      animateIcon,
+      getAnimationClass,
+      isActive,
+      showComponent,
+      handleClick,
+      applyMagneticEffect,
+      hoverMouse,
+      onIconMouseEnter,
+      onIconMouseLeave,
+      showDoomIcon,
+      shouldShowItem,
+      filteredNavItems,
+    };
   },
 });
 </script>
 
 <style lang="scss" scoped>
+.icon-container {
+  mask-image: linear-gradient(to right, white 50%, black 50%);
+  mask-size: 200% 100%;
+  mask-position: 100% 0;
+}
+.hidden {
+  display: none;
+}
 .navbar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between; 
-  height: 100%;
-  width: 50px;
-  max-width: 50px;
+  justify-content: flex-start;
   border-right: 1px solid #dddddde1;
   overflow-x: visible;
   overflow-y: visible;
   margin: 0;
-  padding: 0;
+  padding: 10px 0;
+  height: 100%;
+  width: 50px;
   scrollbar-width: none;
   -ms-overflow-style: none;
   scrollbar-color: transparent transparent;
 
-  &:first-child {
-    margin-top: 5px;
-  }
-
-  &:last-child {
-    position: absolute;
-    bottom: 0;
-  }
-
-
   .icon-mask {
     filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
-    transition: filter 0.3s ease;
+    transition:
+      filter 0.3s ease,
+      transform 0.1s ease;
     z-index: 100000000;
     position: relative;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
+
     &:hover {
       cursor: pointer;
       filter: brightness(1.5) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
@@ -521,27 +469,48 @@ export default defineComponent({
     color: #fff;
     position: absolute;
     bottom: 0;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       display: none;
-
-      &:checked + label .checkbox-svg {
-        fill: #fff;
-      }
-    }
-
-    label {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
     }
 
     .checkbox-svg {
       fill: transparent;
-      stroke: #fff; // White stroke
+      stroke: #fff;
       width: 20px;
       height: 20px;
-      margin-right: 5px;
+      transition: fill 0.3s ease;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        cursor: pointer;
+        fill: #fff;
+        transition:
+          fill 0.3s ease,
+          filter 0.3s ease,
+          transform 0.3s ease;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+        transform: scale(1.1);
+      }
+
+      &.checked {
+        transform: rotate(360deg);
+        transition: transform 0.3s ease;
+        stroke: #fff;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+        animation: glow 1s infinite alternate;
+      }
+    }
+  }
+
+  @keyframes glow {
+    from {
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+    }
+    to {
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 1));
     }
   }
 
@@ -641,6 +610,7 @@ export default defineComponent({
       filter: brightness(1.2);
     }
   }
+
   @keyframes pulseGlow {
     0%,
     100% {
@@ -699,6 +669,32 @@ export default defineComponent({
     }
     100% {
       filter: drop-shadow(0 0 10px #ffc3a0);
+    }
+  }
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      filter: brightness(1);
+    }
+    20% {
+      transform: scale(1.3);
+      filter: brightness(1.3);
+    }
+    40% {
+      transform: scale(1.6);
+      filter: brightness(1.6);
+    }
+    60% {
+      transform: scale(1.3);
+      filter: brightness(1.3);
+    }
+    80% {
+      transform: scale(1);
+      filter: brightness(1);
+    }
+    100% {
+      transform: scale(1);
+      filter: brightness(1);
     }
   }
 }

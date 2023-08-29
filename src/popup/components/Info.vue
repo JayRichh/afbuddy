@@ -6,13 +6,20 @@
       access different functionalities.
     </p>
   </div>
+  <div class="language-selector">
+    <label for="language-select">{{ $t('Select Language') }}:</label>
+    <select v-model="$i18n.locale" id="language-select">
+      <option value="en">{{ $t('English') }}</option>
+      <option value="no">{{ $t('Norwegian') }}</option>
+    </select>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: "Info",
+  name: 'Info',
 });
 </script>
 

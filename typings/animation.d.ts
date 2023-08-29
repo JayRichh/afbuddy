@@ -1,10 +1,8 @@
 declare namespace gsap.core {
-
   // Added to TypeScript 3.5
   type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
 
   class Animation {
-
     static readonly version: string;
 
     data: any;
@@ -93,7 +91,12 @@ declare namespace gsap.core {
      * @memberof Animation
      * @link https://greensock.com/docs/v3/GSAP/Tween/eventCallback()
      */
-    eventCallback(type: CallbackType, callback: Callback | null, params?: any[], scope?: object): this;
+    eventCallback(
+      type: CallbackType,
+      callback: Callback | null,
+      params?: any[],
+      scope?: object,
+    ): this;
     /**
      * Gets the requested callback function of the animation.
      *
@@ -163,7 +166,7 @@ declare namespace gsap.core {
     iteration(): number;
 
     /**
-     * Kills the animation entirely. 
+     * Kills the animation entirely.
      * To kill means to immediately stop the animation, remove it from its parent timeline, and release it for garbage collection.
      *
      * ```js
@@ -260,7 +263,7 @@ declare namespace gsap.core {
      * @link https://greensock.com/docs/v3/GSAP/Tween/progress()
      */
     progress(): number;
-    
+
     rawTime(wrapRepeats?: boolean): number;
 
     /**
@@ -294,7 +297,7 @@ declare namespace gsap.core {
      * Gets the number of repeats of the animation.
      *
      * ```js
-     * anim.repeat(); 
+     * anim.repeat();
      * ```
      *
      * @returns {number} The repeat value
@@ -318,7 +321,7 @@ declare namespace gsap.core {
      * Gets the repeat delay (time between iterations) of the animation.
      *
      * ```js
-     * anim.repeatDelay(); 
+     * anim.repeatDelay();
      * ```
      *
      * @returns {number} The repeatDelay value
@@ -467,7 +470,7 @@ declare namespace gsap.core {
      * @memberof Animation
      * @link https://greensock.com/docs/v3/GSAP/Tween/then()
      */
-    then(onFulfilled?: (result: Omit<this, "then">) => any): Promise<this>;
+    then(onFulfilled?: (result: Omit<this, 'then'>) => any): Promise<this>;
 
     /**
      * Sets the current time of the given animation.
@@ -527,7 +530,7 @@ declare namespace gsap.core {
      * Sets the total duration (including repeats) of the given animation by time scaling the animation.
      *
      * ```js
-     * anim.totalDuration(8); 
+     * anim.totalDuration(8);
      * ```
      *
      * @param {number} value
@@ -611,7 +614,7 @@ declare namespace gsap.core {
      * Setting yoyo to true means that each time the animation repeats it should switch its direction (forwards or reverse).
      *
      * ```js
-     * anim.yoyo(true); 
+     * anim.yoyo(true);
      * ```
      *
      * @param {boolean} value

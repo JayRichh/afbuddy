@@ -28,12 +28,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from "vue";
-import Tooltip from "./Tooltip.vue";
-import { getThemes, Theme } from "../themesList";
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import { defineComponent, ref, computed, onMounted } from 'vue';
+import Tooltip from './Tooltip.vue';
+import { getThemes, Theme } from '../themesList';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 export default defineComponent({
+  name: 'ThemeSelector',
   components: {
     Tooltip,
   },
@@ -42,7 +43,7 @@ export default defineComponent({
   },
   async setup(props) {
     const { themesArray, themeNamesArray, themeList } = await getThemes();
-    const selectedThemeKey = ref(props.currentTheme || "active4d");
+    const selectedThemeKey = ref(props.currentTheme || 'active4d');
     const showTooltip = ref(false);
     const tooltipX = ref(0);
     const tooltipY = ref(0);
@@ -58,7 +59,7 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      console.log("mounted themeselector");
+      console.log('mounted themeselector');
       if (!props.currentTheme) {
         setDefaultTheme();
       }
@@ -85,7 +86,7 @@ export default defineComponent({
     }
 
     function setDefaultTheme() {
-      selectedThemeKey.value = "active4d";
+      selectedThemeKey.value = 'active4d';
       applySelectedTheme();
     }
 
@@ -115,7 +116,9 @@ button {
   background-color: #5d9cec;
   cursor: pointer;
   margin-top: 1em;
-  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+  transition:
+    box-shadow 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
 }
 
 button:hover {
@@ -125,25 +128,6 @@ button:hover {
 
 button:active {
   transform: scale(0.98);
-}
-
-template > .theme-selector-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  height: 100%;
-  margin: 0;
-  width: calc(100% - 20px);
-  background-color: #f4f4f4;
-  border-radius: 5px;
-  box-sizing: border-box;
-  font-family: "Courier New", monospace;
-  white-space: pre-wrap;
-  text-overflow: ellipsis;
-  z-index: 10;
 }
 
 .theme-selector-container {
@@ -159,7 +143,7 @@ template > .theme-selector-container {
   background-color: #f4f4f4;
   border-radius: 5px;
   box-sizing: border-box;
-  font-family: "Courier New", monospace;
+  font-family: 'Courier New', monospace;
   white-space: pre-wrap;
   text-overflow: ellipsis;
   z-index: 10;
@@ -182,7 +166,7 @@ select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("../../../assets/dropdown-arrow.svg");
+  background-image: url('../../../assets/dropdown-arrow.svg');
   background-repeat: no-repeat;
   background-position: 95% center;
 }
@@ -227,42 +211,66 @@ label {
 }
 
 .primary-btn {
-  background-color: #4caf50; /* Green background */
+  background-color: #4caf50;
   color: white;
-  margin-right: 10px;
-  padding: 10px 25px;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+  transition:
+    box-shadow 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
   font-weight: bold;
   font-size: 1.1em;
-  margin-right: 10px;
+  border: 2px solid transparent;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    transform: scale(1.02) translateY(-1px) translateX(1px) !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   }
 
   &:active {
-    transform: scale(0.98) !important;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #4caf50;
+    box-shadow:
+      0 0 10px #4caf50,
+      0 0 20px #4caf50,
+      0 0 30px #4caf50,
+      0 0 40px #4caf50;
   }
 }
 
 .secondary-btn {
-  background-color: #ff5722; /* Orange background */
+  background-color: #f44336;
   color: white;
   padding: 10px 20px;
   cursor: pointer;
-  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+  transition:
+    box-shadow 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
   font-weight: bold;
   font-size: 1.1em;
-  margin-left: 10px;
+  border: 2px solid transparent;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-    transform: scale(1.02) translateY(-1px) translateX(1px) !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   }
 
   &:active {
-    transform: scale(0.98) !important;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #f44336;
+    box-shadow:
+      0 0 10px #f44336,
+      0 0 20px #f44336,
+      0 0 30px #f44336,
+      0 0 40px #f44336;
   }
 }
 

@@ -2,8 +2,8 @@ export const ensureTooltipVisibility = (tooltip: HTMLElement) => {
   let parent: HTMLElement | null = tooltip.parentElement;
   while (parent) {
     const style = getComputedStyle(parent);
-    if (style.overflow === "hidden") {
-      parent.style.overflow = "visible";
+    if (style.overflow === 'hidden') {
+      parent.style.overflow = 'visible';
     }
     parent = parent.parentElement;
   }
@@ -17,7 +17,7 @@ export function showTooltipOnHover(
     showTooltip: boolean;
     tooltipX: number;
     tooltipY: number;
-  }
+  },
 ): void {
   const target = event.target as HTMLElement;
   tooltip.tooltipText = tooltipText;

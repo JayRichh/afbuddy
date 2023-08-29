@@ -1,6 +1,5 @@
 declare namespace gsap {
-
-  type VelocityType = "num" | "deg" | "rad";
+  type VelocityType = 'num' | 'deg' | 'rad';
 
   interface VelocityMap {
     [key: string]: number;
@@ -19,12 +18,21 @@ declare namespace gsap {
     getByTarget(target: TweenTarget): VelocityTrackerInstance;
     getVelocity(target: TweenTarget, property: string): number;
     isTracking(target: TweenTarget, property?: string): boolean;
-    track(target: TweenTarget, properties: string, type?: VelocityType): VelocityTrackerInstance[];
+    track(
+      target: TweenTarget,
+      properties: string,
+      type?: VelocityType,
+    ): VelocityTrackerInstance[];
     untrack(target: TweenTarget, properties?: string): void;
   }
 
   interface VelocityTracker extends VelocityTrackerStatic {
-    new(target: TweenTarget, properties?: string, type?: VelocityType, next?: VelocityTrackerInstance): VelocityTrackerInstance;
+    new (
+      target: TweenTarget,
+      properties?: string,
+      type?: VelocityType,
+      next?: VelocityTrackerInstance,
+    ): VelocityTrackerInstance;
     prototype: VelocityTrackerInstance;
     register(core: typeof gsap): void;
   }
@@ -32,22 +40,22 @@ declare namespace gsap {
 
 declare const VelocityTracker: gsap.VelocityTracker;
 
-declare module "gsap/utils/VelocityTracker" {
+declare module 'gsap/utils/VelocityTracker' {
   export const VelocityTracker: gsap.VelocityTracker;
   export { VelocityTracker as default };
 }
 
-declare module "gsap/src/utils/VelocityTracker" {
-  export * from "gsap/utils/VelocityTracker";
-  export { VelocityTracker as default } from "gsap/utils/VelocityTracker";
+declare module 'gsap/src/utils/VelocityTracker' {
+  export * from 'gsap/utils/VelocityTracker';
+  export { VelocityTracker as default } from 'gsap/utils/VelocityTracker';
 }
 
-declare module "gsap-trial/utils/VelocityTracker" {
-  export * from "gsap/utils/VelocityTracker";
-  export { VelocityTracker as default } from "gsap/utils/VelocityTracker";
+declare module 'gsap-trial/utils/VelocityTracker' {
+  export * from 'gsap/utils/VelocityTracker';
+  export { VelocityTracker as default } from 'gsap/utils/VelocityTracker';
 }
 
-declare module "gsap-trial/src/utils/VelocityTracker" {
-  export * from "gsap/utils/VelocityTracker";
-  export { VelocityTracker as default } from "gsap/utils/VelocityTracker";
+declare module 'gsap-trial/src/utils/VelocityTracker' {
+  export * from 'gsap/utils/VelocityTracker';
+  export { VelocityTracker as default } from 'gsap/utils/VelocityTracker';
 }

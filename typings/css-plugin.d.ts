@@ -1,5 +1,4 @@
 declare namespace gsap {
-
   // GSAP specific
   interface CSSProperties {
     [key: string]: any;
@@ -522,7 +521,7 @@ declare namespace gsap {
     zoom: TweenValue;
   }
 
-  interface CSSVars extends Partial<CSSProperties> { }
+  interface CSSVars extends Partial<CSSProperties> {}
 
   interface TweenVars extends CSSVars {
     css?: CSSVars;
@@ -535,11 +534,10 @@ declare namespace gsap {
 }
 
 declare namespace gsap.plugins {
-
   interface CSSPlugin extends Plugin {}
 
   interface CSSPluginClass extends CSSPlugin {
-    new(): PluginScope & CSSPlugin;
+    new (): PluginScope & CSSPlugin;
     prototype: PluginScope & CSSPlugin;
   }
 
@@ -552,38 +550,38 @@ interface Element {
 
 declare const CSSPlugin: gsap.plugins.CSSPlugin;
 
-declare module "gsap/CSSPlugin" {
+declare module 'gsap/CSSPlugin' {
   export const CSSPlugin: gsap.plugins.CSSPlugin;
   export { CSSPlugin as default };
 }
 
-declare module "gsap/src/CSSPlugin" {
-  export * from "gsap/CSSPlugin";
-  export { CSSPlugin as default } from "gsap/CSSPlugin";
+declare module 'gsap/src/CSSPlugin' {
+  export * from 'gsap/CSSPlugin';
+  export { CSSPlugin as default } from 'gsap/CSSPlugin';
 }
 
-declare module "gsap" {
-  export * from "gsap/CSSPlugin";
+declare module 'gsap' {
+  export * from 'gsap/CSSPlugin';
 }
 
-declare module "gsap/all" {
-  export * from "gsap/CSSPlugin";
+declare module 'gsap/all' {
+  export * from 'gsap/CSSPlugin';
 }
 
-declare module "gsap-trial/CSSPlugin" {
-  export * from "gsap/CSSPlugin";
-  export { CSSPlugin as default } from "gsap/CSSPlugin";
+declare module 'gsap-trial/CSSPlugin' {
+  export * from 'gsap/CSSPlugin';
+  export { CSSPlugin as default } from 'gsap/CSSPlugin';
 }
 
-declare module "gsap-trial/src/CSSPlugin" {
-  export * from "gsap/CSSPlugin";
-  export { CSSPlugin as default } from "gsap/CSSPlugin";
+declare module 'gsap-trial/src/CSSPlugin' {
+  export * from 'gsap/CSSPlugin';
+  export { CSSPlugin as default } from 'gsap/CSSPlugin';
 }
 
-declare module "gsap-trial" {
-  export * from "gsap/CSSPlugin";
+declare module 'gsap-trial' {
+  export * from 'gsap/CSSPlugin';
 }
 
-declare module "gsap-trial/all" {
-  export * from "gsap/CSSPlugin";
+declare module 'gsap-trial/all' {
+  export * from 'gsap/CSSPlugin';
 }

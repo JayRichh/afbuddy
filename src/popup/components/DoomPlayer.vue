@@ -10,103 +10,102 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted } from 'vue';
 
 export default {
-  name: "DoomPlayer",
+  name: 'DoomPlayer',
   setup() {
     const doomIframe = ref(new HTMLIFrameElement());
     // const iframeSrc =
     // "https://dos.zone/player/?bundleUrl=https%3A%2F%2Fcdn.dos.zone%2Foriginal%2F2X%2F2%2F24b00b14f118580763440ecaddcc948f8cb94f14.jsdos&anonymous=1";
     const iframeSrc =
-      "https://dos.zone/player/?bundleUrl=https%3A%2F%2Fcdn.dos.zone%2Fcustom%2Fdos%2Fdoom.jsdos&anonymous=1";
+      'https://dos.zone/player/?bundleUrl=https%3A%2F%2Fcdn.dos.zone%2Fcustom%2Fdos%2Fdoom.jsdos&anonymous=1';
 
     onMounted(() => {
       doomIframe.value.contentWindow?.document.addEventListener(
-        "keydown",
+        'keydown',
         (event) => {
           switch (event.key) {
-            case "ArrowUp":
+            case 'ArrowUp':
               doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent("keydown", {
-                  key: "w",
-                })
+                new KeyboardEvent('keydown', {
+                  key: 'w',
+                }),
               );
               break;
-            case "ArrowDown":
+            case 'ArrowDown':
               doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent("keydown", {
-                  key: "s",
-                })
+                new KeyboardEvent('keydown', {
+                  key: 's',
+                }),
               );
               break;
-            case "ArrowLeft":
+            case 'ArrowLeft':
               doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent("keydown", {
-                  key: "a",
-                })
+                new KeyboardEvent('keydown', {
+                  key: 'a',
+                }),
               );
               break;
-            case "ArrowRight":
+            case 'ArrowRight':
               doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent("keydown", {
-                  key: "d",
-                })
+                new KeyboardEvent('keydown', {
+                  key: 'd',
+                }),
               );
               break;
-            case " ":
+            case ' ':
               doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent("keydown", {
-                  key: " ",
-                })
+                new KeyboardEvent('keydown', {
+                  key: ' ',
+                }),
               );
               break;
-            case "Enter":
+            case 'Enter':
               doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent("keydown", {
-                  key: "Enter",
-                })
+                new KeyboardEvent('keydown', {
+                  key: 'Enter',
+                }),
               );
               break;
-            case "Escape":
+            case 'Escape':
               doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent("keydown", {
-                  key: "Escape",
-                })
+                new KeyboardEvent('keydown', {
+                  key: 'Escape',
+                }),
               );
-            case "f":
+            case 'f':
               doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent("keydown", {
-                  key: "f",
-                })
+                new KeyboardEvent('keydown', {
+                  key: 'f',
+                }),
               );
-            case "e":
+            case 'e':
               doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent("keydown", {
-                  key: "e",
-                })
+                new KeyboardEvent('keydown', {
+                  key: 'e',
+                }),
               );
               break;
             default:
               break;
           }
-
-        }
+        },
       );
 
       doomIframe.value.contentWindow?.document.addEventListener(
-        "fullscreenchange",
+        'fullscreenchange',
         () => {
           if (!doomIframe.value.contentWindow?.document.fullscreenElement) {
             doomIframe.value.contentWindow?.document
-              .querySelector("canvas")
+              .querySelector('canvas')
               ?.requestFullscreen();
           }
-        }
+        },
       );
 
       doomIframe.value.contentWindow?.document
-        .querySelector("canvas")
+        .querySelector('canvas')
         ?.requestFullscreen();
     });
 
@@ -134,5 +133,4 @@ iframe {
   height: calc(100% - 60px);
   border: none;
 }
-
 </style>

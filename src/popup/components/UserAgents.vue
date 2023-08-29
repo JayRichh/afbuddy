@@ -26,27 +26,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import userAgents from "../../../src/utils/userAgents";
+import { defineComponent, ref } from 'vue';
+import userAgents from '../../../src/utils/userAgents';
 
 export default defineComponent({
   data() {
     return {
       userAgents,
       selectedAgents: this.initializeSelectedAgents(),
-      feedbackMessage: "",
+      feedbackMessage: '',
     };
   },
   methods: {
     setUserAgent() {
-      let message = "User agent set to:\n";
+      let message = 'User agent set to:\n';
       for (const agentTitle in this.selectedAgents) {
         message += `${agentTitle}: ${this.selectedAgents[agentTitle]}\n`;
       }
       this.feedbackMessage = message;
     },
     resetUserAgent() {
-      this.feedbackMessage = "User agent reset to default";
+      this.feedbackMessage = 'User agent reset to default';
     },
     initializeSelectedAgents() {
       const agents: { [key: string]: string } = {};
@@ -104,7 +104,8 @@ select {
   border: 1px solid #ced4da;
   border-radius: 4px;
   appearance: none;
-  background: url("../../../assets/dropdown-arrow.svg") no-repeat right 0.5rem center;
+  background: url('../../../assets/dropdown-arrow.svg') no-repeat right 0.5rem
+    center;
   padding-right: 2rem;
   background-size: 1rem;
   background-color: #fff;
@@ -148,5 +149,4 @@ option {
   background-color: #fff;
   cursor: pointer;
 }
-
 </style>

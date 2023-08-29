@@ -1,15 +1,18 @@
 declare namespace gsap {
-
   type PluginInit = (
     this: PluginScope,
     target: object,
     endValue: any,
     tween: core.Tween,
     index: number,
-    targets: object[]
+    targets: object[],
   ) => void;
 
-  type PluginRender = (this: PropTween, progress: number, data: PluginScope) => void;
+  type PluginRender = (
+    this: PropTween,
+    progress: number,
+    data: PluginScope,
+  ) => void;
   type PluginKill = (this: PluginScope) => void;
 
   interface PluginAliases {
@@ -25,7 +28,7 @@ declare namespace gsap {
     t: object;
     modifier(...args: any[]): any; // TODO: Add signature
   }
-  
+
   interface PluginScope {
     [key: string]: any;
     _props: string[];
@@ -59,10 +62,10 @@ declare namespace gsap {
 
   interface ModifiersVars {
     [key: string]: (value: any, target: any) => any;
-  }  
+  }
 
   interface SnapVars {
-    [key: string]: number | number[] | { values: number[], radius?: number };
+    [key: string]: number | number[] | { values: number[]; radius?: number };
   }
 
   interface TweenVars {
@@ -73,23 +76,22 @@ declare namespace gsap {
 }
 
 declare namespace gsap.plugins {
-
   interface AttrPlugin extends Plugin {}
   interface ModifiersPlugin extends Plugin {}
   interface SnapPlugin extends Plugin {}
 
   interface AttrPluginClass extends AttrPlugin {
-    new(): PluginScope & AttrPlugin;
+    new (): PluginScope & AttrPlugin;
     prototype: PluginScope & AttrPlugin;
   }
 
   interface ModifiersPluginClass extends ModifiersPlugin {
-    new(): PluginScope & ModifiersPlugin;
+    new (): PluginScope & ModifiersPlugin;
     prototype: PluginScope & ModifiersPlugin;
   }
 
   interface SnapPluginClass extends SnapPlugin {
-    new(): PluginScope & SnapPlugin;
+    new (): PluginScope & SnapPlugin;
     prototype: PluginScope & SnapPlugin;
   }
 
@@ -98,8 +100,15 @@ declare namespace gsap.plugins {
   const snap: SnapPluginClass;
 
   // Data types shared between plugins
-  type RawPath = number[][]; 
-  type Matrix2D = { a: number, b: number, c: number, d: number, e: number, f: number};
+  type RawPath = number[][];
+  type Matrix2D = {
+    a: number;
+    b: number;
+    c: number;
+    d: number;
+    e: number;
+    f: number;
+  };
 }
 
 declare const AttrPlugin: gsap.plugins.AttrPlugin;

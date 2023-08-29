@@ -1,5 +1,4 @@
 declare class Flip {
-
   static readonly version: string;
 
   /**
@@ -16,7 +15,7 @@ declare class Flip {
    * @link https://greensock.com/docs/v3/Plugins/Flip/static.batch()
    */
   static batch(id?: string): FlipBatch;
-  
+
   /**
    * Gets the matrix to convert points from one element's local coordinates into a
    * different element's local coordinate system.
@@ -31,8 +30,11 @@ declare class Flip {
    * @returns {gsap.plugins.Matrix2D} A matrix to convert from one element's coordinate system to another's
    * @memberof Flip
    */
-  static convertCoordinates(fromElement: Element, toElement: Element): gsap.plugins.Matrix2D;
-    
+  static convertCoordinates(
+    fromElement: Element,
+    toElement: Element,
+  ): gsap.plugins.Matrix2D;
+
   /**
    * Converts a point from one element's local coordinates into a
    * different element's local coordinate system.
@@ -48,16 +50,20 @@ declare class Flip {
    * @returns {gsap.Point2D} A point to convert from one element's coordinate system to another's
    * @memberof Flip
    */
-  static convertCoordinates(fromElement: Element, toElement: Element, point: gsap.Point2D): gsap.Point2D;
-   
+  static convertCoordinates(
+    fromElement: Element,
+    toElement: Element,
+    point: gsap.Point2D,
+  ): gsap.Point2D;
+
   /**
    * Changes the x/y/rotation/skewX transforms (and width/height or scaleX/scaleY) to fit one element exactly into the the position/size/rotation of another element.
-   * 
+   *
    * ```js
    * Flip.fit("#el1", "#el2", {
-   *   scale: true, 
-   *   absolute: true, 
-   *   duration: 1, 
+   *   scale: true,
+   *   absolute: true,
+   *   duration: 1,
    *   ease: "power2"
    * });
    * ```
@@ -69,11 +75,15 @@ declare class Flip {
    * @returns {(gsap.core.Tween | object | null)}
    * @memberof Flip
    */
-  static fit(fromElement: gsap.DOMTarget, toElement: gsap.DOMTarget | Flip.FlipState, vars?: Flip.FitVars): gsap.core.Tween | object | null;
+  static fit(
+    fromElement: gsap.DOMTarget,
+    toElement: gsap.DOMTarget | Flip.FlipState,
+    vars?: Flip.FitVars,
+  ): gsap.core.Tween | object | null;
 
   /**
    * Animates the targets from the provided state to their current state (position/size).
-   * 
+   *
    * ```js
    * Flip.from(state, {
    *   duration: 1,
@@ -90,11 +100,14 @@ declare class Flip {
    * @memberof Flip
    * @link https://greensock.com/docs/v3/Plugins/Flip/static.from()
    */
-  static from(state: Flip.FlipState, vars?: Flip.FromToVars): gsap.core.Timeline;
+  static from(
+    state: Flip.FlipState,
+    vars?: Flip.FromToVars,
+  ): gsap.core.Timeline;
 
   /**
    * Captures information about the current state of the targets so that they can be flipped later.
-   * 
+   *
    * ```js
    * let state = Flip.getState(".my-class, .another-class", {props: "backgroundColor,color", simple: true});
    * ```
@@ -106,7 +119,10 @@ declare class Flip {
    * @memberof Flip
    * @link https://greensock.com/docs/v3/Plugins/Flip/static.getState()
    */
-  static getState(targets: gsap.DOMTarget, vars?: Flip.FlipStateVars | string): Flip.FlipState;
+  static getState(
+    targets: gsap.DOMTarget,
+    vars?: Flip.FlipStateVars | string,
+  ): Flip.FlipState;
 
   /**
    * Gets the timeline for the most recently-created flip animation associated with the provided element
@@ -130,7 +146,7 @@ declare class Flip {
    *   // do stuff
    * }
    * ```
-   * 
+   *
    * @static
    * @param {gsap.DOMTarget} target
    * @returns {boolean} whether or not the target element is actively flipping
@@ -171,7 +187,7 @@ declare class Flip {
 
   /**
    * Animates the targets from the current state to the provided state.
-   * 
+   *
    * ```js
    * Flip.to(state, {
    *   duration: 1,
@@ -201,11 +217,16 @@ declare class Flip {
 }
 
 declare namespace Flip {
-
-  type OverrideProps<M, N> = { [P in keyof M]: P extends keyof N ? N[P] : M[P] };
+  type OverrideProps<M, N> = {
+    [P in keyof M]: P extends keyof N ? N[P] : M[P];
+  };
 
   type EnterOrLeaveCallback = (elements: Element[]) => any;
-  type SpinFunction = (index: number, element: Element, targets: Element[]) => number;
+  type SpinFunction = (
+    index: number,
+    element: Element,
+    targets: Element[],
+  ) => number;
   type LoadStateFunction = (load: Function) => any;
   type BatchActionFunction = (self: FlipBatchAction) => any;
 
@@ -213,7 +234,8 @@ declare namespace Flip {
     scale?: boolean;
   }
 
-  interface AnimationVars extends OverrideProps<gsap.TweenVars, TweenVarOverrides> {
+  interface AnimationVars
+    extends OverrideProps<gsap.TweenVars, TweenVarOverrides> {
     absolute?: boolean | gsap.DOMTarget;
     simple?: boolean;
     props?: string;
@@ -271,7 +293,7 @@ declare namespace Flip {
     onComplete?: BatchActionFunction;
     once?: boolean;
   }
-  
+
   class ElementState {
     readonly bounds: DOMRect;
     readonly cache: object;
@@ -377,7 +399,6 @@ declare class FlipBatch {
    */
   add(config: Flip.BatchActionConfig | Function): FlipBatchAction;
 
-
   /**
    * Flushes the batch.state (merged) object and removes all actions (unless stateOnly parameter is true)
    *
@@ -390,7 +411,6 @@ declare class FlipBatch {
    * @memberof FlipBatch
    */
   clear(stateOnly?: boolean): FlipBatch;
-
 
   /**
    * Calls getState() on all actions in this batch (any that are defined at least), optionally merging the results into batch.state
@@ -449,11 +469,9 @@ declare class FlipBatch {
    * @memberof FlipBatch
    */
   run(skipGetState?: boolean, merge?: boolean): FlipBatch;
-
 }
 
 declare namespace gsap {
-
   /**
    * @deprecated since 3.7.0
    * @see Flip.ElementState
@@ -472,10 +490,10 @@ declare namespace gsap {
    */
   type FitVars = Flip.FitVars;
 
-   /**
-    * @deprecated since 3.7.0
-    * @see Flip.FitReturnVars
-    */
+  /**
+   * @deprecated since 3.7.0
+   * @see Flip.FitReturnVars
+   */
   type FitReturnVars = Flip.FitReturnVars;
 
   /**
@@ -500,7 +518,7 @@ declare namespace gsap {
    * @deprecated since 3.7.0
    * @see Flip.FromToVars
    */
-  type FlipToFromVars = Flip.FromToVars;  
+  type FlipToFromVars = Flip.FromToVars;
 
   /**
    * @deprecated since 3.7.0
@@ -509,43 +527,40 @@ declare namespace gsap {
   type SpinFunction = Flip.SpinFunction;
 }
 
-declare module "gsap/Flip" {
-  class _Flip extends Flip { }
-  export {
-    _Flip as Flip,
-    _Flip as default
-  }
+declare module 'gsap/Flip' {
+  class _Flip extends Flip {}
+  export { _Flip as Flip, _Flip as default };
 }
 
-declare module "gsap/dist/Flip" {
-  export * from "gsap/Flip";
-  export { Flip as default } from "gsap/Flip";
+declare module 'gsap/dist/Flip' {
+  export * from 'gsap/Flip';
+  export { Flip as default } from 'gsap/Flip';
 }
 
-declare module "gsap/src/Flip" {
-  export * from "gsap/Flip";
-  export { Flip as default } from "gsap/Flip";
+declare module 'gsap/src/Flip' {
+  export * from 'gsap/Flip';
+  export { Flip as default } from 'gsap/Flip';
 }
 
-declare module "gsap/all" {
-  export * from "gsap/Flip";
+declare module 'gsap/all' {
+  export * from 'gsap/Flip';
 }
 
-declare module "gsap-trial/Flip" {
-  export * from "gsap/Flip";
-  export { Flip as default } from "gsap/Flip";
+declare module 'gsap-trial/Flip' {
+  export * from 'gsap/Flip';
+  export { Flip as default } from 'gsap/Flip';
 }
 
-declare module "gsap-trial/dist/Flip" {
-  export * from "gsap/Flip";
-  export { Flip as default } from "gsap/Flip";
+declare module 'gsap-trial/dist/Flip' {
+  export * from 'gsap/Flip';
+  export { Flip as default } from 'gsap/Flip';
 }
 
-declare module "gsap-trial/src/Flip" {
-  export * from "gsap/Flip";
-  export { Flip as default } from "gsap/Flip";
+declare module 'gsap-trial/src/Flip' {
+  export * from 'gsap/Flip';
+  export { Flip as default } from 'gsap/Flip';
 }
 
-declare module "gsap-trial/all" {
-  export * from "gsap/Flip";
+declare module 'gsap-trial/all' {
+  export * from 'gsap/Flip';
 }

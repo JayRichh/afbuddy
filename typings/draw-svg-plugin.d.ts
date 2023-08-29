@@ -1,5 +1,4 @@
 declare namespace gsap {
-
   type DrawSVGTarget = string | SVGPrimitive | SVGPathElement;
 
   interface TweenVars {
@@ -8,9 +7,7 @@ declare namespace gsap {
 }
 
 declare namespace gsap.plugins {
-
   interface DrawSVGPlugin extends Plugin {
-
     /**
      * Get the length of an SVG element's stroke.
      *
@@ -41,7 +38,7 @@ declare namespace gsap.plugins {
   }
 
   interface DrawSVGPluginClass extends DrawSVGPlugin {
-    new(): PluginScope & DrawSVGPlugin;
+    new (): PluginScope & DrawSVGPlugin;
     prototype: PluginScope & DrawSVGPlugin;
   }
 
@@ -50,40 +47,40 @@ declare namespace gsap.plugins {
 
 declare const DrawSVGPlugin: gsap.plugins.DrawSVGPlugin;
 
-declare module "gsap/DrawSVGPlugin" {
+declare module 'gsap/DrawSVGPlugin' {
   export const DrawSVGPlugin: gsap.plugins.DrawSVGPlugin;
   export { DrawSVGPlugin as default };
 }
 
-declare module "gsap/src/DrawSVGPlugin" {
-  export * from "gsap/DrawSVGPlugin";
-  export { DrawSVGPlugin as default } from "gsap/DrawSVGPlugin";
+declare module 'gsap/src/DrawSVGPlugin' {
+  export * from 'gsap/DrawSVGPlugin';
+  export { DrawSVGPlugin as default } from 'gsap/DrawSVGPlugin';
 }
 
-declare module "gsap/dist/DrawSVGPlugin" {
-  export * from "gsap/DrawSVGPlugin";
-  export { DrawSVGPlugin as default } from "gsap/DrawSVGPlugin";
+declare module 'gsap/dist/DrawSVGPlugin' {
+  export * from 'gsap/DrawSVGPlugin';
+  export { DrawSVGPlugin as default } from 'gsap/DrawSVGPlugin';
 }
 
-declare module "gsap/all" {
-  export * from "gsap/DrawSVGPlugin";
+declare module 'gsap/all' {
+  export * from 'gsap/DrawSVGPlugin';
 }
 
-declare module "gsap-trial/DrawSVGPlugin" {
-  export * from "gsap/DrawSVGPlugin";
-  export { DrawSVGPlugin as default } from "gsap/DrawSVGPlugin";
+declare module 'gsap-trial/DrawSVGPlugin' {
+  export * from 'gsap/DrawSVGPlugin';
+  export { DrawSVGPlugin as default } from 'gsap/DrawSVGPlugin';
 }
 
-declare module "gsap-trial/src/DrawSVGPlugin" {
-  export * from "gsap/DrawSVGPlugin";
-  export { DrawSVGPlugin as default } from "gsap/DrawSVGPlugin";
+declare module 'gsap-trial/src/DrawSVGPlugin' {
+  export * from 'gsap/DrawSVGPlugin';
+  export { DrawSVGPlugin as default } from 'gsap/DrawSVGPlugin';
 }
 
-declare module "gsap-trial/dist/DrawSVGPlugin" {
-  export * from "gsap/DrawSVGPlugin";
-  export { DrawSVGPlugin as default } from "gsap/DrawSVGPlugin";
+declare module 'gsap-trial/dist/DrawSVGPlugin' {
+  export * from 'gsap/DrawSVGPlugin';
+  export { DrawSVGPlugin as default } from 'gsap/DrawSVGPlugin';
 }
 
-declare module "gsap-trial/all" {
-  export * from "gsap/DrawSVGPlugin";
+declare module 'gsap-trial/all' {
+  export * from 'gsap/DrawSVGPlugin';
 }

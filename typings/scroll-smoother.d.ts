@@ -1,5 +1,4 @@
 declare class ScrollSmoother {
-
   static readonly version: string;
 
   readonly scrollTrigger: ScrollTrigger;
@@ -103,7 +102,10 @@ declare class ScrollSmoother {
    * @memberof ScrollSmoother
    * @link https://greensock.com/docs/v3/Plugins/ScrollSmoother/effects()
    */
-  effects(targets: gsap.DOMTarget, vars?: ScrollSmoother.EffectsVars | null): ScrollTrigger[];
+  effects(
+    targets: gsap.DOMTarget,
+    vars?: ScrollSmoother.EffectsVars | null,
+  ): ScrollTrigger[];
 
   /**
    * Gets the ScrollTrigger instances that are managing the effects (like "speed" and/or "lag")
@@ -137,7 +139,7 @@ declare class ScrollSmoother {
    * ```js
    * scrollSmoother.kill();
    * ```
-   * 
+   *
    * @memberof ScrollSmoother
    * @link https://greensock.com/docs/v3/Plugins/ScrollSmoother/kill()
    */
@@ -215,7 +217,11 @@ declare class ScrollSmoother {
    * @memberof ScrollSmoother
    * @link https://greensock.com/docs/v3/Plugins/ScrollSmoother/scrollTo()
    */
-  scrollTo(target: gsap.DOMTarget | number, smooth?: boolean, position?: string): void;
+  scrollTo(
+    target: gsap.DOMTarget | number,
+    smooth?: boolean,
+    position?: string,
+  ): void;
 
   /**
    * Immediately scrolls to a particular numeric scroll position
@@ -324,11 +330,9 @@ declare class ScrollSmoother {
    * @link https://greensock.com/docs/v3/Plugins/ScrollSmoother/wrapper()
    */
   wrapper(): HTMLElement;
-
 }
 
 declare namespace ScrollSmoother {
-
   type Callback = (self: ScrollSmoother) => any;
   type EventCallback = (self: ScrollSmoother, event: Event) => any;
   type EffectFunc = (index: number, element: Element) => number | string;
@@ -355,53 +359,48 @@ declare namespace ScrollSmoother {
     onFocusIn?: EventCallback;
     onUpdate?: Callback;
     onStop?: Callback;
- //   sections?: boolean | gsap.DOMTarget;
+    //   sections?: boolean | gsap.DOMTarget;
     smooth?: boolean | number;
     smoothTouch?: boolean | number;
     speed?: number;
     wrapper?: gsap.DOMTarget;
   }
-
 }
 
-
-declare module "gsap/ScrollSmoother" {
-  class _ScrollSmoother extends ScrollSmoother { }
-  export {
-    _ScrollSmoother as ScrollSmoother,
-    _ScrollSmoother as default
-  }
+declare module 'gsap/ScrollSmoother' {
+  class _ScrollSmoother extends ScrollSmoother {}
+  export { _ScrollSmoother as ScrollSmoother, _ScrollSmoother as default };
 }
 
-declare module "gsap/dist/ScrollSmoother" {
-  export * from "gsap/ScrollSmoother";
-  export { ScrollSmoother as default } from "gsap/ScrollSmoother";
+declare module 'gsap/dist/ScrollSmoother' {
+  export * from 'gsap/ScrollSmoother';
+  export { ScrollSmoother as default } from 'gsap/ScrollSmoother';
 }
 
-declare module "gsap/src/ScrollSmoother" {
-  export * from "gsap/ScrollSmoother";
-  export { ScrollSmoother as default } from "gsap/ScrollSmoother";
+declare module 'gsap/src/ScrollSmoother' {
+  export * from 'gsap/ScrollSmoother';
+  export { ScrollSmoother as default } from 'gsap/ScrollSmoother';
 }
 
-declare module "gsap/all" {
-  export * from "gsap/ScrollSmoother";
+declare module 'gsap/all' {
+  export * from 'gsap/ScrollSmoother';
 }
 
-declare module "gsap-trial/ScrollSmoother" {
-  export * from "gsap/ScrollSmoother";
-  export { ScrollSmoother as default } from "gsap/ScrollSmoother";
+declare module 'gsap-trial/ScrollSmoother' {
+  export * from 'gsap/ScrollSmoother';
+  export { ScrollSmoother as default } from 'gsap/ScrollSmoother';
 }
 
-declare module "gsap-trial/dist/ScrollSmoother" {
-  export * from "gsap/ScrollSmoother";
-  export { ScrollSmoother as default } from "gsap/ScrollSmoother";
+declare module 'gsap-trial/dist/ScrollSmoother' {
+  export * from 'gsap/ScrollSmoother';
+  export { ScrollSmoother as default } from 'gsap/ScrollSmoother';
 }
 
-declare module "gsap-trial/src/ScrollSmoother" {
-  export * from "gsap/ScrollSmoother";
-  export { ScrollSmoother as default } from "gsap/ScrollSmoother";
+declare module 'gsap-trial/src/ScrollSmoother' {
+  export * from 'gsap/ScrollSmoother';
+  export { ScrollSmoother as default } from 'gsap/ScrollSmoother';
 }
 
-declare module "gsap-trial/all" {
-  export * from "gsap/ScrollSmoother";
+declare module 'gsap-trial/all' {
+  export * from 'gsap/ScrollSmoother';
 }

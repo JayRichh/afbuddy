@@ -10,19 +10,16 @@ declare namespace ScrollToPlugin {
 }
 
 declare namespace gsap {
-
   interface TweenVars {
     scrollTo?: number | string | Element | Function | ScrollToPlugin.Vars;
   }
 }
 
 declare namespace gsap.plugins {
-  interface ScrollToPlugin extends Plugin {
-     
-  }
+  interface ScrollToPlugin extends Plugin {}
 
   interface ScrollToPluginClass extends ScrollToPlugin {
-    new(): PluginScope & ScrollToPlugin;
+    new (): PluginScope & ScrollToPlugin;
     prototype: PluginScope & ScrollToPlugin;
   }
 
@@ -31,40 +28,40 @@ declare namespace gsap.plugins {
 
 declare const ScrollToPlugin: gsap.plugins.ScrollToPlugin;
 
-declare module "gsap/ScrollToPlugin" {
+declare module 'gsap/ScrollToPlugin' {
   export const ScrollToPlugin: gsap.plugins.ScrollToPlugin;
   export { ScrollToPlugin as default };
 }
 
-declare module "gsap/src/ScrollToPlugin" {
-  export * from "gsap/ScrollToPlugin";
-  export { ScrollToPlugin as default } from "gsap/ScrollToPlugin";
+declare module 'gsap/src/ScrollToPlugin' {
+  export * from 'gsap/ScrollToPlugin';
+  export { ScrollToPlugin as default } from 'gsap/ScrollToPlugin';
 }
 
-declare module "gsap/dist/ScrollToPlugin" {
-  export * from "gsap/ScrollToPlugin";
-  export { ScrollToPlugin as default } from "gsap/ScrollToPlugin";
+declare module 'gsap/dist/ScrollToPlugin' {
+  export * from 'gsap/ScrollToPlugin';
+  export { ScrollToPlugin as default } from 'gsap/ScrollToPlugin';
 }
 
-declare module "gsap/all" {
-  export * from "gsap/ScrollToPlugin";
+declare module 'gsap/all' {
+  export * from 'gsap/ScrollToPlugin';
 }
 
-declare module "gsap-trial/ScrollToPlugin" {
-  export * from "gsap/ScrollToPlugin";
-  export { ScrollToPlugin as default } from "gsap/ScrollToPlugin";
+declare module 'gsap-trial/ScrollToPlugin' {
+  export * from 'gsap/ScrollToPlugin';
+  export { ScrollToPlugin as default } from 'gsap/ScrollToPlugin';
 }
 
-declare module "gsap-trial/src/ScrollToPlugin" {
-  export * from "gsap/ScrollToPlugin";
-  export { ScrollToPlugin as default } from "gsap/ScrollToPlugin";
+declare module 'gsap-trial/src/ScrollToPlugin' {
+  export * from 'gsap/ScrollToPlugin';
+  export { ScrollToPlugin as default } from 'gsap/ScrollToPlugin';
 }
 
-declare module "gsap-trial/dist/ScrollToPlugin" {
-  export * from "gsap/ScrollToPlugin";
-  export { ScrollToPlugin as default } from "gsap/ScrollToPlugin";
+declare module 'gsap-trial/dist/ScrollToPlugin' {
+  export * from 'gsap/ScrollToPlugin';
+  export { ScrollToPlugin as default } from 'gsap/ScrollToPlugin';
 }
 
-declare module "gsap-trial/all" {
-  export * from "gsap/ScrollToPlugin";
+declare module 'gsap-trial/all' {
+  export * from 'gsap/ScrollToPlugin';
 }

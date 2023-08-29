@@ -47,9 +47,9 @@
 
       <div class="checkbox-group">
         <input type="checkbox" id="defaultGeo" v-model="useDefault" />
-        <label 
-        style="cursor: pointer;font-size: 1rem;"
-        for="defaultGeo">Use Browser's Default Geolocation</label>
+        <label style="cursor: pointer; font-size: 1rem" for="defaultGeo"
+          >Use Browser's Default Geolocation</label
+        >
       </div>
 
       <button type="submit">Spoof Location</button>
@@ -60,29 +60,29 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   data() {
     return {
-      timezone: "",
-      locale: "",
-      latitude: "",
-      longitude: "",
+      timezone: '',
+      locale: '',
+      latitude: '',
+      longitude: '',
       useDefault: false,
-      feedbackMessage: "",
+      feedbackMessage: '',
     };
   },
   methods: {
     emitData() {
-      this.$emit("spoofLocation", {
+      this.$emit('spoofLocation', {
         timezone: this.timezone,
         locale: this.locale,
         latitude: this.latitude,
         longitude: this.longitude,
         useDefault: this.useDefault,
       });
-      this.feedbackMessage = "Location spoofed successfully!";
+      this.feedbackMessage = 'Location spoofed successfully!';
     },
   },
 });
@@ -114,7 +114,7 @@ label {
   font-size: 1rem;
 }
 
-input[type="text"] {
+input[type='text'] {
   padding: 0.5rem;
   border: 2px solid #b2ebf2;
   border-radius: 4px;
@@ -122,7 +122,7 @@ input[type="text"] {
   transition: border-color 0.3s ease;
 }
 
-input[type="text"]:focus {
+input[type='text']:focus {
   border-color: #00bcd4;
   outline: none;
 }
@@ -134,7 +134,7 @@ input[type="text"]:focus {
   margin-bottom: 1rem;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   appearance: none;
   width: 20px;
   height: 20px;
@@ -144,8 +144,8 @@ input[type="checkbox"] {
   cursor: pointer;
 }
 
-input[type="checkbox"]:checked::before {
-  content: "";
+input[type='checkbox']:checked::before {
+  content: '';
   position: absolute;
   width: 12px;
   height: 12px;
@@ -174,5 +174,4 @@ button:hover {
   color: #4caf50;
   font-weight: bold;
 }
-
 </style>
