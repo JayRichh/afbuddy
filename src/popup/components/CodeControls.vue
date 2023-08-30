@@ -1,12 +1,10 @@
 <template>
   <div class="code-controls-container">
     <div class="button-group">
-      <button class="control-btn" @click="saveToLocalStorage">
-        Save Code 💾
-      </button>
-      <button class="control-btn" @click="loadFromLocalStorage">
-        Load Code 📂
-      </button>
+      <!-- <button class="control-btn" @click="saveToLocalStorage"> -->
+      <button class="control-btn">Save Code 💾</button>
+      <!-- <button class="control-btn" @click="loadFromLocalStorage"> -->
+      <button class="control-btn">Load Code 📂</button>
     </div>
 
     <div class="history-panel">
@@ -108,6 +106,11 @@ export default defineComponent({
   box-sizing: border-box;
   width: calc(100% - 50px);
   background-color: rgba(255, 255, 255, 0.8);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .button-group {

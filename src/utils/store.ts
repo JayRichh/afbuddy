@@ -1,4 +1,5 @@
-import { getThemes } from 'src/popup/themesList';
+import { getThemes } from '../popup/themesList';
+import { NavItems } from '../utils/config';
 import { createStore } from 'vuex';
 import { userAgents } from '../../src/utils/userAgents';
 
@@ -22,6 +23,7 @@ export default createStore({
     themeNamesArray: [],
     themeList: {},
     userAgents: userAgents,
+    navItems: NavItems,
   },
   mutations: {
     setAutoFormat(state, autoFormat: boolean) {

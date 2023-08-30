@@ -11,9 +11,34 @@ export function setupDraggable(
 ) {
   const store = useStore();
   const draggableElements: Draggable[] = [];
-  elements.forEach((element, index) => {
-    const item = NavItems[index];
+
+  NavItems.forEach((item: NavItem) => {
+    PIDStateMap.set(item.ariaLabel, {
+      originalX: 0,
+      originalY: 0,
+      previousErrorX: 0,
+      previousErrorY: 0,
+      setPointX: 0,
+      setPointY: 0,
+      integralX: 0,
+      integralY: 0,
+    });
+    const element = elements.find((el) => el.id === item.id);
+    if (!element) {
+      console.error(`Element for item ${item.id} is not found`);
+      return;
+    }
     const state = PIDStateMap.get(item.ariaLabel) as PIDState;
+    if (!state) {
+      console.error(`State for item ${item.ariaLabel} is undefined`);
+      return;
+    }
+
+    element.addEventListener('mousemove', (event: MouseEvent) => {
+      calculatePID(event, item, state, {}, element);
+      store.commit('setTooltipText', item.ariaLabel);
+    });
+
     const draggable = Draggable.create(element, {
       type: 'x,y',
       edgeResistance: 0.65,
@@ -21,7 +46,6 @@ export function setupDraggable(
       throwProps: true,
       onDrag: function (event: MouseEvent) {
         onDrag(event, item, element);
-        calculatePID(event, item, state, {}, element);
         store.commit('setTooltipX', event.clientX);
         store.commit('setTooltipY', event.clientY);
         store.commit('setCurrentComponent', item.componentName);
@@ -35,8 +59,10 @@ export function setupDraggable(
         }
       },
     })[0];
+
     draggableElements.push(draggable);
   });
+
   return draggableElements;
 }
 

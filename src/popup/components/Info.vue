@@ -1,18 +1,29 @@
 <template>
   <div class="info-container">
-    <p>This application allows users to spoof their geolocation, customize their
+    <p>
+      This application allows users to spoof their geolocation, customize their
       browsing experience, and more. Use each section on the left navbar to
-      access different functionalities.</p>
+      access different functionalities.
+    </p>
   </div>
   <div class="language-selector">
     <label for="language-select">{{ $t('Select Language') }}:</label>
-    <select v-model="selectedLanguage" id="language-select" @change="saveLanguage">
+    <select
+      v-model="selectedLanguage"
+      id="language-select"
+      @change="saveLanguage"
+    >
       <option value="en">{{ $t('English') }}</option>
       <option value="no">{{ $t('Norwegian') }}</option>
     </select>
   </div>
   <div>
-    <input type="checkbox" id="remember-language" v-model="rememberLanguage" @change="saveLanguage">
+    <input
+      type="checkbox"
+      id="remember-language"
+      v-model="rememberLanguage"
+      @change="saveLanguage"
+    />
     <label for="remember-language">Remember Language</label>
   </div>
 </template>

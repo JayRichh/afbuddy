@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NavItem, calculateDistance } from './config';
 
 export interface PIDState {
+  [x: string]: number;
   originalX: number;
   originalY: number;
   previousErrorX: number;
@@ -20,62 +22,24 @@ export const calculatePID = (
   config: any,
   icon: HTMLElement,
 ) => {
-  const ariaLabel = typeof item === 'string' ? item : item.ariaLabel;
-  const rect = icon.getBoundingClientRect();
-  let errorX = event.clientX - rect.left - rect.width / 2;
-  let errorY = event.clientY - rect.top - rect.height / 2;
-  const distance = calculateDistance(errorX, errorY, 0, 0);
+  const now = performance.now();
+  const dt = (now - state.lastTime) / 1000; // time difference in seconds
+  state.lastTime = now;
 
-  if (!state) {
-    state = {
-      integralX: 0,
-      integralY: 0,
-      previousErrorX: 0,
-      previousErrorY: 0,
-      originalX: rect.left + rect.width / 2,
-      originalY: rect.top + rect.height / 2,
-      setPointX: rect.left + rect.width / 2,
-      setPointY: rect.top + rect.height / 2,
-    };
-    PIDStateMap.set(ariaLabel, state);
-  }
+  const errorX = event.clientX - state.setPointX;
+  const errorY = event.clientY - state.setPointY;
 
-  const detachThreshold = config.maxDetachDistance;
-  const maxDetachDistance = config.maxDetachDistance;
-  const maxMovement = config.maxMovement;
-  const Kp = config.Kp;
-  const Ki = config.Ki;
-  const Kd = config.Kd;
-
-  if (distance > detachThreshold) {
-    errorX = state.setPointX - rect.left - rect.width / 2;
-    errorY = state.setPointY - rect.top - rect.height / 2;
-  }
-
-  if (distance > maxDetachDistance) {
-    state.setPointX = state.originalX;
-    state.setPointY = state.originalY;
-    icon.style.transform = `translate(${state.originalX}px, ${state.originalY}px) scale(1)`;
-    return state;
-  }
-
-  const KpScaled = Kp * (distance / maxDetachDistance);
-  const KiScaled = Ki * (distance / maxDetachDistance);
-  const KdScaled = Kd * (distance / maxDetachDistance);
-
-  if (Math.abs(errorX) > maxMovement || Math.abs(errorY) > maxMovement) {
-    state.setPointX = state.originalX;
-    state.setPointY = state.originalY;
-    icon.style.transform = `translate(${state.originalX}px, ${state.originalY}px) scale(1)`;
-    return state;
-  }
+  const KpScaled = config.Kp * errorX;
+  const KiScaled = config.Ki * errorY;
+  const KdScaled = config.Kd;
 
   const proportionalX = KpScaled * errorX;
   const proportionalY = KpScaled * errorY;
-  state.integralX += KiScaled * errorX;
-  state.integralY += KiScaled * errorY;
-  const derivativeX = KdScaled * (errorX - state.previousErrorX);
-  const derivativeY = KdScaled * (errorY - state.previousErrorY);
+  state.integralX += KiScaled * errorX * dt;
+  state.integralY += KiScaled * errorY * dt;
+  const derivativeX = (KdScaled * (errorX - state.previousErrorX)) / dt;
+  const derivativeY = (KdScaled * (errorY - state.previousErrorY)) / dt;
+
   const dx = proportionalX + state.integralX + derivativeX;
   const dy = proportionalY + state.integralY + derivativeY;
 

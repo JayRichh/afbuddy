@@ -3,11 +3,8 @@
     <div v-for="agent in userAgents" :key="agent.title" class="agent-card">
       <h3>{{ agent.title }}</h3>
       <div class="input-group">
-        <select
-          :id="agent.title"
-          v-model="selectedAgents[agent.title]"
-          @change="changeUserAgent(agent.title)"
-        >
+        <select :id="agent.title" v-model="selectedAgents[agent.title]">
+          <!-- @change="changeUserAgent(agent.title)" -->
           <option
             v-for="value in agent.values"
             :key="value.title"

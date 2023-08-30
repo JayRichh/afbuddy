@@ -2,12 +2,10 @@
 <template>
   <nav class="navbar">
     <a
-      v-for="item in filteredNavItems"
-      :if="shouldShowItem(item)"
+      v-for="item in visibleNavItems"
       :key="item.id"
       ref="iconRefs"
       :class="{ selected: isActive(item.componentName) }"
-      @click="handleClick($event, item)"
       class="icon-container"
       :id="item.ariaLabel"
       :aria-label="item.ariaLabel"
@@ -81,7 +79,8 @@ import { useStore } from 'vuex';
 import { gsap, Elastic } from 'gsap';
 import { mapState, mapMutations } from 'vuex';
 import { Draggable } from 'gsap/Draggable';
-import { NavItem, NavItems } from '../../utils/config';
+import { NavItem, NavItems, config } from '../../utils/config';
+import { PIDState, PIDStateMap, calculatePID } from '../../utils/pidstate';
 
 gsap.registerPlugin(Draggable);
 
@@ -112,6 +111,9 @@ export default defineComponent({
     const store = useStore();
     const iconRefs = ref<HTMLElement[]>([]);
     const navItems = reactive<NavItem[]>(NavItems);
+    const visibleNavItems = computed(() => {
+      return navItems.filter((item) => item && shouldShowItem(item));
+    });
     const DoomPlayer = NavItems.find(
       (item) => item.componentName === 'DoomPlayer',
     );
@@ -123,6 +125,8 @@ export default defineComponent({
       draggableElements = setupDraggable(
         iconRefs.value,
         (event: MouseEvent, item: NavItem, element: HTMLElement) => {
+          const state = PIDStateMap.get(item.ariaLabel) as PIDState;
+          calculatePID(event, item, state, config, element);
           store.commit('setTooltipX', event.clientX);
           store.commit('setTooltipY', event.clientY);
           store.commit('setCurrentComponent', item.componentName);
@@ -147,10 +151,6 @@ export default defineComponent({
     });
 
     const handleClick = (event: MouseEvent, item: NavItem) => {
-      store.commit('setTooltipText', item.ariaLabel);
-      store.commit('setTooltipX', event.clientX);
-      store.commit('setTooltipY', event.clientY);
-      store.commit('setShowTooltip', true);
       if (!isDragging.value) {
         emit('changeComponent', item.componentName);
         gsap.to('.icon-container', {
@@ -177,6 +177,10 @@ export default defineComponent({
 
     const crazyModeToggle = () => {
       store.commit('setCrazyModeEnabled', !store.state.crazyModeEnabled);
+      chrome.runtime.sendMessage({
+        action: 'setCrazyMode',
+        status: store.state.crazyModeEnabled,
+      });
       if (store.state.crazyModeEnabled && DoomPlayer) {
         if (!navItems.includes(DoomPlayer)) {
           navItems.push(DoomPlayer);
@@ -218,8 +222,9 @@ export default defineComponent({
       iconRefs,
       isActive,
       shouldShowItem,
-      filteredNavItems,
+      visibleNavItems,
       crazyModeToggle,
+      filteredNavItems,
     };
   },
 });
@@ -246,7 +251,7 @@ export default defineComponent({
   margin: 0;
   padding: 10px 0;
   height: 100%;
-  width: 50px;
+  width: 45px;
   scrollbar-width: none;
   -ms-overflow-style: none;
   scrollbar-color: transparent transparent;
@@ -258,8 +263,8 @@ export default defineComponent({
       transform 0.1s ease;
     z-index: 100000000;
     position: relative;
-    width: 40px;
-    height: 40px;
+    width: 32.5px;
+    height: 32.5px;
 
     &:hover {
       cursor: pointer;

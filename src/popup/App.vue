@@ -1,4 +1,3 @@
-```vue
 <template>
   <div class="container" style="height: 100%; width: 100%">
     <Tooltip
@@ -32,6 +31,7 @@
                 ref="underlinePath"
                 stroke-width="10"
                 stroke="url(#gradient)"
+                d="M 0 100 L 1000 100"
               ></path>
               <defs>
                 <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -85,6 +85,7 @@ import { gsap } from 'gsap';
 import { setupDraggable } from '../utils/draggable';
 import { mapState, mapMutations } from 'vuex';
 import { useStore } from 'vuex';
+import { PIDStateMap, PIDState, calculatePID } from '../utils/pidstate';
 
 gsap.registerPlugin(ExpoScaleEase, RoughEase, SlowMo, Draggable);
 
@@ -157,14 +158,26 @@ export default defineComponent({
     activatePixelPerfection() {},
   },
   mounted() {
-    const store = useStore();
     this.listenForKonamiCode();
+    const store = useStore();
+    const tl = gsap.timeline();
+    tl.fromTo(
+      '.navbar-container',
+      { y: '-100%' },
+      { y: '0%', duration: 0.5, ease: 'bounce.out' },
+    ).fromTo(
+      '.app-header',
+      { y: '-100%' },
+      { y: '0%', duration: 0.5, ease: 'bounce.out' },
+    );
     const draggableElements = Array.from(
-      document.querySelectorAll('.icon-container'),
+      document.querySelectorAll('.icon-container, .draggable'),
     ) as HTMLElement[];
     this.draggableElements = setupDraggable(
       draggableElements,
       (event: MouseEvent, item: NavItem, element: HTMLElement) => {
+        const state = PIDStateMap.get(item.ariaLabel) as PIDState;
+        calculatePID(event, item, state, {}, element);
         store.commit('setTooltipX', event.clientX);
         store.commit('setTooltipY', event.clientY);
         store.commit('setCurrentComponent', item.componentName);
@@ -334,7 +347,7 @@ export default defineComponent({
 }
 
 .underline {
-  z-index: 1;
+  z-index: 1000;
   cursor: pointer;
   scale: calc(1 + 0.1 * var(--speed));
   background-color: #0000;

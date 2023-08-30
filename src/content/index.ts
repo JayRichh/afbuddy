@@ -1,31 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 
-// function processScriptsAndStylesheets(): void {
-//   const scripts = document.querySelectorAll("script[src]");
-//   const stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
-
-//   const processElement = (element: Element | null, attribute: string) => {
-//     try {
-//       const existingNonce = element?.getAttribute("nonce");
-//       const nonce = existingNonce || generateNonce();
-
-//       element?.setAttribute("nonce", nonce);
-
-//       const absoluteURL = new URL(
-//         element?.getAttribute(attribute) || "",
-//         window.location.origin
-//       ).href;
-//       element?.setAttribute(attribute, absoluteURL);
-//     } catch (error) {
-//       console.error("Error processing element:", error);
-//     }
-//   };
-
-//   scripts.forEach((script) => processElement(script, "src"));
-//   stylesheets.forEach((stylesheet) => processElement(stylesheet, "href"));
-// }
-
 function evalInIframe(iframe: HTMLIFrameElement, code: string): any {
   console.log('Executing code:', code);
   const result = (iframe.contentWindow as any)?.eval(code);
@@ -94,6 +69,20 @@ chrome.runtime.onMessage.addListener((message) => {
           });
         } catch (error) {
           console.error('Error executing loadCode:', error);
+        }
+        break;
+      }
+
+      case 'sendMonacoTheme': {
+        if (message.theme) {
+          const themeDataString = JSON.stringify(message.theme);
+          evalInIframe(
+            iframe,
+            `editor.defineTheme('${message.theme.name}', ${themeDataString});`,
+          );
+          evalInIframe(iframe, `editor.setTheme('${message.theme.name}');`);
+        } else {
+          console.warn('Monaco theme data is incomplete or missing');
         }
         break;
       }
