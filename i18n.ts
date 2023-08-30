@@ -14,6 +14,12 @@ export const messages = {
     'Select Language': 'Select Language',
     English: 'English',
     Norwegian: 'Norwegian',
+    About: 'About',
+    Contact: 'Contact',
+    Projects: 'Projects',
+    'Select Theme': 'Select Theme',
+    Apply: 'Apply',
+    Default: 'Default',
   },
   no: {
     Navbar: 'Navigasjonslinje',
@@ -28,6 +34,12 @@ export const messages = {
     'Select Language': 'Velg Språk',
     English: 'Engelsk',
     Norwegian: 'Norsk',
+    About: 'Om',
+    Contact: 'Kontakt',
+    Projects: 'Prosjekter',
+    'Select Theme': 'Velg Tema',
+    Apply: 'Bruk',
+    Default: 'Standard',
   },
 };
 

@@ -1,15 +1,15 @@
+```vue
 <template>
   <div
     class="tooltip"
-    v-if="visible"
+    v-if="showTooltip"
     :style="{
-      top: y + 'px',
-      left: x + 'px',
+      top: tooltipY + 'px',
+      left: tooltipX + 'px',
       overflow: 'hidden',
     }"
   >
-    <div
-      v-if="isCodeEditorPreview"
+    <div v-if="isCodeEditorPreview">
       class="code-preview"
       style="height: 100%; width: 100%"
     >
@@ -19,7 +19,7 @@
         style="height: 100%; width: 100%"
       ></div>
     </div>
-    <div v-else>{{ content }}</div>
+    <div v-else>{{ tooltipText }}</div>
   </div>
 </template>
 
@@ -33,43 +33,22 @@ import {
   ref,
   toRefs,
   Prop,
+reactive,
 } from 'vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import { useStore } from 'vuex';
 
 interface Props {
-  content: string;
   themeData: monaco.editor.IStandaloneThemeData;
-  x: number;
-  y: number;
-  visible: boolean;
   theme: string;
   isCodeEditorPreview: boolean;
 }
 
 export default defineComponent({
   props: {
-    content: {
-      type: String,
-      default: `// ding dong
-        const a={b:{c:1}};
-        function f(n){return n<2?n:f(n-1)+f(n-2);}
-        function g(x){return x<1?1:x*g(x-1);}`,
-    },
     themeData: {
       type: Object as () => monaco.editor.IStandaloneThemeData,
       default: () => ({}),
-    },
-    x: {
-      type: Number,
-      required: true,
-    },
-    y: {
-      type: Number,
-      required: true,
-    },
-    visible: {
-      type: Boolean,
-      required: true,
     },
     theme: {
       type: String,
@@ -81,6 +60,14 @@ export default defineComponent({
     },
   },
   setup(props: Props) {
+    const store = useStore();
+    const tooltipText = computed(() => store.state.tooltipText);
+    const state = reactive({
+  tooltipText: store.state.tooltipText,
+  tooltipX: store.state.tooltipX,
+  tooltipY: store.state.tooltipY,
+  showTooltip: store.state.showTooltip,
+});
     const monacoContainer = ref<HTMLElement | null>(null);
     const editorInstance = ref<monaco.editor.IStandaloneCodeEditor | null>(
       null,
@@ -93,7 +80,7 @@ export default defineComponent({
     const createEditor = () => {
       if (monacoContainer.value) {
         const config = {
-          value: props.content,
+          value: store.state.tooltipText,
           language: 'javascript',
           theme: props.theme,
           fontSize: 20,
@@ -141,25 +128,25 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      if (props.visible && props.isCodeEditorPreview) {
+      if (store.state.showTooltip && props.isCodeEditorPreview) {
         createEditor();
       }
-      if (props.content) {
+      if (store.state.tooltipText) {
         const navItem = document.querySelector(
-          ".nav-item[data-tooltip='" + props.content + "']",
+          ".nav-item[data-tooltip='" + store.state.tooltipText + "']",
         );
         if (navItem) {
-          navItem.textContent = props.content;
+          navItem.textContent = store.state.tooltipText;
         }
       }
     });
 
     watch(
-      () => props.visible,
+      () => store.state.showTooltip,
       (newVal) => {
         if (newVal && props.isCodeEditorPreview) {
           if (editorInstance.value) {
-            editorInstance.value.setValue(props.content);
+            editorInstance.value.setValue(store.state.tooltipText);
             applyTheme();
           } else {
             createEditor();
@@ -169,7 +156,7 @@ export default defineComponent({
     );
 
     watch(
-      () => props.content,
+      () => store.state.tooltipText,
       (newVal) => {
         if (newVal && editorInstance.value) {
           editorInstance.value.setValue(newVal);
@@ -186,27 +173,11 @@ export default defineComponent({
       },
     );
 
-    watch(
-      () => props.x,
-      (newVal) => {
-        if (newVal) {
-          const x = newVal;
-        }
-      },
-    );
-
-    watch(
-      () => props.y,
-      (newVal) => {
-        if (newVal) {
-          const y = newVal;
-        }
-      },
-    );
-
     return {
-      monacoContainer,
-      editorInstance,
+      ...toRefs(state),
+  monacoContainer,
+  editorInstance,
+  tooltipText,
     };
   },
 });

@@ -1,56 +1,37 @@
+```vue
 <template>
-  <div class="container" :style="sunMoonStyles" style="height: 100%; width: 100%">
-    <div class="sun-moon-container">
-      <div v-if="displaySun" class="sun">
-        <img src="../../assets/sun.svg" alt="Sun" />
-      </div>
-      <div v-if="displayMoon" class="moon">
-        <img src="../../assets/moon.svg" alt="Moon" />
-      </div>
-    </div>
-
+  <div
+    class="container"
+    style="height: 100%; width: 100%"
+  >
     <Tooltip
-      v-if="showTooltip"
-      :x="tooltipX"
-      :y="tooltipY"
-      :content="tooltipText"
-      :visible="showTooltip"
-      :theme="theme"
-      :themeData="themeData"
-      :isCodeEditorPreview="!!theme"
+    v-if="showTooltip"
+    :x="tooltipX"
+    :y="tooltipY"
+    :content="tooltipText"
+    :visible="showTooltip"
+    :theme="theme"
+    :themeData="themeData"
+    :isCodeEditorPreview="!!theme"
+  />
+    <Navbar
+      class="navbar-container"
+      :currentComponent="currentComponent"
+      @changeComponent="handleComponentChange"
     />
-
-    <div
-      class="navbar-wrapper navbar-container"
-      @mouseover="handleMouseOver"
-      @mousemove="adjustTooltipPosition"
-      @mouseout="handleMouseOut"
-      :draggable="isDraggable"
-    >
-      <Navbar
-        @changeComponent="handleComponentChange"
-        :currentComponent="currentComponent"
-        @updateTooltipText="updateTooltipText"
-        @mouseout="handleMouseOut"
-      />
-    </div>
-
     <div class="app-container">
       <div class="app-header">
         <div class="title-icon-wrapper">
           <div
-            class="title-wrapper"
+            class="title-wrapper draggable magnetic"
             ref="titleWrapper"
-            @mouseenter="handleMouseEnter"
-            @mouseleave="handleMouseLeave"
-            @click="handleTitleClick"
           >
-            <span class="title">{{ $t(formatTitle(currentComponent)) }}</span>
+          <span class="title">{{ $t('titles.' + currentComponent) }}</span>
             <svg
-              class="underline"
+              class="underline draggable magnetic"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 1000 200"
-              ref="underlineRef"
+              ref="underlineSVG"
             >
               <path
                 class="underline-path"
@@ -60,25 +41,29 @@
               ></path>
               <defs>
                 <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style="stop-color: #7ed4e6; stop-opacity: 1" />
-                  <stop offset="100%" style="stop-color: #b493d3; stop-opacity: 1" />
+                  <stop
+                    offset="0%"
+                    style="stop-color: #7ed4e6; stop-opacity: 1"
+                  />
+                  <stop
+                    offset="100%"
+                    style="stop-color: #b493d3; stop-opacity: 1"
+                  />
                 </linearGradient>
               </defs>
             </svg>
           </div>
           <img
-            ref="paintbrushRef"
+            ref="paintbrush"
             id="iconToChangeColor"
-            class="paintbrush"
-            :class="{ spin: spinBrush, speedUp: speedUpBrush }"
+            class="paintbrush draggable magnetic"
             src="../../assets/icons/logo-bg-full.png"
             alt="Icon"
-            @click="handleBrushClick"
           />
         </div>
       </div>
-      <component
-        class="app-content"
+      <Component
+        class="app-content draggable magnetic"
         :is="currentComponent"
         v-bind="$attrs"
         @changeComponent="handleComponentChange"
@@ -86,7 +71,6 @@
     </div>
   </div>
 </template>
-
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, Component } from 'vue';
@@ -100,11 +84,13 @@ import Info from './components/Info.vue';
 import Tooltip from './components/Tooltip.vue';
 import DoomPlayer from './components/DoomPlayer.vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import { calculateDistance, calculateRotation } from '../utils/calculationUtils';
-import { TimelineMax, Power2, Elastic } from 'gsap';
+import { NavItem, calculateRotation } from '../utils/config';
 import { ExpoScaleEase, RoughEase, SlowMo } from 'gsap/EasePack';
 import Draggable from 'gsap/Draggable';
 import { gsap } from 'gsap';
+import { setupDraggable } from '../utils/draggable';
+import { mapState, mapMutations } from 'vuex';
+import { useStore } from 'vuex';
 
 gsap.registerPlugin(ExpoScaleEase, RoughEase, SlowMo, Draggable);
 
@@ -117,9 +103,8 @@ interface Data {
   tooltipY: number;
   theme: string;
   themeData: monaco.editor.IStandaloneThemeData;
-  sunRotation: number;
-  moonRotation: number;
   isDraggable: boolean;
+  draggableElements: Draggable[];
 }
 
 export default defineComponent({
@@ -134,230 +119,27 @@ export default defineComponent({
     Tooltip,
     DoomPlayer,
   },
-  props: {
-    currentTheme: {
-      type: String,
-      default: 'active4d',
-    },
-  },
-  setup(props) {
-    const paintbrushRef = ref<HTMLElement | null>(null);
-    const underlineRef = ref<HTMLElement | null>(null);
-    const navbarIconsRef = ref<HTMLElement | null>(null);
-    const checkboxRef = ref<HTMLElement | null>(null);
-    const tooltipContent = ref('');
-    const themesArray = ref([]);
-    const themeNamesArray = ref([]);
-    const themeList = ref([]);
-    const selectedThemeKey = ref(props.currentTheme || 'active4d');
-    const showTooltip = ref(false);
-    const theme = ref('');
-    const themeData = ref({} as monaco.editor.IStandaloneThemeData);
-    const isDraggable = ref(false);
-    const currentComponent = ref('ThemeSelector');
-    const tooltipX = ref(0);
-    const tooltipY = ref(0);
-    const originalPositions = ref<{ [key: string]: { x: number; y: number } }>({});
-
-    gsap.registerPlugin(Draggable);
-
-
-    const setupDraggable = (element: HTMLElement | null, id: string) => {
-      if (!element) return;
-
-      originalPositions.value[id] = { x: element.offsetLeft, y: element.offsetTop };
-
-      Draggable.create(element, {
-        type: 'x,y',
-        bounds: 'body',
-        edgeResistance: 0.65,
-        zIndexBoost: false,
-        onDragStart() {
-          // Implement PID controller logic to magnetize element to mouse here
-        },
-        onDragEnd() {
-          const distance = calculateDistance(
-            this.x - originalPositions.value[id].x,
-            this.y - originalPositions.value[id].y,
-            0,
-            0
-          );
-
-          if (distance > 20) {
-            gsap.to(this.target, {
-              x: originalPositions.value[id].x,
-              y: originalPositions.value[id].y,
-              duration: 0.5,
-              ease: 'power1.out',
-            });
-          } else {
-            originalPositions.value[id] = { x: this.x, y: this.y };
-          }
-        },
-      });
-    };
-
-    const handleTooltip = (event: MouseEvent, content: string) => {
-      tooltipX.value = event.clientX;
-      tooltipY.value = event.clientY;
-      tooltipContent.value = content;
-    };
-
-    onMounted(async () => {
-      const themes = await getThemes();
-      themesArray.value = themes.themesArray;
-      themeNamesArray.value = themes.themeNamesArray;
-      themeList.value = themes.themeList;
-      console.log('mounted themeselector');
-
-      setupDraggable(paintbrushRef.value, 'paintbrush');
-      setupDraggable(underlineRef.value, 'underline');
-      setupDraggable(navbarIconsRef.value, 'navbarIcons');
-      setupDraggable(checkboxRef.value, 'checkbox');
-
-      if (!props.currentTheme) {
-        setDefaultTheme();
-      }
-    });
-
-    return {
-      paintbrushRef,
-      underlineRef,
-      navbarIconsRef,
-      checkboxRef,
-      tooltipX,
-      tooltipY,
-      tooltipContent,
-      themesArray,
-      themeNamesArray,
-      themeList,
-      selectedThemeKey,
-      handleTooltip,
-    };
-  },
-
   data(): Data {
     return {
       currentComponent: 'ThemeSelector',
+      scriptContentForTooltip: '',
       showTooltip: false,
-      theme: '',
+      tooltipText: '',
+      tooltipX: 0,
+      tooltipY: 0,
+      theme: 'GitHub',
       themeData: {} as monaco.editor.IStandaloneThemeData,
       isDraggable: false,
+      draggableElements: [],
     };
   },
   computed: {
-    sunMoonStyles(): Record<string, string> {
-      return {
-        '--sun-rotation-deg': `${this.sunRotation}deg`,
-        '--moon-rotation-deg': `${this.moonRotation}deg`,
-      };
-    },
-    displaySun(): boolean {
-      const now = new Date();
-      return now.getUTCHours() >= 6 && now.getUTCHours() < 18;
-    },
-    displayMoon(): boolean {
-      const now = new Date();
-      const hours = now.getUTCHours();
-      return hours < 6 || hours >= 18;
-    },
-  },
-  mounted() {
-    this.listenForKonamiCode();
-    const rotationData = calculateRotation();
-    this.sunRotation = rotationData.sunRotation;
-    this.moonRotation = rotationData.moonRotation;
-  },
-  watch: {
-    sunRotation() {
-      this.rotateSunOrMoon();
-    },
-    moonRotation() {
-      this.rotateSunOrMoon();
-    },
+    ...mapState(['tooltipText', 'tooltipX', 'tooltipY', 'showTooltip']),
   },
   methods: {
-    const updateTooltipText = (newText: string) => {
-      showTooltip.value = true;
-      tooltipX.value = 100; 
-      tooltipY.value = 100; 
-    };
-    rotateSunOrMoon() {
-      const { sunRotation, moonRotation } = calculateRotation();
-      this.sunRotation = sunRotation;
-      this.moonRotation = moonRotation;
-    },
-    const handleMouseOver = (event: MouseEvent) => {
-      tooltipX.value = event.clientX;
-      tooltipY.value = event.clientY;
-      showTooltip.value = true;
-    };
-
+    ...mapMutations(['setTooltipText', 'setTooltipX', 'setTooltipY', 'setShowTooltip']),
     handleComponentChange(componentName: string) {
       this.currentComponent = componentName;
-      this.titleText = '';
-      this.typeWriterEffect(this.$t(this.formatTitle(componentName)), 0);
-    },
-    typeWriterEffect(text: string, index: number) {
-      if (index < text.length) {
-        const letter = text.charAt(index);
-        const spanId = `letter-${index}`;
-        this.titleText += `<span id="${spanId}">${letter}</span>`;
-        gsap.fromTo(`#${spanId}`, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.2 });
-        setTimeout(() => this.typeWriterEffect(text, index + 1), 100); // adjust delay as needed
-      }
-    },
-    formatTitle(componentName: string) {
-      return componentName
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, (str) => str.toUpperCase());
-    },
-    showScriptTooltip(data: any) {
-      this.scriptContentForTooltip = data.content;
-      this.tooltipX = data.x;
-      this.tooltipY = data.y;
-      this.showTooltip = true;
-    },
-    hideScriptTooltip() {
-      this.showTooltip = false;
-    },
-    loadScriptIntoEditor(content: string) {
-      console.log('content:', content);
-      this.$emit('loadScriptIntoEditor', content);
-    },
-    showThemeTooltip(data: any) {
-      this.tooltipX = data.x;
-      this.tooltipY = data.y;
-      this.theme = data.theme;
-      this.themeData = data.themeData;
-      this.showTooltip = true;
-    },
-    adjustThemeTooltipPosition(data: any) {
-      this.tooltipX = data.x;
-      this.tooltipY = data.y;
-    },
-    hideThemeTooltip() {
-      this.showTooltip = false;
-    },
-    adjustTooltipPosition(event: MouseEvent) {
-      const navbar = document.querySelector('.navbar-container') as HTMLElement;
-      const navbarRect = navbar.getBoundingClientRect();
-      const navbarX = navbarRect.left;
-      const navbarY = navbarRect.top;
-
-      this.tooltipX = event.pageX - navbarX + 10;
-      this.tooltipY = event.pageY - navbarY + 10;
-
-      const checkbox = document.querySelector(
-        '.crazy-mode-checkbox',
-      ) as HTMLInputElement;
-      if (checkbox && checkbox.checked) {
-        this.tooltipY += 30;
-      }
-    },
-    handleMouseOut() {
-      this.showTooltip = false;
-      this.isDraggable = false;
     },
     listenForKonamiCode() {
       let input = '';
@@ -372,10 +154,20 @@ export default defineComponent({
     },
     activatePixelPerfection() {},
   },
+  mounted() {
+  const store = useStore();
+  this.listenForKonamiCode();
+  const draggableElements = Array.from(document.querySelectorAll('.icon-container')) as HTMLElement[];
+  this.draggableElements = setupDraggable(draggableElements, (event: MouseEvent, item: NavItem, element: HTMLElement) => {
+    store.commit('setTooltipX', event.clientX);
+    store.commit('setTooltipY', event.clientY);
+    store.commit('setCurrentComponent', item.componentName);
+  });
+},
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -610,3 +402,4 @@ export default defineComponent({
   }
 }
 </style>
+

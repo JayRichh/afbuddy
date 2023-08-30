@@ -1,18 +1,16 @@
 <template>
   <nav class="navbar">
     <a
-      v-for="item in filteredNavItems"
-      :if="shouldShowItem(item)"
-      :key="item.id"
-      ref="iconRefs"
-      :class="{ selected: isActive(item.componentName) }"
-      @click="handleClick($event, item)"
-      @mouseenter="hoverMouse($event, item)"
-      @mouseleave="onIconMouseLeave($event, item)"
-      class="icon-container"
-      :id="item.ariaLabel"
-      :aria-label="item.ariaLabel"
-    >
+    v-for="item in filteredNavItems"
+    :if="shouldShowItem(item)"
+    :key="item.id"
+    ref="iconRefs"
+    :class="{ selected: isActive(item.componentName) }"
+    @click="handleClick($event, item)"
+    class="icon-container"
+    :id="item.ariaLabel"
+    :aria-label="item.ariaLabel"
+  >
       <div
         class="icon-mask"
         :id="`${item.ariaLabel}-mask`"
@@ -69,333 +67,109 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted, computed } from 'vue';
-import { gsap, Power2, Elastic, Bounce } from 'gsap';
-import { CSSPlugin } from 'gsap/CSSPlugin';
-import { ExpoScaleEase, RoughEase, SlowMo } from 'gsap/EasePack';
-import Draggable from 'gsap/Draggable';
+import { defineComponent, ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue';
+import { setupDraggable, destroyDraggable } from '../../utils/draggable';
+import { useStore } from 'vuex';
+import { gsap, Elastic } from 'gsap';
+import { mapState, mapMutations } from 'vuex';
+import { Draggable } from 'gsap/Draggable';
+import { NavItem, NavItems } from '../../utils/config';
 
-import { NavItem, NavItems, config, PIDState } from '../../utils/navbarConfig';
-import Tooltip from './Tooltip.vue';
-import { calculateDistance } from '../../utils/calculationUtils';
-
-gsap.registerPlugin(CSSPlugin, ExpoScaleEase, RoughEase, SlowMo, Draggable);
+gsap.registerPlugin(Draggable);
 
 export default defineComponent({
-  components: {
-    Tooltip,
-  },
   props: {
     currentComponent: String,
   },
-
+  computed: {
+    ...mapState(['tooltipText', 'tooltipX', 'tooltipY', 'showTooltip', 'crazyModeEnabled']),
+  },
+  methods: {
+    ...mapMutations(['setTooltipText', 'setTooltipX', 'setTooltipY', 'setShowTooltip', 'setCurrentComponent', 'setCrazyModeEnabled']),
+  },
   setup(props, { emit }) {
-    // ------------------------------
-    // Variables
-    // ------------------------------
+    const store = useStore();
     const iconRefs = ref<HTMLElement[]>([]);
-    const position = ref({ x: 0, y: 0 });
-    const crazyModeEnabled = ref(false);
-    const crazyModeCheckbox = ref<HTMLInputElement | null>(null);
-    const showDoomIcon = ref(false);
     const navItems = reactive<NavItem[]>(NavItems);
+    const DoomPlayer = NavItems.find(item => item.componentName === 'DoomPlayer');
 
-    let hoveredElement: HTMLElement | null = null;
     let isDragging = ref(false);
+    let draggableElements: Draggable[] = [];
 
-    let pidState = new Map<string, PIDState>();
-
-    // ------------------------------
-    // Lifecycle Hooks
     onMounted(() => {
       iconRefs.value = iconRefs.value.map((ref) => ref as HTMLElement);
-
-
-  // Make the icons draggable
-  iconRefs.value.forEach((icon) => {
-    const originalPosition = { x: icon.offsetLeft, y: icon.offsetTop };
-
-    Draggable.create(icon, {
-      type: "x,y",
-      edgeResistance: 0.65,
-      bounds: "body",
-      onDragEnd: function() {
-        const distance = calculateDistance(
-          this.x - originalPosition.x,
-          this.y - originalPosition.y,
-          0,
-          0
-        );
-
-        if (distance > 20) { // If the distance is more than 20px
-          gsap.to(this.target, { // Animate the icon back to its original position
-            x: originalPosition.x,
-            y: originalPosition.y,
-            duration: 0.5,
-            ease: "power1.out"
-          });
-        }
-      }
+      draggableElements = setupDraggable(iconRefs.value, (event, item, element) => {
+        store.commit('setTooltipX', event.clientX);
+        store.commit('setTooltipY', event.clientY);
+        store.commit('setCurrentComponent', item.componentName);
+      });
     });
-  });
 
-    // ------------------------------
-    // Methods
-    /** @param el - Adds an HTMLElement to iconRefs.
-     */
-    const addIconRef = (el: HTMLElement) => {
-      if (el) {
-        iconRefs.value.push(el);
+    onBeforeUnmount(() => {
+      destroyDraggable(draggableElements);
+    });
+
+    const handleClick = (event: MouseEvent, item: NavItem) => {
+      store.commit('setTooltipText', item.ariaLabel);
+      store.commit('setTooltipX', event.clientX);
+      store.commit('setTooltipY', event.clientY);
+      store.commit('setShowTooltip', true);
+      if (!isDragging.value) {
+        emit('changeComponent', item.componentName);
+        gsap.to('.icon-container', {
+          scale: 1.2,
+          duration: 0.5,
+          ease: Elastic.easeOut.config(1, 0.3),
+        });
       }
     };
 
-    /** @param componentName - Checks if a component is active.
-     */
     const isActive = (componentName: string) => {
       return componentName === props.currentComponent;
     };
 
-    /** @param componentName - Emits a changeComponent event.
-     */
-    const showComponent = (componentName: string) => {
-      emit('changeComponent', componentName);
-    };
-
-    /** @param item - Checks if an item should be shown
-     */
     const shouldShowItem = (item: NavItem) => {
-      return item.componentName !== 'DoomPlayer' || showDoomIcon.value;
+      return item.componentName !== 'DoomPlayer' || store.state.showDoomIcon;
     };
 
-    /** @returns {NavItem[]} An array of filtered navigation items.
-     */
     const filteredNavItems = computed(() => {
       return navItems.filter(
-        (item) => !item.crazyMode || crazyModeEnabled.value,
+        (item) => !item.crazyMode || store.state.crazyModeEnabled,
       );
     });
 
-    /** @param event - The MouseEvent object.
-     * @param item - Handles click event on navigation items.
-     */
-    const handleClick = (event: MouseEvent, item: NavItem) => {
-      event.preventDefault();
-      emit('updateTooltipText', item.ariaLabel);
-
-      navItems.forEach((navItem) => {
-        navItem.selected = navItem.id === item.id;
-      });
-      if (!isDragging.value) {
-        showComponent(item.componentName);
-      }
-    };
-
-    /** @param event - The MouseEvent object.
-     * @param item - Handles mouse hover event on navigation items.
-     */
-    const hoverMouse = (event: MouseEvent, item: NavItem) => {
-      const distance = calculateDistance(
-        event.clientX,
-        event.clientY,
-        item.position.x,
-        item.position.y,
-      );
-      if (distance < 50) {
-        applyMagneticEffect(event, item);
-      }
-      const tooltip = document.querySelector('.tooltip') as HTMLElement;
-      if (tooltip) {
-        tooltip.style.visibility = 'visible';
-      }
-    };
-
-    /** @param event - The MouseEvent object.
-     * @param item - Handles mouse enter event on navigation items.
-     */
-    const onIconMouseEnter = (event: MouseEvent, item: NavItem) => {
-      hoveredElement = event.target as HTMLElement;
-      document.addEventListener('mousemove', (e) =>
-        applyMagneticEffect(e, item),
-      );
-      emit('updateTooltipText', item.ariaLabel);
-    };
-
-    /** @param ariaLabel - Animates an icon.
-     */
-    const animateIcon = (ariaLabel: string) => {
-      const icon = document.querySelector(`a[aria-label='${ariaLabel}']`);
-      if (icon) {
-        const animationClass = getAnimationClass(ariaLabel);
-        icon.classList.add(animationClass);
-        setTimeout(() => {
-          icon.classList.remove(animationClass);
-        }, 3000);
-      }
-    };
-    /**@param ariaLabel - Returns the animation class for an icon.
-     */
-    const getAnimationClass = (ariaLabel: string): string => {
-      const animationMap = {
-        Themes: 'paintbrushFlick',
-        Formatting: 'pyramidRoll',
-        'Code Editor': 'wheelSpin',
-        Geolocation: 'markerPulse',
-        'User Agents': 'magnifyZoom',
-        Doom: 'gamePulse',
-        Info: 'infoAwesome',
-      } as Record<string, string>;
-
-      return animationMap[ariaLabel] || '';
-    };
-
-    // ------------------------------
-    /** @param event - The MouseEvent object.
-     * @param item - Applies a magnetic effect to an icon.
-     */
-    const applyMagneticEffect = (event: MouseEvent, item: NavItem | string) => {
-      if (!crazyModeEnabled.value) {
-        const ariaLabel = typeof item === 'string' ? item : item.ariaLabel;
-        const icon = document.querySelector(
-          `a[aria-label='${ariaLabel}']`,
-        ) as HTMLElement;
-
-        if (icon) {
-          const rect = icon.getBoundingClientRect();
-          let errorX = event.clientX - rect.left - rect.width / 2;
-          let errorY = event.clientY - rect.top - rect.height / 2;
-          const distance = calculateDistance(errorX, errorY, 0, 0);
-
-          let state = pidState.get(ariaLabel);
-          if (!state) {
-            state = {
-              integralX: 0,
-              integralY: 0,
-              previousErrorX: 0,
-              previousErrorY: 0,
-              originalX: rect.left + rect.width / 2,
-              originalY: rect.top + rect.height / 2,
-              setPointX: rect.left + rect.width / 2,
-              setPointY: rect.top + rect.height / 2,
-            };
-            pidState.set(ariaLabel, state);
-          }
-          const detachThreshold = config.maxDetachDistance;
-          const maxDetachDistance = config.maxDetachDistance;
-          const maxMovement = config.maxMovement;
-          const Kp = config.Kp;
-          const Ki = config.Ki;
-          const Kd = config.Kd;
-
-          if (distance > detachThreshold) {
-            errorX = state.setPointX - rect.left - rect.width / 2;
-            errorY = state.setPointY - rect.top - rect.height / 2;
-          }
-
-          if (distance > maxDetachDistance) {
-            state.setPointX = state.originalX;
-            state.setPointY = state.originalY;
-            icon.style.transform = `translate(${state.originalX}px, ${state.originalY}px) scale(1)`;
-            return;
-          }
-
-          const KpScaled = Kp * (distance / maxDetachDistance); // sticktion
-          const KiScaled = Ki * (distance / maxDetachDistance); // sticktion
-          const KdScaled = Kd * (distance / maxDetachDistance); // sticktion
-
-          if (
-            Math.abs(errorX) > maxMovement ||
-            Math.abs(errorY) > maxMovement
-          ) {
-            state.setPointX = state.originalX;
-            state.setPointY = state.originalY;
-            icon.style.transform = `translate(${state.originalX}px, ${state.originalY}px) scale(1)`;
-            return;
-          }
-
-          const proportionalX = Kp * errorX;
-          const proportionalY = Kp * errorY;
-          state.integralX += Ki * errorX;
-          state.integralY += Ki * errorY;
-          const derivativeX = Kd * (errorX - state.previousErrorX);
-          const derivativeY = Kd * (errorY - state.previousErrorY);
-          const dx = proportionalX + state.integralX + derivativeX;
-          const dy = proportionalY + state.integralY + derivativeY;
-
-          state.previousErrorX = errorX;
-          state.previousErrorY = errorY;
-          state.setPointX += dx;
-          state.setPointY += dy;
-          icon.style.transform = `translate(${state.setPointX}px, ${state.setPointY}px) scale(1.1)`;
-        }
-      }
-    };
-
-    /**  Toggles crazy mode.
-     */
     const crazyModeToggle = () => {
-      showDoomIcon.value = crazyModeEnabled.value;
-      if (crazyModeEnabled.value) {
-        gsap.to('.icon-container', {
-          scale: 0.8,
-          ease: Elastic.easeOut.config(1, 0.3),
-        });
-      } else {
-        gsap.to('.icon-container', {
-          scale: 0.9,
-          ease: Elastic.easeOut.config(1, 0.3),
-        });
-      }
-    };
-
-    const onIconMouseLeave = (event: MouseEvent, item: NavItem) => {
-      hoveredElement = null;
-      const applyMagneticEffectListener = (e: MouseEvent) =>
-        applyMagneticEffect(e, item);
-      document.addEventListener('mousemove', applyMagneticEffectListener);
-    };
-
-    const resetStyles = () => {
-      const icons = document.querySelectorAll('.icon-container') as NodeListOf<
-        | HTMLElement
-        | SVGElement
-        | Element
-        | any
-        | null
-        | undefined
-        | unknown
-        | never
-        | void
-      >;
-      icons.forEach((icon) => {
-        icon.style.transform = `translate(0px, 0px)`;
-        icon.style.width = `0px`;
-        icon.style.height = `0px`;
-      });
-    };
+      store.commit('setCrazyModeEnabled', !store.state.crazyModeEnabled);
+  if (store.state.crazyModeEnabled && DoomPlayer) {
+    navItems.push(DoomPlayer);
+    gsap.to('.icon-container', {
+      scale: 1.2,
+      duration: 0.5,
+      ease: Elastic.easeOut.config(1, 0.3),
+    });
+  } else if (DoomPlayer) {
+    const index = navItems.indexOf(DoomPlayer);
+    if (index > -1) {
+      navItems.splice(index, 1);
+    }
+    gsap.to('.icon-container', {
+      scale: 1,
+      duration: 0.5,
+    });
+  }
+};
 
     return {
-      position,
-      crazyModeEnabled,
-      crazyModeCheckbox,
-      crazyModeToggle,
-      iconRefs,
-      addIconRef,
-      navItems,
-      animateIcon,
-      getAnimationClass,
-      isActive,
-      showComponent,
       handleClick,
-      applyMagneticEffect,
-      hoverMouse,
-      onIconMouseEnter,
-      onIconMouseLeave,
-      showDoomIcon,
+      iconRefs,
+      isActive,
       shouldShowItem,
       filteredNavItems,
+      crazyModeToggle,
     };
   },
 });
+
 </script>
 
 <style lang="scss" scoped>
