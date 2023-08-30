@@ -64,16 +64,16 @@ export default defineComponent({
     },
   },
   methods: {
-    saveToLocalStorage() {
-      // Logic to save the current script to localStorage
-      // Emit the save-code event to the parent component to get the current script
-      this.$emit('save-code');
-    },
-    loadFromLocalStorage() {
-      // Logic to load scripts from localStorage
-      // Emit the load-code event to the parent component to set the loaded script
-      this.$emit('load-code');
-    },
+    // saveToLocalStorage() {
+    // Logic to save the current script to localStorage
+    // Emit the save-code event to the parent component to get the current script
+    //   this.$emit('save-code');
+    // },
+    // loadFromLocalStorage() {
+    // Logic to load scripts from localStorage
+    // Emit the load-code event to the parent component to set the loaded script
+    //   this.$emit('load-code');
+    // },
     deleteScript(script: Script) {
       // Logic to delete the selected script from localStorage and the scripts array
     },

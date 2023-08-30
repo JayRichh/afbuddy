@@ -1,16 +1,17 @@
+```vue
 <template>
   <nav class="navbar">
     <a
-    v-for="item in filteredNavItems"
-    :if="shouldShowItem(item)"
-    :key="item.id"
-    ref="iconRefs"
-    :class="{ selected: isActive(item.componentName) }"
-    @click="handleClick($event, item)"
-    class="icon-container"
-    :id="item.ariaLabel"
-    :aria-label="item.ariaLabel"
-  >
+      v-for="item in filteredNavItems"
+      :if="shouldShowItem(item)"
+      :key="item.id"
+      ref="iconRefs"
+      :class="{ selected: isActive(item.componentName) }"
+      @click="handleClick($event, item)"
+      class="icon-container"
+      :id="item.ariaLabel"
+      :aria-label="item.ariaLabel"
+    >
       <div
         class="icon-mask"
         :id="`${item.ariaLabel}-mask`"
@@ -28,7 +29,7 @@
         />
       </div>
     </a>
-    <div class="crazy-mode-toggle">
+    <div class="crazy-mode-toggle draggable">
       <input
         ref="crazyModeCheckbox"
         type="checkbox"
@@ -67,7 +68,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue';
+import {
+  defineComponent,
+  ref,
+  reactive,
+  onMounted,
+  onBeforeUnmount,
+  computed,
+} from 'vue';
 import { setupDraggable, destroyDraggable } from '../../utils/draggable';
 import { useStore } from 'vuex';
 import { gsap, Elastic } from 'gsap';
@@ -82,27 +90,56 @@ export default defineComponent({
     currentComponent: String,
   },
   computed: {
-    ...mapState(['tooltipText', 'tooltipX', 'tooltipY', 'showTooltip', 'crazyModeEnabled']),
+    ...mapState([
+      'tooltipText',
+      'tooltipX',
+      'tooltipY',
+      'showTooltip',
+      'crazyModeEnabled',
+    ]),
   },
   methods: {
-    ...mapMutations(['setTooltipText', 'setTooltipX', 'setTooltipY', 'setShowTooltip', 'setCurrentComponent', 'setCrazyModeEnabled']),
+    ...mapMutations([
+      'setTooltipText',
+      'setTooltipX',
+      'setTooltipY',
+      'setShowTooltip',
+      'setCurrentComponent',
+      'setCrazyModeEnabled',
+    ]),
   },
   setup(props, { emit }) {
     const store = useStore();
     const iconRefs = ref<HTMLElement[]>([]);
     const navItems = reactive<NavItem[]>(NavItems);
-    const DoomPlayer = NavItems.find(item => item.componentName === 'DoomPlayer');
+    const DoomPlayer = NavItems.find(
+      (item) => item.componentName === 'DoomPlayer',
+    );
 
     let isDragging = ref(false);
     let draggableElements: Draggable[] = [];
-
     onMounted(() => {
       iconRefs.value = iconRefs.value.map((ref) => ref as HTMLElement);
-      draggableElements = setupDraggable(iconRefs.value, (event, item, element) => {
-        store.commit('setTooltipX', event.clientX);
-        store.commit('setTooltipY', event.clientY);
-        store.commit('setCurrentComponent', item.componentName);
-      });
+      draggableElements = setupDraggable(
+        iconRefs.value,
+        (event: MouseEvent, item: NavItem, element: HTMLElement) => {
+          store.commit('setTooltipX', event.clientX);
+          store.commit('setTooltipY', event.clientY);
+          store.commit('setCurrentComponent', item.componentName);
+          // New code for color transformation
+          if (element.offsetLeft <= 50) {
+            gsap.to(element, {
+              '--mask-position': '0% 0',
+              duration: 0.3,
+            });
+          } else {
+            gsap.to(element, {
+              '--mask-position': '100% 0',
+              duration: 0.3,
+            });
+          }
+        },
+      );
     });
 
     onBeforeUnmount(() => {
@@ -140,24 +177,41 @@ export default defineComponent({
 
     const crazyModeToggle = () => {
       store.commit('setCrazyModeEnabled', !store.state.crazyModeEnabled);
-  if (store.state.crazyModeEnabled && DoomPlayer) {
-    navItems.push(DoomPlayer);
-    gsap.to('.icon-container', {
-      scale: 1.2,
-      duration: 0.5,
-      ease: Elastic.easeOut.config(1, 0.3),
-    });
-  } else if (DoomPlayer) {
-    const index = navItems.indexOf(DoomPlayer);
-    if (index > -1) {
-      navItems.splice(index, 1);
-    }
-    gsap.to('.icon-container', {
-      scale: 1,
-      duration: 0.5,
-    });
-  }
-};
+      if (store.state.crazyModeEnabled && DoomPlayer) {
+        if (!navItems.includes(DoomPlayer)) {
+          navItems.push(DoomPlayer);
+        }
+        gsap.to('.icon-container', {
+          scale: 1.2,
+          duration: 0.5,
+          ease: Elastic.easeOut.config(1, 0.3),
+        });
+        gsap.to('.icon-container', {
+          y: '-=10',
+          yoyo: true,
+          repeat: 1,
+          ease: Elastic.easeOut.config(1, 0.3),
+          stagger: { each: 0.5 },
+        });
+      } else if (DoomPlayer) {
+        const index = navItems.indexOf(DoomPlayer);
+        if (index > -1) {
+          navItems.splice(index, 1);
+          navItems.unshift(DoomPlayer);
+        }
+        gsap.to('.icon-container', {
+          scale: 1,
+          duration: 0.5,
+        });
+        gsap.to('.icon-container', {
+          y: '+=10',
+          yoyo: true,
+          repeat: 1,
+          ease: Elastic.easeOut.config(1, 0.3),
+          stagger: { each: 0.5 },
+        });
+      }
+    };
 
     return {
       handleClick,
@@ -169,14 +223,14 @@ export default defineComponent({
     };
   },
 });
-
 </script>
 
 <style lang="scss" scoped>
 .icon-container {
+  --mask-position: 100% 0;
   mask-image: linear-gradient(to right, white 50%, black 50%);
   mask-size: 200% 100%;
-  mask-position: 100% 0;
+  mask-position: var(--mask-position);
 }
 .hidden {
   display: none;

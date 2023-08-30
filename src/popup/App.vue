@@ -1,19 +1,16 @@
 ```vue
 <template>
-  <div
-    class="container"
-    style="height: 100%; width: 100%"
-  >
+  <div class="container" style="height: 100%; width: 100%">
     <Tooltip
-    v-if="showTooltip"
-    :x="tooltipX"
-    :y="tooltipY"
-    :content="tooltipText"
-    :visible="showTooltip"
-    :theme="theme"
-    :themeData="themeData"
-    :isCodeEditorPreview="!!theme"
-  />
+      v-if="showTooltip"
+      :x="tooltipX"
+      :y="tooltipY"
+      :content="tooltipText"
+      :visible="showTooltip"
+      :theme="theme"
+      :themeData="themeData"
+      :isCodeEditorPreview="!!theme"
+    />
     <Navbar
       class="navbar-container"
       :currentComponent="currentComponent"
@@ -22,11 +19,8 @@
     <div class="app-container">
       <div class="app-header">
         <div class="title-icon-wrapper">
-          <div
-            class="title-wrapper draggable magnetic"
-            ref="titleWrapper"
-          >
-          <span class="title">{{ $t('titles.' + currentComponent) }}</span>
+          <div class="title-wrapper draggable magnetic" ref="titleWrapper">
+            <span class="title">{{ $t(currentComponent) }}</span>
             <svg
               class="underline draggable magnetic"
               xmlns="http://www.w3.org/2000/svg"
@@ -133,11 +127,19 @@ export default defineComponent({
       draggableElements: [],
     };
   },
+  created() {
+    this.$store.dispatch('initializeStore');
+  },
   computed: {
     ...mapState(['tooltipText', 'tooltipX', 'tooltipY', 'showTooltip']),
   },
   methods: {
-    ...mapMutations(['setTooltipText', 'setTooltipX', 'setTooltipY', 'setShowTooltip']),
+    ...mapMutations([
+      'setTooltipText',
+      'setTooltipX',
+      'setTooltipY',
+      'setShowTooltip',
+    ]),
     handleComponentChange(componentName: string) {
       this.currentComponent = componentName;
     },
@@ -155,15 +157,20 @@ export default defineComponent({
     activatePixelPerfection() {},
   },
   mounted() {
-  const store = useStore();
-  this.listenForKonamiCode();
-  const draggableElements = Array.from(document.querySelectorAll('.icon-container')) as HTMLElement[];
-  this.draggableElements = setupDraggable(draggableElements, (event: MouseEvent, item: NavItem, element: HTMLElement) => {
-    store.commit('setTooltipX', event.clientX);
-    store.commit('setTooltipY', event.clientY);
-    store.commit('setCurrentComponent', item.componentName);
-  });
-},
+    const store = useStore();
+    this.listenForKonamiCode();
+    const draggableElements = Array.from(
+      document.querySelectorAll('.icon-container'),
+    ) as HTMLElement[];
+    this.draggableElements = setupDraggable(
+      draggableElements,
+      (event: MouseEvent, item: NavItem, element: HTMLElement) => {
+        store.commit('setTooltipX', event.clientX);
+        store.commit('setTooltipY', event.clientY);
+        store.commit('setCurrentComponent', item.componentName);
+      },
+    );
+  },
 });
 </script>
 
@@ -402,4 +409,3 @@ export default defineComponent({
   }
 }
 </style>
-

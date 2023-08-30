@@ -1,21 +1,35 @@
+import { getThemes } from 'src/popup/themesList';
 import { createStore } from 'vuex';
+import { userAgents } from '../../src/utils/userAgents';
 
 export default createStore({
   state: {
-    selectedLanguage: this.commit('loadFromLocalStorage', 'language') || 'en',
-    rememberLanguage:
-      this.commit('loadFromLocalStorage', 'rememberLanguage') === 'true',
+    selectedLanguage: 'en',
+    rememberLanguage: false,
     tooltipText: '',
     tooltipX: 0,
     tooltipY: 0,
     showTooltip: false,
-    theme: '',
+    theme: localStorage.getItem('theme') || 'default',
+    jsonViewerTheme: 'Github',
     themeData: {},
     isCodeEditorPreview: false,
     currentComponent: '',
     crazyModeEnabled: false,
+    autoFormat: true as boolean,
+    selectedThemeKey: 'active4d',
+    themesArray: [],
+    themeNamesArray: [],
+    themeList: {},
+    userAgents: userAgents,
   },
   mutations: {
+    setAutoFormat(state, autoFormat: boolean) {
+      state.autoFormat = autoFormat;
+    },
+    setJsonViewerTheme(state, theme) {
+      state.jsonViewerTheme = theme;
+    },
     setTooltipText(state, text) {
       state.tooltipText = text;
     },
@@ -43,19 +57,45 @@ export default createStore({
     setCrazyModeEnabled(state, crazyModeEnabled) {
       state.crazyModeEnabled = crazyModeEnabled;
     },
-    setSelectedLanguage(state, language) {
-      this.commit('setSelectedLanguage', language);
-      this.commit('saveToLocalStorage', { key: 'language', value: language });
+    setSelectedLanguage(state, language: string) {
+      state.selectedLanguage = language;
+      localStorage.setItem('language', language);
     },
-    setRememberLanguage(state, remember) {
-      commit('setRememberLanguage', remember);
-      this.commit('saveToLocalStorage', {
-        key: 'rememberLanguage',
-        value: remember.toString(),
-      });
+    setRememberLanguage(state, remember: boolean) {
+      state.rememberLanguage = remember;
+      localStorage.setItem('rememberLanguage', remember.toString());
     },
-    saveToLocalStorage(_, { key, value }) {
-      localStorage.setItem(key, value);
+    setSelectedThemeKey(state, key) {
+      state.selectedThemeKey = key;
     },
+    setThemesArray(state, themes) {
+      state.themesArray = themes;
+    },
+    setThemeNamesArray(state, names) {
+      state.themeNamesArray = names;
+    },
+    setThemeList(state, list) {
+      state.themeList = list;
+    },
+  },
+  actions: {
+    async initializeStore({ dispatch, commit }) {
+      await dispatch('fetchThemes');
+      commit('setSelectedLanguage', localStorage.getItem('language'));
+      commit(
+        'setRememberLanguage',
+        localStorage.getItem('rememberLanguage') === 'true',
+      );
+    },
+    async fetchThemes({ commit }) {
+      const { themeNamesArray, themeList, themesArray } = await getThemes();
+      commit('setThemesArray', themesArray);
+      commit('setThemeNamesArray', themeNamesArray);
+      commit('setThemeList', themeList);
+    },
+  },
+  getters: {
+    jsonViewerTheme: (state) => state.jsonViewerTheme,
+    autoFormat: (state) => state.autoFormat,
   },
 });

@@ -16,8 +16,8 @@
       @mousemove="adjustTooltipPosition"
       @mouseout="handleMouseOut"
     >
-      <option v-for="(name, key) in themeList" :value="key" :key="key">
-        {{ name }}
+      <option v-for="theme in themeNamesArray" :key="theme" :value="theme">
+        {{ theme }}
       </option>
     </select>
     <div class="button-group">
@@ -32,6 +32,7 @@ import { defineComponent, ref, computed, onMounted } from 'vue';
 import Tooltip from './Tooltip.vue';
 import { getThemes, Theme } from '../themesList';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import { useStore, mapState } from 'vuex';
 
 export default defineComponent({
   name: 'ThemeSelector',
@@ -41,15 +42,20 @@ export default defineComponent({
   props: {
     currentTheme: String,
   },
-  async setup(props) {
-    const { themesArray, themeNamesArray, themeList } = await getThemes();
-    const selectedThemeKey = ref(props.currentTheme || 'active4d');
+  computed: {
+    ...mapState(['themeNamesArray']),
+  },
+  setup(props) {
+    const store = useStore();
+    const selectedThemeKey = ref(
+      props.currentTheme || store.state.selectedThemeKey,
+    );
     const showTooltip = ref(false);
     const tooltipX = ref(0);
     const tooltipY = ref(0);
 
     const selectedTheme = computed(() => {
-      const theme: Theme = themesArray[selectedThemeKey.value];
+      const theme: Theme = store.state.themesArray[selectedThemeKey.value];
       return {
         base: theme.base,
         inherit: theme.inherit,
@@ -58,11 +64,14 @@ export default defineComponent({
       } as monaco.editor.IStandaloneThemeData;
     });
 
-    onMounted(() => {
-      console.log('mounted themeselector');
-      if (!props.currentTheme) {
-        setDefaultTheme();
+    onMounted(async () => {
+      if (!store.state.themesArray.length) {
+        const { themesArray, themeNamesArray, themeList } = await getThemes();
+        store.commit('setThemesArray', themesArray);
+        store.commit('setThemeNamesArray', themeNamesArray);
+        store.commit('setThemeList', themeList);
       }
+      applySelectedTheme();
     });
 
     function handleThemeMouseOver(event: MouseEvent) {
@@ -83,6 +92,8 @@ export default defineComponent({
       const themeData = selectedTheme.value;
       monaco.editor.defineTheme(themeName, themeData);
       monaco.editor.setTheme(themeName);
+      store.commit('setThemeData', themeData);
+      store.commit('setTooltipEditorTheme', selectedTheme.value.base);
     }
 
     function setDefaultTheme() {
@@ -91,7 +102,7 @@ export default defineComponent({
     }
 
     return {
-      themeList,
+      themeList: computed(() => store.state.themeList),
       selectedThemeKey,
       showTooltip,
       tooltipX,

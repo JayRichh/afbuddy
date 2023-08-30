@@ -96,3 +96,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse(request);
   }
 });
+
+// chrome.webRequest.onBeforeSendHeaders.addListener(
+//   function (details) {
+//     const userAgents = store.state.userAgents;
+//     if (userAgents && userAgents.length > 0) {
+//       const userAgent = userAgents[0]; // or any other logic to select a user agent
+
+//       if (details.requestHeaders) {
+//   for (let i = 0; i < details.requestHeaders.length; ++i) {
+//     if (details.requestHeaders[i].name === 'User-Agent') {
+//       details.requestHeaders[i].value = userAgent;
+//       break;
+//     }
+//   }
+// }
+//     }
+//     return { requestHeaders: details.requestHeaders };
+//   }
+//   { urls: ['<all_urls>'] },
+//   ['blocking', 'requestHeaders'],
+// );
+
+// export function setUserAgent(userAgent: string) {
+//   store.commit('setUserAgent', userAgent);
+// }

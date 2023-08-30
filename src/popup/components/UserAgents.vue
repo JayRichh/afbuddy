@@ -3,7 +3,11 @@
     <div v-for="agent in userAgents" :key="agent.title" class="agent-card">
       <h3>{{ agent.title }}</h3>
       <div class="input-group">
-        <select :id="agent.title" v-model="selectedAgents[agent.title]">
+        <select
+          :id="agent.title"
+          v-model="selectedAgents[agent.title]"
+          @change="changeUserAgent(agent.title)"
+        >
           <option
             v-for="value in agent.values"
             :key="value.title"
@@ -28,6 +32,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import userAgents from '../../../src/utils/userAgents';
+// import { setUserAgent } from '../../../src/background/index';
 
 export default defineComponent({
   data() {
@@ -48,6 +53,9 @@ export default defineComponent({
     resetUserAgent() {
       this.feedbackMessage = 'User agent reset to default';
     },
+    // changeUserAgent(agentTitle: string) {
+    //   setUserAgent(this.selectedAgents[agentTitle]);
+    // },
     initializeSelectedAgents() {
       const agents: { [key: string]: string } = {};
       for (const agent of userAgents) {

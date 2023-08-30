@@ -1,5 +1,13 @@
-// eslint-disable-next-line
-const userAgents: any = [
+export interface UserAgent {
+  title: string;
+  values: Array<{
+    title: string;
+    value: string;
+    platform: string;
+  }>;
+}
+
+export const userAgents: UserAgent[] = [
   {
     title: 'Android',
     values: [
@@ -331,5 +339,13 @@ const userAgents: any = [
     ],
   },
 ];
+
+export const getUserAgents = new Promise((resolve, reject) => {
+  try {
+    resolve(userAgents);
+  } catch (error) {
+    reject(error);
+  }
+});
 
 export default userAgents;

@@ -9,7 +9,8 @@
       overflow: 'hidden',
     }"
   >
-    <div v-if="isCodeEditorPreview">
+    <div
+      v-if="isCodeEditorPreview"
       class="code-preview"
       style="height: 100%; width: 100%"
     >
@@ -33,10 +34,10 @@ import {
   ref,
   toRefs,
   Prop,
-reactive,
+  reactive,
 } from 'vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import { useStore } from 'vuex';
+import { useStore, mapState } from 'vuex';
 
 interface Props {
   themeData: monaco.editor.IStandaloneThemeData;
@@ -50,24 +51,37 @@ export default defineComponent({
       type: Object as () => monaco.editor.IStandaloneThemeData,
       default: () => ({}),
     },
-    theme: {
-      type: String,
-      default: 'GitHub',
-    },
-    isCodeEditorPreview: {
-      type: Boolean,
-      default: false,
-    },
+    theme: { type: String, default: 'GitHub' },
+    isCodeEditorPreview: { type: Boolean, default: false },
+  },
+  computed: {
+    ...mapState([
+      'tooltipText',
+      'tooltipX',
+      'tooltipY',
+      'showTooltip',
+      'theme',
+      'themeData',
+    ]),
   },
   setup(props: Props) {
     const store = useStore();
     const tooltipText = computed(() => store.state.tooltipText);
+    const tooltipX = computed(() => store.state.tooltipX);
+    const tooltipY = computed(() => store.state.tooltipY);
+    const showTooltip = computed(() => store.state.showTooltip);
+    const theme = computed(() => store.state.theme);
+    const themeData = computed(() => store.state.themeData);
+
     const state = reactive({
-  tooltipText: store.state.tooltipText,
-  tooltipX: store.state.tooltipX,
-  tooltipY: store.state.tooltipY,
-  showTooltip: store.state.showTooltip,
-});
+      tooltipText,
+      tooltipX,
+      tooltipY,
+      showTooltip,
+      theme,
+      themeData,
+    });
+
     const monacoContainer = ref<HTMLElement | null>(null);
     const editorInstance = ref<monaco.editor.IStandaloneCodeEditor | null>(
       null,
@@ -82,7 +96,7 @@ export default defineComponent({
         const config = {
           value: store.state.tooltipText,
           language: 'javascript',
-          theme: props.theme,
+          theme: store.state.themeData,
           fontSize: 20,
           lineHeight: 30,
           lineNumbers: 'off',
@@ -175,9 +189,14 @@ export default defineComponent({
 
     return {
       ...toRefs(state),
-  monacoContainer,
-  editorInstance,
-  tooltipText,
+      monacoContainer,
+      editorInstance,
+      tooltipText,
+      tooltipX,
+      tooltipY,
+      showTooltip,
+      theme,
+      themeData,
     };
   },
 });
