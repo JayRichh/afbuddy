@@ -2,10 +2,12 @@
 <template>
   <nav class="navbar">
     <a
-      v-for="item in visibleNavItems"
+      v-for="item in filteredNavItems"
+      :if="shouldShowItem(item)"
       :key="item.id"
       ref="iconRefs"
       :class="{ selected: isActive(item.componentName) }"
+      @click="handleClick($event, item)"
       class="icon-container"
       :id="item.ariaLabel"
       :aria-label="item.ariaLabel"
@@ -79,8 +81,7 @@ import { useStore } from 'vuex';
 import { gsap, Elastic } from 'gsap';
 import { mapState, mapMutations } from 'vuex';
 import { Draggable } from 'gsap/Draggable';
-import { NavItem, NavItems, config } from '../../utils/config';
-import { PIDState, PIDStateMap, calculatePID } from '../../utils/pidstate';
+import { NavItem, NavItems } from '../../utils/config';
 
 gsap.registerPlugin(Draggable);
 
@@ -111,37 +112,21 @@ export default defineComponent({
     const store = useStore();
     const iconRefs = ref<HTMLElement[]>([]);
     const navItems = reactive<NavItem[]>(NavItems);
-    const visibleNavItems = computed(() => {
-      return navItems.filter((item) => item && shouldShowItem(item));
-    });
     const DoomPlayer = NavItems.find(
       (item) => item.componentName === 'DoomPlayer',
     );
 
     let isDragging = ref(false);
     let draggableElements: Draggable[] = [];
+
     onMounted(() => {
       iconRefs.value = iconRefs.value.map((ref) => ref as HTMLElement);
       draggableElements = setupDraggable(
         iconRefs.value,
         (event: MouseEvent, item: NavItem, element: HTMLElement) => {
-          const state = PIDStateMap.get(item.ariaLabel) as PIDState;
-          calculatePID(event, item, state, config, element);
           store.commit('setTooltipX', event.clientX);
           store.commit('setTooltipY', event.clientY);
           store.commit('setCurrentComponent', item.componentName);
-          // New code for color transformation
-          if (element.offsetLeft <= 50) {
-            gsap.to(element, {
-              '--mask-position': '0% 0',
-              duration: 0.3,
-            });
-          } else {
-            gsap.to(element, {
-              '--mask-position': '100% 0',
-              duration: 0.3,
-            });
-          }
         },
       );
     });
@@ -151,6 +136,10 @@ export default defineComponent({
     });
 
     const handleClick = (event: MouseEvent, item: NavItem) => {
+      store.commit('setTooltipText', item.ariaLabel);
+      store.commit('setTooltipX', event.clientX);
+      store.commit('setTooltipY', event.clientY);
+      store.commit('setShowTooltip', true);
       if (!isDragging.value) {
         emit('changeComponent', item.componentName);
         gsap.to('.icon-container', {
@@ -177,10 +166,6 @@ export default defineComponent({
 
     const crazyModeToggle = () => {
       store.commit('setCrazyModeEnabled', !store.state.crazyModeEnabled);
-      chrome.runtime.sendMessage({
-        action: 'setCrazyMode',
-        status: store.state.crazyModeEnabled,
-      });
       if (store.state.crazyModeEnabled && DoomPlayer) {
         if (!navItems.includes(DoomPlayer)) {
           navItems.push(DoomPlayer);
@@ -222,9 +207,8 @@ export default defineComponent({
       iconRefs,
       isActive,
       shouldShowItem,
-      visibleNavItems,
-      crazyModeToggle,
       filteredNavItems,
+      crazyModeToggle,
     };
   },
 });
@@ -232,10 +216,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .icon-container {
-  --mask-position: 100% 0;
   mask-image: linear-gradient(to right, white 50%, black 50%);
   mask-size: 200% 100%;
-  mask-position: var(--mask-position);
+  mask-position: 100% 0;
 }
 .hidden {
   display: none;
@@ -251,7 +234,7 @@ export default defineComponent({
   margin: 0;
   padding: 10px 0;
   height: 100%;
-  width: 45px;
+  width: 50px;
   scrollbar-width: none;
   -ms-overflow-style: none;
   scrollbar-color: transparent transparent;
@@ -263,8 +246,8 @@ export default defineComponent({
       transform 0.1s ease;
     z-index: 100000000;
     position: relative;
-    width: 32.5px;
-    height: 32.5px;
+    width: 40px;
+    height: 40px;
 
     &:hover {
       cursor: pointer;
