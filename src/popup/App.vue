@@ -234,7 +234,7 @@ export default defineComponent({
   display: flex;
   flex-direction: row;
   height: auto;
-  width: calc(100% - 50px);
+  width: calc(100% - 40px);
   left: 50px;
   top: 0;
   right: 0;
