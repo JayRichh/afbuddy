@@ -4,8 +4,7 @@
       v-if="showTooltip"
       :x="tooltipX"
       :y="tooltipY"
-      :theme="selectedTheme.base"
-      :themeData="selectedTheme"
+      :theme="selectedThemeKey"
       :visible="showTooltip"
     ></Tooltip>
     <div class="label-button-wrapper">
@@ -32,8 +31,6 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
 import Tooltip from './Tooltip.vue';
-import { getThemes, Theme } from '../themesList';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { useStore, mapState } from 'vuex';
 
 export default defineComponent({
@@ -48,6 +45,10 @@ export default defineComponent({
     ...mapState(['themeNamesArray']),
   },
   setup(props) {
+    const state = ref({
+      monacoContainer: null,
+      editorInstance: null,
+    });
     const store = useStore();
     const selectedThemeKey = ref(
       props.currentTheme || store.state.selectedThemeKey,
@@ -56,28 +57,24 @@ export default defineComponent({
     const tooltipX = ref(0);
     const tooltipY = ref(0);
 
-    const selectedTheme = computed(() => {
-      const theme: Theme = store.state.themesArray[selectedThemeKey.value];
-      return {
-        base: theme.base,
-        inherit: theme.inherit,
-        rules: theme.rules.map((rule) => ({ ...rule })),
-        colors: { ...theme.colors },
-      } as monaco.editor.IStandaloneThemeData;
-    });
-
     onMounted(async () => {
-      if (!store.state.themesArray.length) {
-        const { themesArray, themeNamesArray, themeList } = await getThemes();
-        store.commit('setThemesArray', themesArray);
-        store.commit('setThemeNamesArray', themeNamesArray);
-        store.commit('setThemeList', themeList);
-      }
+      await store.dispatch('updateThemes');
       applySelectedTheme();
     });
 
     function handleThemeMouseOver(event: MouseEvent) {
+      if (!state.value.monacoContainer || !state.value.editorInstance) {
+        console.error('Monaco container or editor instance is not set');
+        return;
+      }
       showTooltip.value = true;
+      store.dispatch('createEditor', {
+        monacoContainer: state.value.monacoContainer,
+        editorInstance: state.value.editorInstance,
+      });
+      store.dispatch('applyTheme', {
+        theme: selectedThemeKey.value,
+      });
     }
 
     function adjustTooltipPosition(event: MouseEvent) {
@@ -90,16 +87,16 @@ export default defineComponent({
     }
 
     function applySelectedTheme() {
-      const themeName = selectedTheme.value.base;
-      const themeData = selectedTheme.value;
-      monaco.editor.defineTheme(themeName, themeData);
-      monaco.editor.setTheme(themeName);
-      store.commit('setThemeData', themeData);
-      // store.commit('setTooltipEditorTheme', selectedTheme.value.base);
+      const themeName = selectedThemeKey.value;
+      console.log('themeName', themeName, store.state.themeList[themeName]);
+      store.dispatch('applyTheme', {
+        theme: themeName,
+        themeData: store.state.themeList[themeName],
+      });
     }
 
     function setDefaultTheme() {
-      selectedThemeKey.value = 'active4d';
+      selectedThemeKey.value = store.state.themeList[0];
       applySelectedTheme();
     }
 
@@ -109,7 +106,6 @@ export default defineComponent({
       showTooltip,
       tooltipX,
       tooltipY,
-      selectedTheme,
       handleThemeMouseOver,
       adjustTooltipPosition,
       handleMouseOut,
@@ -135,6 +131,8 @@ button:active {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
   margin-bottom: 10px;
 }
 
@@ -163,16 +161,28 @@ select {
   background-image: url('../../../assets/dropdown-arrow.svg');
   background-repeat: no-repeat;
   background-position: 95% center;
+  padding: 10px;
+  border-radius: 5px;
   border: 1px solid #ccc;
-  padding: 5px 10px;
-  border-radius: 4px;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out;
+  width: 100%;
   font-size: 1.1em;
-  margin: 10px 0;
+}
+
+.label-button-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
 }
 
 label {
   font-size: 1.1em;
   font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .theme-label {
@@ -253,8 +263,8 @@ label {
 
 .button-group {
   display: flex;
-  justify-content: center;
-  width: 100%;
-  margin: 10px 0px;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 </style>

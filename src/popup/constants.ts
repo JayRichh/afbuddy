@@ -21,7 +21,7 @@ export const navIcons = [
   },
   {
     id: '3',
-    componentName: 'Tab Management',
+    componentName: 'TabManagement',
     iconSrc: require('../../assets/icons/tabclose.png'),
     iconMaskSrc: require('../../assets/icons/tabcloseWhite.png'),
     altText: 'tabclose-icon',
@@ -31,7 +31,7 @@ export const navIcons = [
   },
   {
     id: '4',
-    componentName: 'Json',
+    componentName: 'JsonViewer',
     iconSrc: require('../../assets/icons/json.png'),
     iconMaskSrc: require('../../assets/icons/jsonWhite.png'),
     altText: 'json-icon',

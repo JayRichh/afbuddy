@@ -29,7 +29,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import userAgents from '../../../src/utils/userAgents';
-// import { setUserAgent } from '../../../src/background/index';
+import { useStore } from 'vuex';
 
 export default defineComponent({
   data() {
@@ -46,13 +46,12 @@ export default defineComponent({
         message += `${agentTitle}: ${this.selectedAgents[agentTitle]}\n`;
       }
       this.feedbackMessage = message;
+      this.$store.dispatch('setUserAgent', this.selectedAgents);
     },
     resetUserAgent() {
       this.feedbackMessage = 'User agent reset to default';
+      this.$store.dispatch('resetUserAgent');
     },
-    // changeUserAgent(agentTitle: string) {
-    //   setUserAgent(this.selectedAgents[agentTitle]);
-    // },
     initializeSelectedAgents() {
       const agents: { [key: string]: string } = {};
       for (const agent of userAgents) {

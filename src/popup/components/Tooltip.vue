@@ -1,4 +1,4 @@
-```vue
+```vue ```vue
 <template>
   <div
     class="tooltip"
@@ -38,6 +38,7 @@ import {
 } from 'vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { useStore, mapState } from 'vuex';
+import { updateTooltipNavItem } from '../../utils/editorUtils';
 
 interface Props {
   themeData: monaco.editor.IStandaloneThemeData;
@@ -72,6 +73,10 @@ export default defineComponent({
     const showTooltip = computed(() => store.state.showTooltip);
     const theme = computed(() => store.state.theme);
     const themeData = computed(() => store.state.themeData);
+    const monacoContainer = ref<HTMLElement | null>(null);
+    const editorInstance = ref(
+      null as monaco.editor.IStandaloneCodeEditor | null,
+    );
 
     const state = reactive({
       tooltipText,
@@ -80,79 +85,22 @@ export default defineComponent({
       showTooltip,
       theme,
       themeData,
-    });
-
-    const monacoContainer = ref<HTMLElement | null>(null);
-    const editorInstance = ref<monaco.editor.IStandaloneCodeEditor | null>(
-      null,
-    );
-
-    const tooltipSize = computed(() => {
-      return props.isCodeEditorPreview ? '200px' : '100px';
-    });
-
-    const createEditor = () => {
-      if (monacoContainer.value) {
-        const config = {
-          value: store.state.tooltipText,
-          language: 'javascript',
-          theme: store.state.themeData,
-          fontSize: 20,
-          lineHeight: 30,
-          lineNumbers: 'off',
-          minimap: { enabled: false },
-          overviewRulerLanes: 0,
-          mouseWheelZoom: false,
-          cursorStyle: 'line',
-          cursorBlinking: 'blink',
-          renderWhitespace: 'none',
-          wordWrap: 'on',
-          automaticLayout: true,
-          folding: false,
-          readOnly: true,
-          lineDecorationsWidth: 0,
-          scrollbar: {
-            vertical: 'hidden',
-            horizontal: 'hidden',
-            useShadows: false,
-          },
-          glyphMargin: false,
-          selectionHighlight: false,
-        } as monaco.editor.IStandaloneEditorConstructionOptions;
-
-        editorInstance.value = monaco.editor.create(
-          monacoContainer.value,
-          config,
-        );
-        applyTheme();
-      }
-    };
-
-    const applyTheme = () => {
-      if (Object.keys(props.themeData).length > 0) {
-        monaco.editor.defineTheme(props.theme, props.themeData);
-        monaco.editor.setTheme(props.theme);
-      }
-    };
-
-    onBeforeUnmount(() => {
-      if (editorInstance.value) {
-        editorInstance.value.dispose();
-      }
+      monacoContainer,
+      editorInstance,
     });
 
     onMounted(() => {
       if (store.state.showTooltip && props.isCodeEditorPreview) {
-        createEditor();
-      }
-      if (store.state.tooltipText) {
-        const navItem = document.querySelector(
-          ".nav-item[data-tooltip='" + store.state.tooltipText + "']",
-        );
-        if (navItem) {
-          navItem.textContent = store.state.tooltipText;
+        if (!state.monacoContainer || !state.editorInstance) {
+          console.error('Monaco container or editor instance is not set');
+          return;
         }
+        store.dispatch('createEditor', {
+          monacoContainer: state.monacoContainer,
+          editorInstance: state.editorInstance,
+        });
       }
+      updateTooltipNavItem(store.state.tooltipText);
     });
 
     watch(
@@ -161,13 +109,22 @@ export default defineComponent({
         if (newVal && props.isCodeEditorPreview) {
           if (editorInstance.value) {
             editorInstance.value.setValue(store.state.tooltipText);
-            applyTheme();
+            store.dispatch('applyTheme', {
+              theme: props.theme,
+              themeData: props.themeData,
+            });
           } else {
-            createEditor();
+            store.dispatch('createEditor', { monacoContainer, editorInstance });
           }
         }
       },
     );
+
+    onBeforeUnmount(() => {
+  if (editorInstance.value) {
+    editorInstance.value.dispose();
+  }
+});
 
     watch(
       () => store.state.tooltipText,
@@ -182,7 +139,10 @@ export default defineComponent({
       () => props.themeData,
       (newVal) => {
         if (newVal && Object.keys(newVal).length > 0 && editorInstance.value) {
-          applyTheme();
+          store.dispatch('applyTheme', {
+            theme: props.theme,
+            themeData: props.themeData,
+          });
         }
       },
     );

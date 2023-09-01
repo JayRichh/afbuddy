@@ -1,13 +1,13 @@
 <template>
   <div class="geo-container">
-    <form @submit.prevent="emitData">
+    <form @submit.prevent="setGeolocation">
       <div class="input-group">
-        <label for="timezone">TimeZone:</label>
+        <label for="timeZone">TimeZone:</label>
         <input
           type="text"
-          id="timezone"
+          id="timeZone"
           placeholder="Asia/Kolkata"
-          v-model="timezone"
+          v-model="timeZone"
           aria-label="Time Zone"
         />
       </div>
@@ -60,12 +60,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
+import { useStore, mapState } from 'vuex';
 
 export default defineComponent({
   data() {
     return {
-      timezone: '',
+      timeZone: '',
       locale: '',
       latitude: '',
       longitude: '',
@@ -74,15 +75,18 @@ export default defineComponent({
     };
   },
   methods: {
-    emitData() {
-      this.$emit('spoofLocation', {
-        timezone: this.timezone,
+    setGeolocation() {
+      this.$store.dispatch('setGeolocation', {
+        timeZone: this.timeZone,
         locale: this.locale,
         latitude: this.latitude,
         longitude: this.longitude,
         useDefault: this.useDefault,
       });
-      this.feedbackMessage = 'Location spoofed successfully!';
+      this.$store.commit(
+        'setFeedbackMessage',
+        'Location spoofed successfully!',
+      );
     },
   },
 });

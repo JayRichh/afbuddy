@@ -1,14 +1,12 @@
-```vue
 <template>
   <nav class="navbar">
     <a
-      v-for="item in filteredNavItems"
-      :if="shouldShowItem(item)"
+      v-for="item in navItems"
       :key="item.id"
       ref="iconRefs"
       :class="{ selected: isActive(item.componentName) }"
       @click="handleClick($event, item)"
-      class="icon-container"
+      class="icon-container draggable"
       :id="item.ariaLabel"
       :aria-label="item.ariaLabel"
     >
@@ -76,12 +74,11 @@ import {
   onBeforeUnmount,
   computed,
 } from 'vue';
-import { setupDraggable, destroyDraggable } from '../../utils/draggable';
 import { useStore } from 'vuex';
 import { gsap, Elastic } from 'gsap';
 import { mapState, mapMutations } from 'vuex';
 import { Draggable } from 'gsap/Draggable';
-import { NavItem, NavItems } from '../../utils/config';
+import { NavItem } from '../../utils/config';
 
 gsap.registerPlugin(Draggable);
 
@@ -96,6 +93,8 @@ export default defineComponent({
       'tooltipY',
       'showTooltip',
       'crazyModeEnabled',
+      'currentComponent',
+      'navItems',
     ]),
   },
   methods: {
@@ -110,104 +109,21 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const store = useStore();
-    const iconRefs = ref<HTMLElement[]>([]);
-    const navItems = reactive<NavItem[]>(NavItems);
-    const DoomPlayer = NavItems.find(
-      (item) => item.componentName === 'DoomPlayer',
-    );
-
-    let isDragging = ref(false);
-    let draggableElements: Draggable[] = [];
-
-    onMounted(() => {
-      iconRefs.value = iconRefs.value.map((ref) => ref as HTMLElement);
-      draggableElements = setupDraggable(
-        iconRefs.value,
-        (event: MouseEvent, item: NavItem, element: HTMLElement) => {
-          store.commit('setTooltipX', event.clientX);
-          store.commit('setTooltipY', event.clientY);
-          store.commit('setCurrentComponent', item.componentName);
-        },
-      );
-    });
-
-    onBeforeUnmount(() => {
-      destroyDraggable(draggableElements);
-    });
-
     const handleClick = (event: MouseEvent, item: NavItem) => {
-      store.commit('setTooltipText', item.ariaLabel);
-      store.commit('setTooltipX', event.clientX);
-      store.commit('setTooltipY', event.clientY);
-      store.commit('setShowTooltip', true);
-      if (!isDragging.value) {
-        emit('changeComponent', item.componentName);
-        gsap.to('.icon-container', {
-          scale: 1.2,
-          duration: 0.5,
-          ease: Elastic.easeOut.config(1, 0.3),
-        });
-      }
+      emit('changeComponent', item.componentName);
     };
 
     const isActive = (componentName: string) => {
       return componentName === props.currentComponent;
     };
 
-    const shouldShowItem = (item: NavItem) => {
-      return item.componentName !== 'DoomPlayer' || store.state.showDoomIcon;
-    };
-
-    const filteredNavItems = computed(() => {
-      return navItems.filter(
-        (item) => !item.crazyMode || store.state.crazyModeEnabled,
-      );
-    });
-
     const crazyModeToggle = () => {
       store.commit('setCrazyModeEnabled', !store.state.crazyModeEnabled);
-      if (store.state.crazyModeEnabled && DoomPlayer) {
-        if (!navItems.includes(DoomPlayer)) {
-          navItems.push(DoomPlayer);
-        }
-        gsap.to('.icon-container', {
-          scale: 1.2,
-          duration: 0.5,
-          ease: Elastic.easeOut.config(1, 0.3),
-        });
-        gsap.to('.icon-container', {
-          y: '-=10',
-          yoyo: true,
-          repeat: 1,
-          ease: Elastic.easeOut.config(1, 0.3),
-          stagger: { each: 0.5 },
-        });
-      } else if (DoomPlayer) {
-        const index = navItems.indexOf(DoomPlayer);
-        if (index > -1) {
-          navItems.splice(index, 1);
-          navItems.unshift(DoomPlayer);
-        }
-        gsap.to('.icon-container', {
-          scale: 1,
-          duration: 0.5,
-        });
-        gsap.to('.icon-container', {
-          y: '+=10',
-          yoyo: true,
-          repeat: 1,
-          ease: Elastic.easeOut.config(1, 0.3),
-          stagger: { each: 0.5 },
-        });
-      }
     };
 
     return {
       handleClick,
-      iconRefs,
       isActive,
-      shouldShowItem,
-      filteredNavItems,
       crazyModeToggle,
     };
   },
@@ -215,14 +131,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.icon-container {
-  mask-image: linear-gradient(to right, white 50%, black 50%);
-  mask-size: 200% 100%;
-  mask-position: 100% 0;
-}
 .hidden {
   display: none;
 }
+
 .navbar {
   display: flex;
   flex-direction: column;
@@ -232,12 +144,13 @@ export default defineComponent({
   overflow-x: visible;
   overflow-y: visible;
   margin: 0;
-  padding: 10px 0;
+  padding: 5px 0 0 0;
   height: 100%;
-  width: 50px;
+  width: 40px;
   scrollbar-width: none;
   -ms-overflow-style: none;
   scrollbar-color: transparent transparent;
+  gap: 1px;
 
   .icon-mask {
     filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
@@ -246,8 +159,9 @@ export default defineComponent({
       transform 0.1s ease;
     z-index: 100000000;
     position: relative;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
+    mix-blend-mode: multiply; /* Added to remove glow on transparent background */
 
     &:hover {
       cursor: pointer;
@@ -260,6 +174,10 @@ export default defineComponent({
       filter: drop-shadow(0 0 5px white) blur(1px);
       transform: scale(0.9);
       transition: filter 0.3s ease;
+    }
+
+    img {
+      mix-blend-mode: screen; /* Added to enhance the outlines of the png icons */
     }
   }
 

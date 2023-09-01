@@ -32,32 +32,19 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
+import { mapState } from 'vuex';
 
 export default defineComponent({
-  name: 'Info',
-  setup() {
-    const { locale } = useI18n();
-    const store = useStore();
-    const selectedLanguage = ref(store.state.selectedLanguage);
-    const rememberLanguage = ref(store.state.rememberLanguage);
-
-    onMounted(() => {
-      if (rememberLanguage.value) {
-        locale.value = selectedLanguage.value;
-      }
-    });
-
-    const saveLanguage = () => {
-      locale.value = selectedLanguage.value;
-      store.commit('setSelectedLanguage', selectedLanguage.value);
-      store.commit('setRememberLanguage', rememberLanguage.value);
-    };
-
-    return {
-      selectedLanguage,
-      rememberLanguage,
-      saveLanguage,
-    };
+  computed: {
+    ...mapState(['selectedLanguage', 'rememberLanguage']),
+  },
+  methods: {
+    saveLanguage() {
+      this.$store.dispatch('saveLanguage', {
+        selectedLanguage: this.selectedLanguage,
+        rememberLanguage: this.rememberLanguage,
+      });
+    },
   },
 });
 </script>

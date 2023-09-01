@@ -1,92 +1,156 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { calculatePID, PIDStateMap, PIDState } from './pidstate';
 import { NavItem, NavItems } from './config';
-import { useStore } from 'vuex';
+import { useStore, Store } from 'vuex';
+import store from './store';
 
-console.log('Registering Draggable plugin with gsap');
 gsap.registerPlugin(Draggable);
-export function setupDraggable(
-  elements: HTMLElement[],
-  onDrag: (event: MouseEvent, item: NavItem, element: HTMLElement) => void,
-) {
-  console.log('Initializing Vuex store');
-  const store = useStore();
+
+export function setupDraggable(elements: HTMLElement[], store: Store<any>) {
   const draggableElements: Draggable[] = [];
 
-  console.log('Iterating over NavItems');
-  NavItems.forEach((item: NavItem) => {
-    console.log(`Setting initial PIDState for NavItem ${item.ariaLabel}`);
-    PIDStateMap.set(item.ariaLabel, {
-      originalX: 0,
-      originalY: 0,
-      previousErrorX: 0,
-      previousErrorY: 0,
-      setPointX: 0,
-      setPointY: 0,
-      integralX: 0,
-      integralY: 0,
-    });
-    const element = elements.find((el) => el.id === item.id);
-    if (!element) {
-      console.error(`Element for item ${item.id} is not found`);
-      return;
-    }
-    const state = PIDStateMap.get(item.ariaLabel) as PIDState;
-    if (!state) {
-      console.error(`State for item ${item.ariaLabel} is undefined`);
+  elements.forEach((element) => {
+    const item = NavItems.find(
+      (item) =>
+        item.id === element.id ||
+        element.classList.contains('draggable') ||
+        element.classList.contains('magnetic'),
+    );
+    if (!item) {
+      console.error(`Item not found for ${element.id}`);
       return;
     }
 
-    console.log(`Adding mousemove event listener for element ${element.id}`);
-    element.addEventListener('mousemove', (event: MouseEvent) => {
+    const state = PIDStateMap.get(item.ariaLabel) || initializePIDState(item);
+    if (!state) {
+      console.error(`State not found for ${item.ariaLabel}`);
+      return;
+    }
+
+    attachMouseMoveListener(element, (event) => {
       calculatePID(event, item, state, {}, element);
       store.commit('setTooltipText', item.ariaLabel);
     });
 
-    console.log(`Creating Draggable for element ${element.id}`);
-    const draggable = Draggable.create(element, {
-      type: 'x,y',
-      edgeResistance: 0.65,
-      bounds: document.body,
-      throwProps: true,
-      onDrag: function (event: MouseEvent) {
-        onDrag(event, item, element);
-        store.commit('setTooltipX', event.clientX);
-        store.commit('setTooltipY', event.clientY);
-        store.commit('setCurrentComponent', item.componentName);
-      },
-      onDragEnd: function () {
-        if (
-          Math.abs(this.x - state.originalX) <= 20 &&
-          Math.abs(this.y - state.originalY) <= 20
-        ) {
-          console.log(`Element ${element.id} hit test passed, reverting`);
-          this.revert();
-          state.setPointX = this.x;
-          state.setPointY = this.y;
-          store.commit('setShowTooltip', false);
-        } else {
-          state.setPointX = this.x;
-          state.setPointY = this.y;
-        }
-      },
-    })[0];
+    attachMouseHoverListener(element, state);
 
-    console.log(
-      `Adding Draggable for element ${element.id} to draggableElements array`,
-    );
+    const onDrag = (
+      event: MouseEvent,
+      item: NavItem,
+      _element: HTMLElement,
+    ) => {
+      store.commit('setTooltipX', event.clientX);
+      store.commit('setTooltipY', event.clientY);
+      store.commit('setCurrentComponent', item.componentName);
+    };
+
+    const draggable = createDraggable(element, item, state, store);
     draggableElements.push(draggable);
   });
 
-  console.log('Returning draggableElements');
   return draggableElements;
 }
 
+function initializePIDState(item: NavItem): PIDState | null {
+  const initialState: PIDState = {
+    originalX: 0,
+    originalY: 0,
+    previousErrorX: 0,
+    previousErrorY: 0,
+    setPointX: 0,
+    setPointY: 0,
+    integralX: 0,
+    integralY: 0,
+  };
+  PIDStateMap.set(item.ariaLabel, initialState);
+  return PIDStateMap.get(item.ariaLabel) || null;
+}
+
+function attachMouseMoveListener(
+  element: HTMLElement,
+  handler: (event: MouseEvent) => void,
+) {
+  element.addEventListener('mouseover', handler);
+}
+
+function attachMouseHoverListener(element: HTMLElement, state: PIDState) {
+  element.addEventListener('mouseover', function () {
+    gsap.to(element, {
+      x: state.setPointX + 10,
+      y: state.setPointY + 10,
+      duration: 0.5,
+    });
+  });
+}
+
+function createDraggable(
+  element: HTMLElement,
+  item: NavItem,
+  state: PIDState,
+  store: Store<any>,
+): Draggable {
+  const onDrag = (event: MouseEvent, item: NavItem, _element: HTMLElement) => {
+    store.commit('setTooltipX', event.clientX);
+    store.commit('setTooltipY', event.clientY);
+    store.commit('setCurrentComponent', item.componentName);
+    store.commit('setTooltipText', item.ariaLabel);
+    store.commit('setTooltipVisible', true);
+  };
+
+  element.addEventListener('mouseover', function () {
+    store.commit('setShowTooltip', true);
+  });
+
+  element.addEventListener('mouseout', function () {
+    store.commit('setShowTooltip', false);
+  });
+
+  return Draggable.create(element, {
+    type: 'x,y',
+    edgeResistance: 0.65,
+    bounds: document.body,
+    throwProps: true,
+    onDrag: function (event: MouseEvent) {
+      onDrag(event, item, element);
+      calculatePID(event, item, state, {}, element);
+    },
+    onDragEnd: function (this: Draggable) {
+      handleDragEnd(this, state);
+    },
+    snap: {
+      x: function (endValue) {
+        return Math.round(endValue / 50) * 50;
+      },
+      y: function (endValue) {
+        return Math.round(endValue / 50) * 50;
+      },
+    },
+  })[0];
+}
+
+function handleDragEnd(draggable: Draggable, state: PIDState) {
+  const distanceX = Math.abs(draggable.x - state.originalX);
+  const distanceY = Math.abs(draggable.y - state.originalY);
+  if (distanceX > 20 || distanceY > 20) {
+    const rubberBandX = (1.0 - 1.0 / ((distanceX * 0.55) / 640 + 1.0)) * 640;
+    const rubberBandY = (1.0 - 1.0 / ((distanceY * 0.55) / 640 + 1.0)) * 640;
+    gsap.to(draggable.target, {
+      x: rubberBandX,
+      y: rubberBandY,
+      duration: 0.5,
+    });
+    state.setPointX = rubberBandX;
+    state.setPointY = rubberBandY;
+  } else {
+    state.setPointX = draggable.x;
+    state.setPointY = draggable.y;
+  }
+}
+
 export function destroyDraggable(draggableElements: Draggable[]) {
-  console.log('Destroying draggable elements');
   draggableElements.forEach((draggable) => {
-    console.log(`Killing Draggable for element ${draggable.target.id}`);
     draggable.kill();
   });
 }

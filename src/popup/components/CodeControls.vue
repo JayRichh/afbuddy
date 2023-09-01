@@ -1,15 +1,11 @@
 <template>
   <div class="code-controls-container">
     <div class="button-group">
-      <!-- <button class="control-btn" @click="saveToLocalStorage"> -->
-      <button class="control-btn">Save Code 💾</button>
-      <!-- <button class="control-btn" @click="loadFromLocalStorage"> -->
-      <button class="control-btn">Load Code 📂</button>
+      <button class="control-btn" @click="saveJsonToLocalStorage">Save Code 💾</button>
+      <button class="control-btn" @click="loadJsonFromLocalStorage">Load Code 📂</button>
     </div>
-
     <div class="history-panel">
       <input type="text" placeholder="Search scripts..." v-model="searchTerm" />
-
       <ul id="history">
         <li v-for="script in filteredScripts" :key="script.id">
           <div
@@ -26,10 +22,6 @@
             <button class="delete-btn action-btn">Delete</button>
             <button class="rename-btn action-btn">Rename</button>
           </div>
-          <div v-if="hoveredScript === script" class="script-tooltip">
-            {{ script.content }}
-            <div class="tooltip-date">{{ script.date }}</div>
-          </div>
         </li>
       </ul>
     </div>
@@ -37,7 +29,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, computed } from 'vue';
+import { useStore, mapState } from 'vuex';
 
 type Script = {
   id: number;
@@ -46,52 +39,32 @@ type Script = {
 };
 
 export default defineComponent({
-  data() {
-    return {
-      scripts: [] as Script[],
-      hoveredScript: null as Script | null,
-      searchTerm: '',
-    };
-  },
   computed: {
+    ...mapState(['jsonObjects', 'searchTerm']),
     filteredScripts() {
-      if (!this.searchTerm) return this.scripts;
-      return this.scripts.filter((script) =>
+      if (!this.searchTerm) return this.jsonObjects;
+      return this.jsonObjects.filter((script: Script) =>
         script.content.includes(this.searchTerm),
       );
     },
   },
   methods: {
-    // saveToLocalStorage() {
-    // Logic to save the current script to localStorage
-    // Emit the save-code event to the parent component to get the current script
-    //   this.$emit('save-code');
-    // },
-    // loadFromLocalStorage() {
-    // Logic to load scripts from localStorage
-    // Emit the load-code event to the parent component to set the loaded script
-    //   this.$emit('load-code');
-    // },
-    deleteScript(script: Script) {
-      // Logic to delete the selected script from localStorage and the scripts array
+    saveJsonToLocalStorage() {
+      this.$store.dispatch('saveJsonToLocalStorage', this.jsonObjects);
     },
-    renameScript(script: Script) {
-      // Logic to rename the selected script
+    loadJsonFromLocalStorage() {
+      this.$store.dispatch('loadJsonFromLocalStorage');
     },
     showPreview(script: Script, event: MouseEvent) {
-      this.hoveredScript = script;
-      this.$emit('show-tooltip', {
-        content: script.content,
-        x: event.pageX,
-        y: event.pageY,
-      });
+      this.$store.dispatch('updateTooltipText', script.content);
+      this.$store.dispatch('updateTooltipX', event.pageX);
+      this.$store.dispatch('updateTooltipY', event.pageY);
     },
     hidePreview() {
-      this.hoveredScript = null;
-      this.$emit('hide-tooltip');
+      this.$store.dispatch('updateTooltipText', '');
     },
     loadScriptIntoMainEditor(script: Script) {
-      this.$emit('load-script-content', script.content);
+      // Logic to load script into main editor
     },
   },
 });

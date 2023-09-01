@@ -20,6 +20,8 @@
         <div class="title-icon-wrapper">
           <div class="title-wrapper draggable magnetic" ref="titleWrapper">
             <span class="title">{{ $t(currentComponent) }}</span>
+          </div>
+          <div class="svg-wrapper">
             <svg
               class="underline draggable magnetic"
               xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +79,6 @@ import UserAgents from './components/UserAgents.vue';
 import Info from './components/Info.vue';
 import Tooltip from './components/Tooltip.vue';
 import DoomPlayer from './components/DoomPlayer.vue';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { NavItem, calculateRotation } from '../utils/config';
 import { ExpoScaleEase, RoughEase, SlowMo } from 'gsap/EasePack';
 import Draggable from 'gsap/Draggable';
@@ -85,19 +86,12 @@ import { gsap } from 'gsap';
 import { setupDraggable } from '../utils/draggable';
 import { mapState, mapMutations } from 'vuex';
 import { useStore } from 'vuex';
-import { PIDStateMap, PIDState, calculatePID } from '../utils/pidstate';
 
 gsap.registerPlugin(ExpoScaleEase, RoughEase, SlowMo, Draggable);
 
 interface Data {
   currentComponent: string;
   scriptContentForTooltip: string;
-  showTooltip: boolean;
-  tooltipText: string;
-  tooltipX: number;
-  tooltipY: number;
-  theme: string;
-  themeData: monaco.editor.IStandaloneThemeData;
   isDraggable: boolean;
   draggableElements: Draggable[];
 }
@@ -114,35 +108,45 @@ export default defineComponent({
     Tooltip,
     DoomPlayer,
   },
+
   data(): Data {
     return {
       currentComponent: 'ThemeSelector',
       scriptContentForTooltip: '',
-      showTooltip: false,
-      tooltipText: '',
-      tooltipX: 0,
-      tooltipY: 0,
-      theme: 'GitHub',
-      themeData: {} as monaco.editor.IStandaloneThemeData,
       isDraggable: false,
       draggableElements: [],
     };
   },
-  created() {
-    this.$store.dispatch('initializeStore');
+
+  async created() {
+    await this.$store.dispatch('initializeStore');
   },
+
   computed: {
-    ...mapState(['tooltipText', 'tooltipX', 'tooltipY', 'showTooltip']),
+    ...mapState([
+      'tooltipText',
+      'tooltipX',
+      'tooltipY',
+      'showTooltip',
+      'crazyModeEnabled',
+      'currentComponent',
+      'navItems',
+      'theme',
+      'themeData',
+    ]),
   },
+
   methods: {
     ...mapMutations([
       'setTooltipText',
       'setTooltipX',
       'setTooltipY',
       'setShowTooltip',
+      'setCurrentComponent',
+      'setCrazyModeEnabled',
     ]),
     handleComponentChange(componentName: string) {
-      this.currentComponent = componentName;
+      this.$store.commit('setCurrentComponent', componentName);
     },
     listenForKonamiCode() {
       let input = '';
@@ -157,32 +161,83 @@ export default defineComponent({
     },
     activatePixelPerfection() {},
   },
-  mounted() {
+
+  async mounted() {
     this.listenForKonamiCode();
     const store = useStore();
-    const tl = gsap.timeline();
+    const tl = gsap.timeline({ smoothChildTiming: true, repeat: 0 });
     tl.fromTo(
-      '.navbar-container',
-      { y: '-100%' },
-      { y: '0%', duration: 0.5, ease: 'bounce.out' },
-    ).fromTo(
       '.app-header',
       { y: '-100%' },
-      { y: '0%', duration: 0.5, ease: 'bounce.out' },
-    );
-    const draggableElements = Array.from(
-      document.querySelectorAll('.icon-container, .draggable'),
-    ) as HTMLElement[];
-    this.draggableElements = setupDraggable(
-      draggableElements,
-      (event: MouseEvent, item: NavItem, element: HTMLElement) => {
-        const state = PIDStateMap.get(item.ariaLabel) as PIDState;
-        calculatePID(event, item, state, {}, element);
-        store.commit('setTooltipX', event.clientX);
-        store.commit('setTooltipY', event.clientY);
-        store.commit('setCurrentComponent', item.componentName);
-      },
-    );
+      { y: '0%', duration: 0.5, ease: 'power2.out' },
+    )
+      .fromTo(
+        '.paintbrush',
+        { x: '100%', y: '-100%', rotation: 360 },
+        { x: '0%', y: '0%', rotation: 0, duration: 1, ease: 'power2.out' },
+      )
+      .to('.paintbrush', {
+        rotation: 15,
+        yoyo: true,
+        repeat: 1,
+        duration: 0.2,
+        ease: 'power1.inOut',
+      });
+
+    gsap.utils.toArray('.icon-mask').forEach((mask: any, index: number) => {
+      tl.fromTo(
+        mask,
+        { y: '200%', autoAlpha: 0 },
+        {
+          y: '0%',
+          duration: 0.1 + index * 0.015,
+          ease: 'bounce.out',
+          autoAlpha: 0,
+        },
+        index * 0.015,
+      ).to(mask, {
+        y: '0%',
+        duration: 0.2 + index * 0.015,
+        ease: 'power2.out',
+        autoAlpha: 1,
+        blur: index * 5,
+      });
+    });
+
+    const navbarContainer = document.querySelector('.navbar-container');
+    if (navbarContainer instanceof HTMLElement) {
+      const cutoffPoint = navbarContainer.offsetHeight * 0.25;
+      window.addEventListener('scroll', () => {
+        gsap.utils.toArray('.icon-mask').forEach((mask: any) => {
+          if (mask.getBoundingClientRect().top < cutoffPoint) {
+            tl.to(mask, {
+              autoAlpha: 1,
+              blur: 0,
+            });
+          } else {
+            tl.to(mask, {
+              autoAlpha: 0,
+            });
+          }
+        });
+      });
+    }
+
+    tl.pause();
+    tl.resume();
+    tl.seek(1.5);
+    tl.reverse();
+    tl.timeScale(2);
+    tl.restart();
+
+    const draggableClassElements = Array.from(
+      document.querySelectorAll('.icon-container'),
+    ).map((el) => el as HTMLElement);
+    if (draggableClassElements.length > 0) {
+      setupDraggable(draggableClassElements, this.$store);
+    } else {
+      console.error('No draggable elements found');
+    }
   },
 });
 </script>
@@ -220,8 +275,16 @@ export default defineComponent({
   transform: rotate(calc(90deg + var(--moon-rotation-deg))) translateX(80%);
 }
 
+.svg-line {
+  stroke: url(#gradient);
+}
+
+:root {
+  --watercolour-gradient: linear-gradient(to right, #3f87a6, #ebf8e1, #f69d3c);
+}
+
 .navbar-container {
-  width: 50px;
+  width: 40px;
   height: 100%;
   padding: 0;
   background: linear-gradient(to bottom, #1c1c1c, #454545);
@@ -232,16 +295,14 @@ export default defineComponent({
 
 .app-container {
   display: flex;
-  flex-direction: row;
-  height: auto;
+  flex-direction: column;
+  height: 100%;
   width: calc(100% - 40px);
-  left: 50px;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  position: absolute;
+
+  position: relative;
   overflow: auto;
   overflow-x: hidden; //this might break things
+  z-index: 0;
 
   .app-header {
     display: flex;
@@ -252,27 +313,12 @@ export default defineComponent({
     flex: 1;
     z-index: 10002;
     background-color: transparent;
-    position: absolute;
+    position: relative;
     top: 0;
     width: 100%;
     box-sizing: border-box;
     min-width: 100%;
     padding: 0.5rem;
-  }
-
-  .app-content {
-    display: flex;
-    flex-direction: row;
-    flex: 1;
-    justify-content: center;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background-color: transparent;
-    position: relative;
-    z-index: 0;
   }
 }
 
@@ -309,6 +355,7 @@ export default defineComponent({
     animation: rockBrush 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
     cursor: pointer;
     opacity: calc(0.8 + 0.2 * var(--speed));
+    transform: scale(1.1); // Added for hover effect
   }
 
   &:active {
@@ -347,15 +394,15 @@ export default defineComponent({
 }
 
 .underline {
-  z-index: 1000;
+  z-index: 1000001;
   cursor: pointer;
   scale: calc(1 + 0.1 * var(--speed));
   background-color: #0000;
   width: 100%;
   transition: stroke 0.3s;
-  position: relative;
   bottom: 0;
   left: 0;
+  position: absolute;
 }
 
 .underline-path {

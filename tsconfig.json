@@ -54,7 +54,9 @@
 		"typings/**/*",
 		"typings/*",
 		"typings",
-		"declarations.d.ts"
-, "i18n.ts"	],
+		"declarations.d.ts",
+		"i18n.ts",
+		"* / * / * .d.ts"
+	],
 	"files": ["./vue-shims.d.ts"]
 }

@@ -64,6 +64,7 @@ export const NavItems = [
     altText: 'theme-icon',
     ariaLabel: 'ThemeSelector',
     selected: true,
+    crazyMode: false,
     position: { x: 0, y: 0 },
   },
   {
@@ -74,6 +75,7 @@ export const NavItems = [
     altText: 'tabclose-icon',
     ariaLabel: 'TabManagement',
     selected: false,
+    crazyMode: false,
     position: { x: 0, y: 0 },
   },
   {
@@ -84,6 +86,7 @@ export const NavItems = [
     altText: 'json-icon',
     ariaLabel: 'JsonViewer',
     selected: true,
+    crazyMode: false,
     position: { x: 0, y: 0 },
   },
   {
@@ -94,6 +97,7 @@ export const NavItems = [
     altText: 'code-icon',
     ariaLabel: 'CodeControls',
     selected: false,
+    crazyMode: false,
     position: { x: 0, y: 0 },
   },
   {
@@ -104,6 +108,7 @@ export const NavItems = [
     altText: 'geolocation-icon',
     ariaLabel: 'Geolocations',
     selected: false,
+    crazyMode: false,
     position: { x: 0, y: 0 },
   },
   {
@@ -114,6 +119,7 @@ export const NavItems = [
     altText: 'user-agent-icon',
     ariaLabel: 'UserAgents',
     selected: false,
+    crazyMode: false,
     position: { x: 0, y: 0 },
   },
   {
@@ -124,6 +130,7 @@ export const NavItems = [
     altText: 'info-icon',
     ariaLabel: 'Info',
     selected: false,
+    crazyMode: false,
     position: { x: 0, y: 0 },
   },
 ];
