@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar">
     <a
-      v-for="item in navItems"
+      v-for="item in displayNavItems"
       :key="item.id"
       ref="iconRefs"
       :class="{ selected: isActive(item.componentName) }"
@@ -109,6 +109,14 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const store = useStore();
+    const displayNavItems = computed(() => {
+      if (store.state.crazyModeEnabled) {
+        return store.state.navItems;
+      } else {
+        return store.state.navItems.slice(1);
+      }
+    });
+
     const handleClick = (event: MouseEvent, item: NavItem) => {
       emit('changeComponent', item.componentName);
     };
@@ -119,9 +127,24 @@ export default defineComponent({
 
     const crazyModeToggle = () => {
       store.commit('setCrazyModeEnabled', !store.state.crazyModeEnabled);
+      const checkboxSvg = document.querySelector('.checkbox-svg');
+      if (store.state.crazyModeEnabled) {
+        gsap.to(checkboxSvg, {
+          rotation: 360,
+          duration: 1,
+          ease: Elastic.easeOut.config(1, 0.3),
+        });
+      } else {
+        gsap.to(checkboxSvg, {
+          rotation: 0,
+          duration: 1,
+          ease: Elastic.easeOut.config(1, 0.3),
+        });
+      }
     };
 
     return {
+      displayNavItems,
       handleClick,
       isActive,
       crazyModeToggle,
@@ -150,7 +173,10 @@ export default defineComponent({
   scrollbar-width: none;
   -ms-overflow-style: none;
   scrollbar-color: transparent transparent;
-  gap: 1px;
+
+  .icon-container {
+    padding: 2px;
+  }
 
   .icon-mask {
     filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
@@ -161,7 +187,6 @@ export default defineComponent({
     position: relative;
     width: 32px;
     height: 32px;
-    mix-blend-mode: multiply; /* Added to remove glow on transparent background */
 
     &:hover {
       cursor: pointer;
@@ -175,10 +200,6 @@ export default defineComponent({
       transform: scale(0.9);
       transition: filter 0.3s ease;
     }
-
-    img {
-      mix-blend-mode: screen; /* Added to enhance the outlines of the png icons */
-    }
   }
 
   .masked-icon {
@@ -186,14 +207,6 @@ export default defineComponent({
     width: 100%;
     height: 100%;
     object-fit: contain;
-    z-index: 1000000000;
-  }
-
-  .black-icon {
-    z-index: 100000000;
-  }
-
-  .white-icon {
     z-index: 1000000000;
   }
 

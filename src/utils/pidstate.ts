@@ -15,6 +15,21 @@ export interface PIDState {
 
 export const PIDStateMap = new Map<string, PIDState>();
 
+export interface PIDStateBase {
+  [x: string]: number;
+  originalX: number;
+  originalY: number;
+  previousErrorX: number;
+  previousErrorY: number;
+  setPointX: number;
+  setPointY: number;
+  integralX: number;
+  integralY: number;
+}
+export interface PIDState extends PIDStateBase {
+  lastTime: number;
+}
+
 export const calculatePID = (
   event: MouseEvent,
   item: NavItem | string,
@@ -23,8 +38,8 @@ export const calculatePID = (
   icon: HTMLElement,
 ) => {
   const now = performance.now();
-  const dt = (now - state.lastTime) / 1000; // time difference in seconds
-  state.lastTime = now;
+  state.lastTime = state.lastTime ? state.lastTime : performance.now();
+  const dt = (now - state.lastTime) / 1000;
 
   const errorX = event.clientX - state.setPointX;
   const errorY = event.clientY - state.setPointY;

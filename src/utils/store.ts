@@ -1,7 +1,10 @@
-import { NavItems } from '../utils/config';
+import { NavItem, NavItems } from '../utils/config';
+import { getThemes } from '../popup/themesList';
 import { createStore } from 'vuex';
 import { userAgents } from '../../src/utils/userAgents';
-import { getThemes } from 'src/popup/themesList';
+import { Theme, themeList } from 'src/popup/themesList';
+import * as monaco from 'monaco-editor';
+import { PIDState } from './pidstate';
 
 interface State {
   tooltipText: string;
@@ -28,24 +31,32 @@ interface State {
   tabWidth: number;
   tabManagementEnabled: boolean;
   tabSetPoint: number;
-  themeData: object;
-  themes: any[];
+  themeData: Theme;
+  themes: {
+    themesArray: Record<string, Theme>;
+    themeNamesArray: string[];
+    themeList: Record<string, string>;
+  };
+  selectedTheme: Theme;
   isCodeEditorPreview: boolean;
   showTooltip: boolean;
   tooltipTheme: object;
   userAgents: typeof userAgents;
   userAgent: string;
   draggableElements: HTMLElement[];
+  PIDStateMap: Map<string, PIDState>;
 }
 
 export default createStore<State>({
   state: {
     // Common
+    PIDStateMap: new Map(),
+
     draggableElements: [],
-    tooltipText: '',
+    tooltipText: 'ayo',
     tooltipX: 0,
     tooltipY: 0,
-    currentComponent: '',
+    currentComponent: 'ThemeSelector',
 
     // CodeControls.vue
     jsonObjects: {},
@@ -80,8 +91,13 @@ export default createStore<State>({
     tabSetPoint: 0,
 
     // ThemeSelector.vue
-    themeData: {},
-    themes: [],
+    themes: {
+      themesArray: themeList as unknown as Record<string, Theme>,
+      themeNamesArray: Object.keys(themeList),
+      themeList: themeList as unknown as Record<string, string>,
+    },
+    themeData: {} as Theme,
+    selectedTheme: {} as Theme,
 
     // Tooltip.vue
     isCodeEditorPreview: false,
@@ -93,34 +109,41 @@ export default createStore<State>({
     userAgent: '',
   },
   getters: {
+    getPIDState: (state) => (ariaLabel: string) =>
+      state.PIDStateMap.get(ariaLabel),
     // common
-    getDraggableElements: (state) => state.draggableElements,
-    getTooltipText: (state) => state.tooltipText,
-    getTooltipX: (state) => state.tooltipX,
-    getTooltipY: (state) => state.tooltipY,
-    getCurrentComponent: (state) => state.currentComponent,
+    getDraggableElements: async (state) => state.draggableElements,
+    getTooltipText: async (state) => state.tooltipText,
+    getTooltipX: async (state) => state.tooltipX,
+    getTooltipY: async (state) => state.tooltipY,
+    getCurrentComponent: async (state) => state.currentComponent,
     // Component-specific getters
-    getJsonObjects: (state) => state.jsonObjects,
-    getTimeZone: (state) => state.timeZone,
-    getLocale: (state) => state.locale,
-    getLatitude: (state) => state.latitude,
-    getLongitude: (state) => state.longitude,
-    getDefaultView: (state) => state.defaultView,
-    getFeedbackMessage: (state) => state.feedbackMessage,
-    getLanguage: (state) => state.language,
-    getMonacoTheme: (state) => state.monacoTheme,
-    getShowModal: (state) => state.showModal,
-    getCrazyMode: (state) => state.crazyModeEnabled,
-    getTabWidth: (state) => state.tabWidth,
-    getTabManagementEnabled: (state) => state.tabManagementEnabled,
-    getTabSetPoint: (state) => state.tabSetPoint,
-    getThemeData: (state) => state.themeData,
-    getTooltipTheme: (state) => state.tooltipTheme,
-    getUserAgent: (state) => state.userAgent,
-    getMonacoContainer: (state) => state.monacoContainer,
-    getEditorInstance: (state) => state.editorInstance,
+    getJsonObjects: async (state) => state.jsonObjects,
+    getTimeZone: async (state) => state.timeZone,
+    getLocale: async (state) => state.locale,
+    getLatitude: async (state) => state.latitude,
+    getLongitude: async (state) => state.longitude,
+    getDefaultView: async (state) => state.defaultView,
+    getFeedbackMessage: async (state) => state.feedbackMessage,
+    getLanguage: async (state) => state.language,
+    getMonacoTheme: async (state) => state.monacoTheme,
+    getShowModal: async (state) => state.showModal,
+    getCrazyMode: async (state) => state.crazyModeEnabled,
+    getTabWidth: async (state) => state.tabWidth,
+    getTabManagementEnabled: async (state) => state.tabManagementEnabled,
+    getTabSetPoint: async (state) => state.tabSetPoint,
+    getThemeData: async (state) => state.themeData,
+    getTooltipTheme: async (state) => state.tooltipTheme,
+    getUserAgent: async (state) => state.userAgent,
+    getSelectedTheme: async (state) => state.selectedTheme,
+    getMonacoContainer: async (state) => state.monacoContainer,
+    getEditorInstance: async (state) => state.editorInstance,
   },
   mutations: {
+    setPIDState(state, { ariaLabel, pidState }) {
+      state.PIDStateMap.set(ariaLabel, pidState);
+    },
+
     updateState(state: State, payload: Partial<State>) {
       Object.keys(payload).forEach((key) => {
         (state as any)[key] = (payload as any)[key];
@@ -232,12 +255,33 @@ export default createStore<State>({
       commit('setDraggableElements', elements);
     },
     async initializeStore({ dispatch }) {
-      await dispatch('updateThemes');
+      if (!this.state.themes.themesArray) {
+        await dispatch('updateThemes');
+        await dispatch('updateCurrentComponent', 'ThemeSelector');
+      }
     },
     async updateThemes({ commit }) {
       const themes = await getThemes();
-      commit('updateState', { themes });
+      commit('setThemes', themes);
     },
+    initializePIDState({ commit }, item: NavItem) {
+      const initialState: PIDState = {
+        originalX: 0,
+        originalY: 0,
+        previousErrorX: 0,
+        previousErrorY: 0,
+        setPointX: 0,
+        setPointY: 0,
+        integralX: 0,
+        integralY: 0,
+        lastTime: 0,
+      };
+      commit('setPIDState', {
+        ariaLabel: item.ariaLabel,
+        pidState: initialState,
+      });
+    },
+
     applyTheme({ commit, dispatch }, payload: any) {
       commit('updateState', {
         themeData: payload.themeData,
@@ -301,11 +345,10 @@ export default createStore<State>({
     },
 
     applySelectedTheme({ commit }, selectedThemeKey) {
-      // Logic to apply theme
       commit('setSelectedThemeKey', selectedThemeKey);
     },
     setDefaultTheme({ commit }) {
-      commit('setSelectedThemeKey', 'defaultTheme');
+      commit('setSelectedThemeKey', 'GitHub');
     },
     // Common
     updateTooltipText({ commit }, payload) {

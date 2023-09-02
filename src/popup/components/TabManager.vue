@@ -13,8 +13,8 @@
           max="10"
           class="number-input"
         />
-        <button class="increment-button" @click="tabWidth++">+</button>
-        <button class="decrement-button" @click="tabWidth--">-</button>
+        <button class="increment-button" @click="incrementTabWidth">+</button>
+        <button class="decrement-button" @click="decrementTabWidth">-</button>
         <div class="input-line"></div>
       </div>
     </div>
@@ -25,10 +25,10 @@
       <input
         type="checkbox"
         id="enableTabManagement"
-        v-model="enableTabManagement"
+        v-model="tabManagementEnabled"
       />
 
-      <div v-if="enableTabManagement">
+      <div v-if="tabManagementEnabled">
         <label for="excludeTabs">Exclude Specific Tabs:</label>
         <input type="checkbox" id="excludeTabs" v-model="excludeTabs" />
 
@@ -52,27 +52,59 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { useStore } from 'vuex';
 
 export default defineComponent({
-  data() {
-    return {
-      tabWidth: 4,
-      defaultTabWidth: 4,
-      enableTabManagement: false,
-      excludeTabs: false,
-      tabSetPoint: 4,
+  setup() {
+    const store = useStore();
+    const tabWidth = ref(store.state.tabWidth);
+    const tabManagementEnabled = ref(store.state.tabManagementEnabled);
+    const tabSetPoint = ref(store.state.tabSetPoint);
+    const excludeTabs = ref(store.state.excludeTabs);
+    const defaultTabWidth = ref(store.state.defaultTabWidth);
+
+    const setTabWidthValue = () => {
+      store.commit('updateTabWidth', tabWidth.value);
     };
-  },
-  methods: {
-    setTabWidthValue() {
-      this.$emit('set-tab-width', this.tabWidth);
-    },
-    resetAllValues() {
-      this.tabWidth = this.defaultTabWidth;
-      this.enableTabManagement = false;
-      this.excludeTabs = false;
-      this.tabSetPoint = 4;
-    },
+
+    const setTabManagementEnabled = () => {
+      store.commit('updateTabManagementEnabled', tabManagementEnabled.value);
+    };
+
+    const setTabSetPoint = () => {
+      store.commit('updateTabSetPoint', tabSetPoint.value);
+    };
+
+    const setExcludeTabs = () => {
+      store.commit('updateExcludeTabs', excludeTabs.value);
+    };
+
+    const resetAllValues = () => {
+      store.commit('resetAllValues');
+    };
+
+    const incrementTabWidth = () => {
+      tabWidth.value++;
+    };
+
+    const decrementTabWidth = () => {
+      tabWidth.value--;
+    };
+
+    return {
+      tabWidth,
+      tabManagementEnabled,
+      tabSetPoint,
+      excludeTabs,
+      setTabWidthValue,
+      setTabManagementEnabled,
+      setTabSetPoint,
+      setExcludeTabs,
+      resetAllValues,
+      incrementTabWidth,
+      decrementTabWidth,
+      defaultTabWidth,
+    };
   },
 });
 </script>

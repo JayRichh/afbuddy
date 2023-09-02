@@ -1,153 +1,80 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
-import { calculatePID, PIDStateMap, PIDState } from './pidstate';
-import { NavItem, NavItems } from './config';
-import { useStore, Store } from 'vuex';
-import store from './store';
+import { calculatePID, PIDState } from './pidstate';
+import { NavItems, calculateDistance } from './config';
+import { Store } from 'vuex';
 
 gsap.registerPlugin(Draggable);
 
-export function setupDraggable(elements: HTMLElement[], store: Store<any>) {
-  const draggableElements: Draggable[] = [];
+export function setupDraggable(store: Store<any>) {
+  const elements = Array.from(
+    document.querySelectorAll('.draggable'),
+  ) as HTMLElement[];
 
-  elements.forEach((element) => {
-    const item = NavItems.find(
-      (item) =>
-        item.id === element.id ||
-        element.classList.contains('draggable') ||
-        element.classList.contains('magnetic'),
-    );
+  elements.forEach((element: HTMLElement) => {
+    const item = NavItems.find((item) => item.id === element.id);
     if (!item) {
-      console.error(`Item not found for ${element.id}`);
-      return;
+      throw new Error(`Could not find item with id: ${element.id}`);
     }
 
-    const state = PIDStateMap.get(item.ariaLabel) || initializePIDState(item);
+    let state = store.getters.getPIDState(item.ariaLabel);
     if (!state) {
-      console.error(`State not found for ${item.ariaLabel}`);
-      return;
+      store.dispatch('initializePIDState', item);
+      state = store.getters.getPIDState(item.ariaLabel);
     }
 
     attachMouseMoveListener(element, (event) => {
       calculatePID(event, item, state, {}, element);
+      handleMagneticEffect(event, state, element);
       store.commit('setTooltipText', item.ariaLabel);
-    });
-
-    attachMouseHoverListener(element, state);
-
-    const onDrag = (
-      event: MouseEvent,
-      item: NavItem,
-      _element: HTMLElement,
-    ) => {
       store.commit('setTooltipX', event.clientX);
       store.commit('setTooltipY', event.clientY);
       store.commit('setCurrentComponent', item.componentName);
-    };
-
-    const draggable = createDraggable(element, item, state, store);
-    draggableElements.push(draggable);
+    });
   });
-
-  return draggableElements;
 }
 
-function initializePIDState(item: NavItem): PIDState | null {
-  const initialState: PIDState = {
-    originalX: 0,
-    originalY: 0,
-    previousErrorX: 0,
-    previousErrorY: 0,
-    setPointX: 0,
-    setPointY: 0,
-    integralX: 0,
-    integralY: 0,
-  };
-  PIDStateMap.set(item.ariaLabel, initialState);
-  return PIDStateMap.get(item.ariaLabel) || null;
+function handleMagneticEffect(
+  event: MouseEvent,
+  state: PIDState,
+  element: HTMLElement,
+) {
+  const distance = calculateDistance(
+    event.clientX,
+    event.clientY,
+    state.setPointX,
+    state.setPointY,
+  );
+  if (distance <= 20) {
+    gsap.to(element, { x: event.clientX, y: event.clientY, duration: 0.5 });
+  }
 }
 
 function attachMouseMoveListener(
   element: HTMLElement,
   handler: (event: MouseEvent) => void,
 ) {
-  element.addEventListener('mouseover', handler);
+  element.addEventListener('mousemove', handler);
 }
 
-function attachMouseHoverListener(element: HTMLElement, state: PIDState) {
-  element.addEventListener('mouseover', function () {
-    gsap.to(element, {
-      x: state.setPointX + 10,
-      y: state.setPointY + 10,
-      duration: 0.5,
-    });
-  });
-}
-
-function createDraggable(
-  element: HTMLElement,
-  item: NavItem,
-  state: PIDState,
-  store: Store<any>,
-): Draggable {
-  const onDrag = (event: MouseEvent, item: NavItem, _element: HTMLElement) => {
-    store.commit('setTooltipX', event.clientX);
-    store.commit('setTooltipY', event.clientY);
-    store.commit('setCurrentComponent', item.componentName);
-    store.commit('setTooltipText', item.ariaLabel);
-    store.commit('setTooltipVisible', true);
-  };
-
-  element.addEventListener('mouseover', function () {
-    store.commit('setShowTooltip', true);
-  });
-
-  element.addEventListener('mouseout', function () {
-    store.commit('setShowTooltip', false);
-  });
-
-  return Draggable.create(element, {
-    type: 'x,y',
-    edgeResistance: 0.65,
-    bounds: document.body,
-    throwProps: true,
-    onDrag: function (event: MouseEvent) {
-      onDrag(event, item, element);
-      calculatePID(event, item, state, {}, element);
-    },
-    onDragEnd: function (this: Draggable) {
-      handleDragEnd(this, state);
-    },
-    snap: {
-      x: function (endValue) {
-        return Math.round(endValue / 50) * 50;
-      },
-      y: function (endValue) {
-        return Math.round(endValue / 50) * 50;
-      },
-    },
-  })[0];
-}
-
-function handleDragEnd(draggable: Draggable, state: PIDState) {
-  const distanceX = Math.abs(draggable.x - state.originalX);
-  const distanceY = Math.abs(draggable.y - state.originalY);
-  if (distanceX > 20 || distanceY > 20) {
-    const rubberBandX = (1.0 - 1.0 / ((distanceX * 0.55) / 640 + 1.0)) * 640;
-    const rubberBandY = (1.0 - 1.0 / ((distanceY * 0.55) / 640 + 1.0)) * 640;
-    gsap.to(draggable.target, {
-      x: rubberBandX,
-      y: rubberBandY,
-      duration: 0.5,
-    });
-    state.setPointX = rubberBandX;
-    state.setPointY = rubberBandY;
-  } else {
-    state.setPointX = draggable.x;
-    state.setPointY = draggable.y;
-  }
-}
+// function handleDragEnd(draggable: Draggable, state: PIDState) {
+//   const distanceX = Math.abs(draggable.x - state.originalX);
+//   const distanceY = Math.abs(draggable.y - state.originalY);
+//   if (distanceX > 20 || distanceY > 20) {
+//     const rubberBandX = (1.0 - 1.0 / ((distanceX * 0.55) / 640 + 1.0)) * 640;
+//     const rubberBandY = (1.0 - 1.0 / ((distanceY * 0.55) / 640 + 1.0)) * 640;
+//     gsap.to(draggable.target, {
+//       x: rubberBandX,
+//       y: rubberBandY,
+//       duration: 0.5,
+//     });
+//     state.setPointX = rubberBandX;
+//     state.setPointY = rubberBandY;
+//   } else {
+//     state.setPointX = draggable.x;
+//     state.setPointY = draggable.y;
+//   }
+// }
 
 export function destroyDraggable(draggableElements: Draggable[]) {
   draggableElements.forEach((draggable) => {

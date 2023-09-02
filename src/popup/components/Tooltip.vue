@@ -1,13 +1,8 @@
-```vue ```vue
 <template>
   <div
-    class="tooltip"
     v-if="showTooltip"
-    :style="{
-      top: tooltipY + 'px',
-      left: tooltipX + 'px',
-      overflow: 'hidden',
-    }"
+    class="tooltip"
+    :style="{ left: `${tooltipX}px`, top: `${tooltipY}px` }"
   >
     <div
       v-if="isCodeEditorPreview"
@@ -32,12 +27,10 @@ import {
   watch,
   onBeforeUnmount,
   ref,
-  toRefs,
   Prop,
-  reactive,
 } from 'vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import { useStore, mapState } from 'vuex';
+import { useStore } from 'vuex';
 import { updateTooltipNavItem } from '../../utils/editorUtils';
 
 interface Props {
@@ -55,16 +48,6 @@ export default defineComponent({
     theme: { type: String, default: 'GitHub' },
     isCodeEditorPreview: { type: Boolean, default: false },
   },
-  computed: {
-    ...mapState([
-      'tooltipText',
-      'tooltipX',
-      'tooltipY',
-      'showTooltip',
-      'theme',
-      'themeData',
-    ]),
-  },
   setup(props: Props) {
     const store = useStore();
     const tooltipText = computed(() => store.state.tooltipText);
@@ -78,56 +61,53 @@ export default defineComponent({
       null as monaco.editor.IStandaloneCodeEditor | null,
     );
 
-    const state = reactive({
-      tooltipText,
-      tooltipX,
-      tooltipY,
-      showTooltip,
-      theme,
-      themeData,
-      monacoContainer,
-      editorInstance,
-    });
+    const initializeEditor = () => {
+      if (!monacoContainer.value || !editorInstance.value) {
+        console.error('Monaco container or editor instance is not set');
+        return;
+      }
+      store.dispatch('createEditor', {
+        monacoContainer: monacoContainer.value,
+        editorInstance: editorInstance.value,
+      });
+    };
+
+    const applyThemeToEditor = () => {
+      if (editorInstance.value) {
+        editorInstance.value.setValue(store.state.tooltipText);
+        store.dispatch('applyTheme', {
+          theme: props.theme,
+          themeData: props.themeData,
+        });
+      } else {
+        store.dispatch('createEditor', { monacoContainer, editorInstance });
+      }
+    };
 
     onMounted(() => {
-      if (store.state.showTooltip && props.isCodeEditorPreview) {
-        if (!state.monacoContainer || !state.editorInstance) {
-          console.error('Monaco container or editor instance is not set');
-          return;
-        }
-        store.dispatch('createEditor', {
-          monacoContainer: state.monacoContainer,
-          editorInstance: state.editorInstance,
-        });
+      if (showTooltip.value && props.isCodeEditorPreview) {
+        initializeEditor();
       }
       updateTooltipNavItem(store.state.tooltipText);
     });
 
     watch(
-      () => store.state.showTooltip,
+      () => showTooltip.value,
       (newVal) => {
         if (newVal && props.isCodeEditorPreview) {
-          if (editorInstance.value) {
-            editorInstance.value.setValue(store.state.tooltipText);
-            store.dispatch('applyTheme', {
-              theme: props.theme,
-              themeData: props.themeData,
-            });
-          } else {
-            store.dispatch('createEditor', { monacoContainer, editorInstance });
-          }
+          applyThemeToEditor();
         }
       },
     );
 
     onBeforeUnmount(() => {
-  if (editorInstance.value) {
-    editorInstance.value.dispose();
-  }
-});
+      if (editorInstance.value) {
+        editorInstance.value.dispose();
+      }
+    });
 
     watch(
-      () => store.state.tooltipText,
+      () => tooltipText.value,
       (newVal) => {
         if (newVal && editorInstance.value) {
           editorInstance.value.setValue(newVal);
@@ -148,15 +128,14 @@ export default defineComponent({
     );
 
     return {
-      ...toRefs(state),
-      monacoContainer,
-      editorInstance,
       tooltipText,
       tooltipX,
       tooltipY,
       showTooltip,
       theme,
       themeData,
+      monacoContainer,
+      editorInstance,
     };
   },
 });

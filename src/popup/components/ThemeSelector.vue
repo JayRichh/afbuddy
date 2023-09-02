@@ -7,24 +7,39 @@
       :theme="selectedThemeKey"
       :visible="showTooltip"
     ></Tooltip>
+
+    <n-space vertical>
+      <n-label for="theme-selector" class="theme-label">Select Theme:</n-label>
+      <n-select
+        id="theme-selector"
+        v-model:value="selectedThemeKey"
+        :options="themeNamesArray"
+        @mouseover="handleThemeMouseOver"
+        @mousemove="adjustTooltipPosition"
+        @mouseout="handleMouseOut"
+      >
+      </n-select>
+      <n-text size="small" type="secondary">
+        {{ selectedThemeKey }}
+      </n-text>
+    </n-space>
+
     <div class="label-button-wrapper">
-      <label for="theme-select" class="theme-label">Select Theme:</label>
-      <div class="button-group">
-        <button @click="applySelectedTheme" class="primary-btn">Apply</button>
-        <button @click="setDefaultTheme" class="secondary-btn">Default</button>
+      <div class="button-group-wrapper">
+        <NButton
+          type="primary"
+          @click="applySelectedTheme"
+          class="button-group-item button-group-item--right"
+          >Apply</NButton
+        >
+        <NButton
+          type="error"
+          @click="setDefaultTheme"
+          class="button-group-item button-group-item--left"
+          >Default</NButton
+        >
       </div>
     </div>
-    <select
-      id="theme-select"
-      v-model="selectedThemeKey"
-      @mouseover="handleThemeMouseOver"
-      @mousemove="adjustTooltipPosition"
-      @mouseout="handleMouseOut"
-    >
-      <option v-for="theme in themeNamesArray" :key="theme" :value="theme">
-        {{ theme }}
-      </option>
-    </select>
   </div>
 </template>
 
@@ -32,34 +47,45 @@
 import { defineComponent, ref, computed, onMounted } from 'vue';
 import Tooltip from './Tooltip.vue';
 import { useStore, mapState } from 'vuex';
+import { NButton, NButtonGroup, NSelect, NText } from 'naive-ui';
 
 export default defineComponent({
   name: 'ThemeSelector',
   components: {
+    NSelect,
     Tooltip,
+    NButton,
+    NButtonGroup,
+    NText,
   },
   props: {
     currentTheme: String,
   },
-  computed: {
-    ...mapState(['themeNamesArray']),
-  },
-  setup(props) {
+  async setup(props) {
+    const store = useStore();
+
     const state = ref({
       monacoContainer: null,
       editorInstance: null,
     });
-    const store = useStore();
     const selectedThemeKey = ref(
       props.currentTheme || store.state.selectedThemeKey,
     );
     const showTooltip = ref(false);
     const tooltipX = ref(0);
     const tooltipY = ref(0);
+    const themes = computed(() => store.state.themes);
+    const themeNamesArray = computed(() => {
+      return Object.keys(themes.value).map((key) => ({
+        label: themes.value[key]?.base,
+        value: key,
+      }));
+    });
 
     onMounted(async () => {
-      await store.dispatch('updateThemes');
-      applySelectedTheme();
+      if (selectedThemeKey.value) {
+        await store.dispatch('applySelectedTheme', selectedThemeKey.value);
+      }
     });
 
     function handleThemeMouseOver(event: MouseEvent) {
@@ -72,9 +98,11 @@ export default defineComponent({
         monacoContainer: state.value.monacoContainer,
         editorInstance: state.value.editorInstance,
       });
-      store.dispatch('applyTheme', {
-        theme: selectedThemeKey.value,
-      });
+      if (selectedThemeKey.value) {
+        store.dispatch('applyTheme', {
+          theme: selectedThemeKey.value,
+        });
+      }
     }
 
     function adjustTooltipPosition(event: MouseEvent) {
@@ -86,22 +114,28 @@ export default defineComponent({
       showTooltip.value = false;
     }
 
-    function applySelectedTheme() {
+    async function applySelectedTheme() {
       const themeName = selectedThemeKey.value;
-      console.log('themeName', themeName, store.state.themeList[themeName]);
-      store.dispatch('applyTheme', {
-        theme: themeName,
-        themeData: store.state.themeList[themeName],
-      });
+      const themeData = await store.getters.getThemeData(themeName);
+      console.log('themeName', themeName, themeData);
+      if (themeName && themeData) {
+        store.dispatch('applyTheme', {
+          theme: themeName,
+          themeData: themeData,
+        });
+      }
     }
 
-    function setDefaultTheme() {
-      selectedThemeKey.value = store.state.themeList[0];
-      applySelectedTheme();
+    async function setDefaultTheme() {
+      const defaultThemeData = await store.getters.getThemeData('GitHub');
+      if (defaultThemeData) {
+        selectedThemeKey.value = defaultThemeData;
+        store.dispatch('applySelectedTheme', selectedThemeKey.value);
+      }
     }
 
     return {
-      themeList: computed(() => store.state.themeList),
+      themeList: computed(async () => await store.getters.getThemeData),
       selectedThemeKey,
       showTooltip,
       tooltipX,
@@ -111,12 +145,31 @@ export default defineComponent({
       handleMouseOut,
       applySelectedTheme,
       setDefaultTheme,
+      themeNamesArray,
     };
   },
 });
 </script>
 
 <style scoped lang="scss">
+.button-group-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.button-group-item {
+  flex: 1;
+}
+
+.button-group-item--left {
+  margin-right: 10px;
+}
+
+.button-group-item--right {
+  margin-left: 10px;
+}
+
 button:hover {
   background-color: #666;
   box-shadow: 0 0 3px #555;
@@ -138,11 +191,10 @@ button:active {
 
 .theme-selector-container {
   display: flex;
-  padding: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   height: 100%;
   margin: 0;
-  width: calc(100% - 40px);
+  width: 100%;
   flex-direction: column;
   background-color: #f4f4f4;
   border-radius: 5px;
@@ -259,12 +311,5 @@ label {
       0 0 30px #f44336,
       0 0 40px #f44336;
   }
-}
-
-.button-group {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 </style>

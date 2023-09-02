@@ -17,38 +17,40 @@
     />
     <div class="app-container">
       <div class="app-header">
-        <div class="title-icon-wrapper">
-          <div class="title-wrapper draggable magnetic" ref="titleWrapper">
-            <span class="title">{{ $t(currentComponent) }}</span>
-          </div>
-          <div class="svg-wrapper">
-            <svg
-              class="underline draggable magnetic"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 1000 200"
-              ref="underlineSVG"
-            >
-              <path
-                class="underline-path"
-                ref="underlinePath"
-                stroke-width="10"
-                stroke="url(#gradient)"
-                d="M 0 100 L 1000 100"
-              ></path>
-              <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop
-                    offset="0%"
-                    style="stop-color: #7ed4e6; stop-opacity: 1"
-                  />
-                  <stop
-                    offset="100%"
-                    style="stop-color: #b493d3; stop-opacity: 1"
-                  />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
+        <div class="title-icon-wrapper draggable">
+          <h1 class="title">{{ $t(formattedTitle) }}</h1>
+          <svg
+            class="underline"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1000 200"
+          >
+            <defs>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop
+                  offset="0%"
+                  style="stop-color: #7ed4e6; stop-opacity: 1"
+                />
+                <stop
+                  offset="100%"
+                  style="stop-color: #b493d3; stop-opacity: 1"
+                />
+              </linearGradient>
+            </defs>
+            <path
+              class="underline-path"
+              stroke-width="10"
+              stroke="url(#gradient)"
+              d="M 0 100 L 1000 100"
+              filter="url(#glow)"
+            ></path>
+          </svg>
           <img
             ref="paintbrush"
             id="iconToChangeColor"
@@ -59,10 +61,10 @@
         </div>
       </div>
       <Component
-        class="app-content draggable magnetic"
-        :is="currentComponent"
-        v-bind="$attrs"
-        @changeComponent="handleComponentChange"
+        class="app-content"
+        :currentComponent="currentComponent"
+        :theme="theme"
+        :themeData="themeData"
       />
     </div>
   </div>
@@ -72,6 +74,7 @@
 import { defineComponent, ref, onMounted, computed, Component } from 'vue';
 import Navbar from './components/Navbar.vue';
 import ThemeSelector from './components/ThemeSelector.vue';
+import Json from './components/Json.vue';
 import TabManager from './components/TabManager.vue';
 import CodeControls from './components/CodeControls.vue';
 import Geolocation from './components/Geolocation.vue';
@@ -79,13 +82,14 @@ import UserAgents from './components/UserAgents.vue';
 import Info from './components/Info.vue';
 import Tooltip from './components/Tooltip.vue';
 import DoomPlayer from './components/DoomPlayer.vue';
-import { NavItem, calculateRotation } from '../utils/config';
 import { ExpoScaleEase, RoughEase, SlowMo } from 'gsap/EasePack';
 import Draggable from 'gsap/Draggable';
 import { gsap } from 'gsap';
 import { setupDraggable } from '../utils/draggable';
 import { mapState, mapMutations } from 'vuex';
 import { useStore } from 'vuex';
+import { setupAnimations } from '../utils/animationUtils';
+import { listenForKonamiCode as konamiCodeListener } from '../utils/folder/eventUtils';
 
 gsap.registerPlugin(ExpoScaleEase, RoughEase, SlowMo, Draggable);
 
@@ -98,8 +102,9 @@ interface Data {
 
 export default defineComponent({
   components: {
-    Navbar,
-    ThemeSelector,
+    Navbar: Navbar,
+    ThemeSelector: ThemeSelector,
+    Json,
     TabManager,
     CodeControls,
     Geolocation,
@@ -111,15 +116,11 @@ export default defineComponent({
 
   data(): Data {
     return {
-      currentComponent: 'ThemeSelector',
+      currentComponent: this.$store.state.currentComponent,
       scriptContentForTooltip: '',
       isDraggable: false,
       draggableElements: [],
     };
-  },
-
-  async created() {
-    await this.$store.dispatch('initializeStore');
   },
 
   computed: {
@@ -162,87 +163,55 @@ export default defineComponent({
     activatePixelPerfection() {},
   },
 
-  async mounted() {
-    this.listenForKonamiCode();
+  setup() {
     const store = useStore();
-    const tl = gsap.timeline({ smoothChildTiming: true, repeat: 0 });
-    tl.fromTo(
-      '.app-header',
-      { y: '-100%' },
-      { y: '0%', duration: 0.5, ease: 'power2.out' },
-    )
-      .fromTo(
-        '.paintbrush',
-        { x: '100%', y: '-100%', rotation: 360 },
-        { x: '0%', y: '0%', rotation: 0, duration: 1, ease: 'power2.out' },
-      )
-      .to('.paintbrush', {
-        rotation: 15,
-        yoyo: true,
-        repeat: 1,
-        duration: 0.2,
-        ease: 'power1.inOut',
-      });
-
-    gsap.utils.toArray('.icon-mask').forEach((mask: any, index: number) => {
-      tl.fromTo(
-        mask,
-        { y: '200%', autoAlpha: 0 },
-        {
-          y: '0%',
-          duration: 0.1 + index * 0.015,
-          ease: 'bounce.out',
-          autoAlpha: 0,
-        },
-        index * 0.015,
-      ).to(mask, {
-        y: '0%',
-        duration: 0.2 + index * 0.015,
-        ease: 'power2.out',
-        autoAlpha: 1,
-        blur: index * 5,
-      });
+    const formattedTitle = computed(() => {
+      let title = store.state.currentComponent;
+      title = title.replace(/([A-Z])/g, ' $1').trim();
+      title = title.replace(' ', '\n');
+      return title;
     });
 
-    const navbarContainer = document.querySelector('.navbar-container');
-    if (navbarContainer instanceof HTMLElement) {
-      const cutoffPoint = navbarContainer.offsetHeight * 0.25;
-      window.addEventListener('scroll', () => {
-        gsap.utils.toArray('.icon-mask').forEach((mask: any) => {
-          if (mask.getBoundingClientRect().top < cutoffPoint) {
-            tl.to(mask, {
-              autoAlpha: 1,
-              blur: 0,
-            });
-          } else {
-            tl.to(mask, {
-              autoAlpha: 0,
-            });
-          }
-        });
-      });
-    }
+    return {
+      formattedTitle,
+    };
+  },
 
-    tl.pause();
-    tl.resume();
-    tl.seek(1.5);
-    tl.reverse();
-    tl.timeScale(2);
-    tl.restart();
+  async mounted() {
+    konamiCodeListener(this.activatePixelPerfection);
+
+    const tl = setupAnimations() as gsap.core.Timeline;
+    tl.play();
 
     const draggableClassElements = Array.from(
-      document.querySelectorAll('.icon-container'),
-    ).map((el) => el as HTMLElement);
+      document.querySelectorAll('.draggable'),
+    ) as HTMLElement[];
     if (draggableClassElements.length > 0) {
-      setupDraggable(draggableClassElements, this.$store);
+      setupDraggable(this.$store);
     } else {
-      console.error('No draggable elements found');
+      console.error('No .draggable elements found');
     }
   },
 });
 </script>
 
 <style lang="scss">
+.underline {
+  z-index: 9999999992;
+  position: absolute;
+  width: 100%;
+  display: block;
+
+  .underline-path {
+    transition: d 0.3s ease;
+    stroke-linecap: round;
+    stroke-dasharray: 20, 10;
+    stroke-dashoffset: 0;
+    z-index: 9999999993;
+    display: block;
+  }
+}
+
 .hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -256,9 +225,10 @@ export default defineComponent({
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: rgba(246, 248, 250, 0.9);
-  z-index: 0;
+  position: relative;
+  background-color: #fff;
 }
+
 .sun-moon-container {
   position: absolute;
   bottom: 50%;
@@ -282,7 +252,6 @@ export default defineComponent({
 :root {
   --watercolour-gradient: linear-gradient(to right, #3f87a6, #ebf8e1, #f69d3c);
 }
-
 .navbar-container {
   width: 40px;
   height: 100%;
@@ -297,23 +266,20 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: calc(100% - 40px);
-
+  width: 100%;
   position: relative;
   overflow: auto;
-  overflow-x: hidden; //this might break things
+  overflow-x: hidden;
   z-index: 0;
 
   .app-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    height: 60px;
-    max-height: 60px;
+    height: auto;
+    min-height: 3em;
     flex: 1;
-    z-index: 10002;
     background-color: transparent;
-    position: relative;
     top: 0;
     width: 100%;
     box-sizing: border-box;
@@ -324,21 +290,44 @@ export default defineComponent({
 
 .title-icon-wrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   width: 100%;
   height: 100%;
   padding: 0;
   margin: 0;
+  position: relative;
+  z-index: 9999999999;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.title-wrapper {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
+h1 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 300;
+  font-size: 20px;
+  color: #080808;
+  transition: all 0.4s ease;
+  -webkit-transition: all 0.4s ease;
+  letter-spacing: 1px;
+  line-height: 1em;
+  padding-bottom: 7.5px;
+  white-space: pre-line;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 .paintbrush {
+  position: absolute;
+  top: 0;
+  right: 0;
   transform-origin: center;
   z-index: 10000;
   width: 64px;
@@ -355,7 +344,7 @@ export default defineComponent({
     animation: rockBrush 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
     cursor: pointer;
     opacity: calc(0.8 + 0.2 * var(--speed));
-    transform: scale(1.1); // Added for hover effect
+    transform: scale(1.1);
   }
 
   &:active {
@@ -370,44 +359,6 @@ export default defineComponent({
   &.speedUp {
     animation: spinAndRubberBand 1s linear infinite;
   }
-}
-
-.title {
-  letter-spacing: 0.075rem;
-  color: #333;
-  text-transform: uppercase;
-  cursor: pointer;
-  z-index: 10000;
-  background-color: #0000;
-  flex: 1;
-  width: 100%;
-  height: 2em;
-  margin: 0;
-  padding: 2.5rem 0 0.2rem;
-  font: 700 1.2rem monospace;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  position: relative;
-  text-align: left;
-  font-size: 20px;
-}
-
-.underline {
-  z-index: 1000001;
-  cursor: pointer;
-  scale: calc(1 + 0.1 * var(--speed));
-  background-color: #0000;
-  width: 100%;
-  transition: stroke 0.3s;
-  bottom: 0;
-  left: 0;
-  position: absolute;
-}
-
-.underline-path {
-  fill: none;
-  stroke-linecap: round;
 }
 
 // Animation Keyframes
