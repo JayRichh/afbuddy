@@ -93,11 +93,7 @@ declare namespace gsap.core {
      * @memberof Tween
      * @link https://greensock.com/docs/v3/GSAP/gsap.fromTo()
      */
-    static fromTo(
-      targets: TweenTarget,
-      fromVars: TweenVars,
-      toVars: TweenVars,
-    ): Tween;
+    static fromTo(targets: TweenTarget, fromVars: TweenVars, toVars: TweenVars): Tween;
 
     /**
      * **Deprecated method.** Use `gsap.set()` instead.
@@ -124,11 +120,7 @@ declare namespace gsap.core {
      * @memberof Tween
      * @link https://greensock.com/docs/v3/GSAP/gsap.from()
      */
-    static staggerFrom(
-      targets: TweenTarget,
-      duration: number,
-      vars: TweenVars,
-    ): Tween;
+    static staggerFrom(targets: TweenTarget, duration: number, vars: TweenVars): Tween;
 
     /**
      * **Deprecated method.** Use `gsap.from()` instead.
@@ -173,11 +165,7 @@ declare namespace gsap.core {
      * @memberof Tween
      * @link https://greensock.com/docs/v3/GSAP/gsap.fromTo()
      */
-    static staggerFromTo(
-      targets: TweenTarget,
-      fromVars: TweenVars,
-      toVars: TweenVars,
-    ): Tween;
+    static staggerFromTo(targets: TweenTarget, fromVars: TweenVars, toVars: TweenVars): Tween;
 
     /**
      * **Deprecated method.** Use `gsap.to()` instead.
@@ -191,11 +179,7 @@ declare namespace gsap.core {
      * @memberof Tween
      * @link https://greensock.com/docs/v3/GSAP/gsap.to()
      */
-    static staggerTo(
-      targets: TweenTarget,
-      duration: number,
-      vars: TweenVars,
-    ): Tween;
+    static staggerTo(targets: TweenTarget, duration: number, vars: TweenVars): Tween;
 
     /**
      * **Deprecated method.** Use `gsap.to()` instead.
@@ -253,12 +237,7 @@ declare namespace gsap.core {
      * @memberof Tween
      * @link https://greensock.com/docs/v3/GSAP/Tween/resetTo()
      */
-    resetTo(
-      property: string,
-      value: number,
-      start?: number,
-      startIsRelative?: boolean,
-    ): this;
+    resetTo(property: string, value: number, start?: number, startIsRelative?: boolean): this;
 
     /**
      * Returns an array of all of the tween's targets.

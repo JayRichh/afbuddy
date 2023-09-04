@@ -142,10 +142,7 @@ declare class Observer {
 
 declare namespace Observer {
   type ObserverCallback = (self: Observer) => any;
-  type IgnoreCheckCallback = (
-    event: Event,
-    isTouchOrPointer: boolean,
-  ) => boolean;
+  type IgnoreCheckCallback = (event: Event, isTouchOrPointer: boolean) => boolean;
 
   interface ObserverVars {
     allowClicks?: boolean;

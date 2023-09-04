@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NavItem, calculateDistance } from './config';
+import { NavItem } from './config';
+import { calculateDistance } from './calculations';
 
 export interface PIDState {
   [x: string]: number;
@@ -25,9 +26,6 @@ export interface PIDStateBase {
   setPointY: number;
   integralX: number;
   integralY: number;
-}
-export interface PIDState extends PIDStateBase {
-  lastTime: number;
 }
 
 export const calculatePID = (

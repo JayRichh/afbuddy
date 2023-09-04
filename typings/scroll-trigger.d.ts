@@ -42,12 +42,7 @@ declare class ScrollTrigger {
    * @link https://greensock.com/docs/v3/Plugins/ScrollTrigger/static.addEventListener()
    */
   static addEventListener(
-    event:
-      | 'scrollStart'
-      | 'scrollEnd'
-      | 'refreshInit'
-      | 'refresh'
-      | 'matchMedia',
+    event: 'scrollStart' | 'scrollEnd' | 'refreshInit' | 'refresh' | 'matchMedia',
     callback: gsap.Callback,
   ): void;
 
@@ -72,10 +67,7 @@ declare class ScrollTrigger {
    * @memberof ScrollTrigger
    * @link https://greensock.com/docs/v3/Plugins/ScrollTrigger/static.batch()
    */
-  static batch(
-    targets: gsap.DOMTarget,
-    vars: ScrollTrigger.BatchVars,
-  ): ScrollTrigger[];
+  static batch(targets: gsap.DOMTarget, vars: ScrollTrigger.BatchVars): ScrollTrigger[];
 
   /**
    * Un-registers .matchMedia() break points (or just one).
@@ -247,11 +239,7 @@ declare class ScrollTrigger {
    * @memberof ScrollTrigger
    * @link https://greensock.com/docs/v3/Plugins/ScrollTrigger/static.isInViewport()
    */
-  static isInViewport(
-    element: Element | string,
-    ratio?: number,
-    horizontal?: boolean,
-  ): boolean;
+  static isInViewport(element: Element | string, ratio?: number, horizontal?: boolean): boolean;
 
   /**
    * Find out if a ScrollTrigger-related scroller is currently scrolling.
@@ -420,12 +408,7 @@ declare class ScrollTrigger {
    * @link https://greensock.com/docs/v3/Plugins/ScrollTrigger/static.removeEventListener()
    */
   static removeEventListener(
-    event:
-      | 'scrollStart'
-      | 'scrollEnd'
-      | 'refreshInit'
-      | 'refresh'
-      | 'matchMedia',
+    event: 'scrollStart' | 'scrollEnd' | 'refreshInit' | 'refresh' | 'matchMedia',
     callback: gsap.Callback,
   ): void;
 
@@ -464,10 +447,7 @@ declare class ScrollTrigger {
    * @memberof ScrollTrigger
    * @link https://greensock.com/docs/v3/Plugins/ScrollTrigger/static.scrollerProxy()
    */
-  static scrollerProxy(
-    scroller: gsap.DOMTarget,
-    vars?: ScrollTrigger.ScrollerProxyVars,
-  ): void;
+  static scrollerProxy(scroller: gsap.DOMTarget, vars?: ScrollTrigger.ScrollerProxyVars): void;
 
   /**
    * Returns a function that will snap in a given direction where 1 is positive and -1 is negative. It will accept an increment or Array of numbers
@@ -484,9 +464,7 @@ declare class ScrollTrigger {
    * @memberof ScrollTrigger
    * @link https://greensock.com/docs/v3/Plugins/ScrollTrigger/static.snapDirectional()
    */
-  static snapDirectional(
-    incrementOrArray: number | number[],
-  ): ScrollTrigger.SnapDirectionalFunc;
+  static snapDirectional(incrementOrArray: number | number[]): ScrollTrigger.SnapDirectionalFunc;
 
   /**
    * Sorts the internal Array of ScrollTriggers by "refreshPriority" first, then by their "start" positions (or by a custom function you provide).
@@ -717,11 +695,7 @@ declare namespace ScrollTrigger {
   type BatchCallback = (targets: Element[], triggers: ScrollTrigger[]) => any;
   type NumFunc = () => number;
   type SnapFunc = (value: number) => number;
-  type SnapDirectionalFunc = (
-    value: number,
-    direction?: number,
-    threshold?: number,
-  ) => number;
+  type SnapDirectionalFunc = (value: number, direction?: number, threshold?: number) => number;
   type GetterSetterNumFunc = (value?: number) => number | void;
   type GetterRectFunc = () => RectObj;
   type StartEndFunc = (self: ScrollTrigger) => string | number;
@@ -790,13 +764,7 @@ declare namespace ScrollTrigger {
     refreshPriority?: number;
     scroller?: gsap.DOMTarget | Window;
     scrub?: boolean | number;
-    snap?:
-      | number
-      | number[]
-      | 'labels'
-      | 'labelsDirectional'
-      | SnapFunc
-      | SnapVars;
+    snap?: number | number[] | 'labels' | 'labelsDirectional' | SnapFunc | SnapVars;
     start?: string | number | StartEndFunc;
     toggleActions?: string;
     toggleClass?: string | ToggleClassVars;

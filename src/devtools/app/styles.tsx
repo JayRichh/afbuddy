@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Container: <T>(props: T) => JSX.Element = styled.div`
+export const Container = styled.div`
   font-size: 20px;
   padding: 20px;
 `;

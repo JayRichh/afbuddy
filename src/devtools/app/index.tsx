@@ -1,5 +1,10 @@
 import React from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 
-render(<App />, document.getElementById('app'));
+const app = document.getElementById('app') as HTMLElement;
+
+if (app) {
+  const container = createRoot(app);
+  container.render(<App />);
+}

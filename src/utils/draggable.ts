@@ -1,80 +1,146 @@
 import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
-import { calculatePID, PIDState } from './pidstate';
-import { NavItems, calculateDistance } from './config';
+import { PIDStateMap, calculatePID } from '../utils/pidstate';
+import { calculateDistance } from './calculations';
 import { Store } from 'vuex';
+import type { State } from './store/types';
+import { config } from './config';
 
 gsap.registerPlugin(Draggable);
 
-export function setupDraggable(store: Store<any>) {
-  const elements = Array.from(
-    document.querySelectorAll('.draggable'),
-  ) as HTMLElement[];
+export async function setupDraggable(store: Store<State>) {
+  const elements = Array.from(document.querySelectorAll('.draggable')) as HTMLElement[];
 
   elements.forEach((element: HTMLElement) => {
-    const item = NavItems.find((item) => item.id === element.id);
-    if (!item) {
-      throw new Error(`Could not find item with id: ${element.id}`);
-    }
+    let hideTooltipTimeoutId: number | null = null;
+    let latestEvent: MouseEvent | null = null;
 
-    let state = store.getters.getPIDState(item.ariaLabel);
-    if (!state) {
-      store.dispatch('initializePIDState', item);
-      state = store.getters.getPIDState(item.ariaLabel);
-    }
+    Draggable.create(element, {
+      type: 'x,y',
+      edgeResistance: 0.65,
+      bounds: window,
+      throwProps: true,
+      onDragStart: function () {
+        const state = PIDStateMap.get(element.id);
+        if (state) {
+          state.setPointX = this.x;
+          state.setPointY = this.y;
+        }
+      },
+      onDragEnd: function () {
+        const state = PIDStateMap.get(element.id);
+        if (state) {
+          state.setPointX = this.x;
+          state.setPointY = this.y;
+        }
+      },
+    });
 
-    attachMouseMoveListener(element, (event) => {
-      calculatePID(event, item, state, {}, element);
-      handleMagneticEffect(event, state, element);
-      store.commit('setTooltipText', item.ariaLabel);
+    const updatePosition = () => {
+      const state = PIDStateMap.get(element.id);
+      if (state && latestEvent) {
+        const rect = element.getBoundingClientRect();
+        const center = {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        };
+        const distance = calculateDistance(state.setPointX, state.setPointY, center.x, center.y);
+
+        if (distance < config.maxDetachDistance) {
+          calculatePID(latestEvent, element.id, state, config, element);
+        }
+
+        requestAnimationFrame(updatePosition);
+      }
+    };
+
+    updatePosition();
+
+    element.addEventListener('mousemove', async (event: MouseEvent) => {
+      latestEvent = event;
       store.commit('setTooltipX', event.clientX);
       store.commit('setTooltipY', event.clientY);
-      store.commit('setCurrentComponent', item.componentName);
+      if (hideTooltipTimeoutId !== null) {
+        window.clearTimeout(hideTooltipTimeoutId);
+        hideTooltipTimeoutId = null;
+      }
+      if (!element.classList.contains('paintbrush') && !element.classList.contains('title')) {
+        store.commit('setTooltipVisible', true);
+      }
+
+      const rect = element.getBoundingClientRect();
+      const distance = calculateDistance(
+        event.clientX,
+        event.clientY,
+        rect.left + rect.width / 2,
+        rect.top + rect.height / 2,
+      );
+
+      if (distance < config.maxDetachDistance) {
+        const state = PIDStateMap.get(element.id);
+        if (state) {
+          calculatePID(
+            event,
+            element.id,
+            state,
+            { Kp: config.Kp, Ki: config.Ki, Kd: config.Kd },
+            element,
+          );
+        }
+      }
+
+      await handleMouseMove(event, store);
+    });
+
+    element.addEventListener('mouseleave', () => {
+      latestEvent = null;
+      hideTooltipTimeoutId = window.setTimeout(() => {
+        store.commit('setTooltipVisible', false);
+      }, 200);
+
+      const state = PIDStateMap.get(element.id);
+      if (state) {
+        element.style.transform = `translate(${state.originalX}px, ${state.originalY}px) scale(1)`;
+      }
     });
   });
 }
 
-function handleMagneticEffect(
-  event: MouseEvent,
-  state: PIDState,
-  element: HTMLElement,
-) {
-  const distance = calculateDistance(
-    event.clientX,
-    event.clientY,
-    state.setPointX,
-    state.setPointY,
-  );
-  if (distance <= 20) {
-    gsap.to(element, { x: event.clientX, y: event.clientY, duration: 0.5 });
+async function handleMouseMove(event: MouseEvent, store: Store<State>) {
+  const item = findClosestItem(event);
+
+  if (item) {
+    store.dispatch('updateTooltip', {
+      text: item.ariaLabel,
+      x: event.clientX,
+      y: event.clientY,
+      visible: true,
+    });
   }
 }
 
-function attachMouseMoveListener(
-  element: HTMLElement,
-  handler: (event: MouseEvent) => void,
-) {
-  element.addEventListener('mousemove', handler);
-}
+function findClosestItem(event: MouseEvent) {
+  const elements = Array.from(document.querySelectorAll('.draggable')) as HTMLElement[];
 
-// function handleDragEnd(draggable: Draggable, state: PIDState) {
-//   const distanceX = Math.abs(draggable.x - state.originalX);
-//   const distanceY = Math.abs(draggable.y - state.originalY);
-//   if (distanceX > 20 || distanceY > 20) {
-//     const rubberBandX = (1.0 - 1.0 / ((distanceX * 0.55) / 640 + 1.0)) * 640;
-//     const rubberBandY = (1.0 - 1.0 / ((distanceY * 0.55) / 640 + 1.0)) * 640;
-//     gsap.to(draggable.target, {
-//       x: rubberBandX,
-//       y: rubberBandY,
-//       duration: 0.5,
-//     });
-//     state.setPointX = rubberBandX;
-//     state.setPointY = rubberBandY;
-//   } else {
-//     state.setPointX = draggable.x;
-//     state.setPointY = draggable.y;
-//   }
-// }
+  return elements.reduce((prev, curr) => {
+    const prevRect = prev.getBoundingClientRect();
+    const currRect = curr.getBoundingClientRect();
+
+    const prevCenter = {
+      x: prevRect.left + prevRect.width / 2,
+      y: prevRect.top + prevRect.height / 2,
+    };
+    const currCenter = {
+      x: currRect.left + currRect.width / 2,
+      y: currRect.top + currRect.height / 2,
+    };
+
+    return calculateDistance(event.clientX, event.clientY, prevCenter.x, prevCenter.y) <
+      calculateDistance(event.clientX, event.clientY, currCenter.x, currCenter.y)
+      ? prev
+      : curr;
+  });
+}
 
 export function destroyDraggable(draggableElements: Draggable[]) {
   draggableElements.forEach((draggable) => {

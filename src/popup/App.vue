@@ -10,17 +10,13 @@
       :themeData="themeData"
       :isCodeEditorPreview="!!theme"
     />
-    <Navbar
-      class="navbar-container"
-      :currentComponent="currentComponent"
-      @changeComponent="handleComponentChange"
-    />
+    <Navbar class="navbar-container" @changeComponent="handleComponentChange" />
     <div class="app-container">
       <div class="app-header">
-        <div class="title-icon-wrapper draggable">
-          <h1 class="title">{{ $t(formattedTitle) }}</h1>
+        <div class="title-icon-wrapper">
+          <h1 class="title draggable">{{ $t(formattedTitle) }}</h1>
           <svg
-            class="underline"
+            class="underline draggable"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1000 200"
           >
@@ -33,14 +29,8 @@
                 </feMerge>
               </filter>
               <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop
-                  offset="0%"
-                  style="stop-color: #7ed4e6; stop-opacity: 1"
-                />
-                <stop
-                  offset="100%"
-                  style="stop-color: #b493d3; stop-opacity: 1"
-                />
+                <stop offset="0%" style="stop-color: #7ed4e6; stop-opacity: 1" />
+                <stop offset="100%" style="stop-color: #b493d3; stop-opacity: 1" />
               </linearGradient>
             </defs>
             <path
@@ -54,24 +44,19 @@
           <img
             ref="paintbrush"
             id="iconToChangeColor"
-            class="paintbrush draggable magnetic"
+            class="paintbrush draggable"
             src="../../assets/icons/logo-bg-full.png"
             alt="Icon"
           />
         </div>
       </div>
-      <Component
-        class="app-content"
-        :currentComponent="currentComponent"
-        :theme="theme"
-        :themeData="themeData"
-      />
+      <component :is="currentComponent" class="app-content draggable" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, Component } from 'vue';
+import { defineComponent, computed, Component, ref, onMounted } from 'vue';
 import Navbar from './components/Navbar.vue';
 import ThemeSelector from './components/ThemeSelector.vue';
 import Json from './components/Json.vue';
@@ -88,16 +73,15 @@ import { gsap } from 'gsap';
 import { setupDraggable } from '../utils/draggable';
 import { mapState, mapMutations } from 'vuex';
 import { useStore } from 'vuex';
-import { setupAnimations } from '../utils/animationUtils';
-import { listenForKonamiCode as konamiCodeListener } from '../utils/folder/eventUtils';
+import { setupAnimations } from '../utils/animations';
+import { listenForKonamiCode as konamiCodeListener } from '../utils/z';
 
 gsap.registerPlugin(ExpoScaleEase, RoughEase, SlowMo, Draggable);
 
 interface Data {
-  currentComponent: string;
+  currentComponent: Component;
   scriptContentForTooltip: string;
   isDraggable: boolean;
-  draggableElements: Draggable[];
 }
 
 export default defineComponent({
@@ -116,10 +100,9 @@ export default defineComponent({
 
   data(): Data {
     return {
-      currentComponent: this.$store.state.currentComponent,
+      currentComponent: ThemeSelector,
       scriptContentForTooltip: '',
       isDraggable: false,
-      draggableElements: [],
     };
   },
 
@@ -130,7 +113,6 @@ export default defineComponent({
       'tooltipY',
       'showTooltip',
       'crazyModeEnabled',
-      'currentComponent',
       'navItems',
       'theme',
       'themeData',
@@ -147,7 +129,8 @@ export default defineComponent({
       'setCrazyModeEnabled',
     ]),
     handleComponentChange(componentName: string) {
-      this.$store.commit('setCurrentComponent', componentName);
+      const store = useStore();
+      store.commit('setCurrentComponent', componentName);
     },
     listenForKonamiCode() {
       let input = '';
@@ -164,33 +147,64 @@ export default defineComponent({
   },
 
   setup() {
+    let [firstIcon, popin, popout]: gsap.core.Timeline[] = [];
+    const currentComponent = ref(null);
+
     const store = useStore();
     const formattedTitle = computed(() => {
-      let title = store.state.currentComponent;
-      title = title.replace(/([A-Z])/g, ' $1').trim();
-      title = title.replace(' ', '\n');
-      return title;
+      const title = store.state.currentComponent;
+      return title
+        .replace(/([A-Z])/g, ' $1')
+        .trim()
+        .replace(' ', '\n');
     });
+
+    onMounted(() => {
+      const animations = setupAnimations();
+      const tl = animations.tl;
+      popin = animations.popin;
+      popout = animations.popout;
+      firstIcon = animations.firstIcon;
+      tl.play();
+
+      gsap.utils.toArray('.icon-mask').forEach((mask: any, index: number) => {
+        if (index === 0) {
+          firstIcon.play();
+        } else {
+          popin.play();
+          popout.play();
+        }
+      });
+    });
+
+    const crazyModeToggle = () => {
+      store.commit('setCrazyModeEnabled', !store.state.crazyModeEnabled);
+
+      if (store.state.crazyModeEnabled) {
+        firstIcon.play();
+        popin.play();
+      } else {
+        firstIcon.reverse();
+        popout.play();
+      }
+    };
 
     return {
       formattedTitle,
+      crazyModeToggle,
     };
   },
 
   async mounted() {
+    this.listenForKonamiCode = this.listenForKonamiCode.bind(this) as () => void;
+    this.activatePixelPerfection = this.activatePixelPerfection.bind(this) as () => void;
     konamiCodeListener(this.activatePixelPerfection);
 
-    const tl = setupAnimations() as gsap.core.Timeline;
-    tl.play();
+    const store = useStore();
+    await store.dispatch('initializeStore');
+    await this.handleComponentChange('ThemeSelector');
 
-    const draggableClassElements = Array.from(
-      document.querySelectorAll('.draggable'),
-    ) as HTMLElement[];
-    if (draggableClassElements.length > 0) {
-      setupDraggable(this.$store);
-    } else {
-      console.error('No .draggable elements found');
-    }
+    setupDraggable(store);
   },
 });
 </script>
@@ -198,12 +212,13 @@ export default defineComponent({
 <style lang="scss">
 .underline {
   z-index: 9999999992;
-  position: absolute;
+  position: relative;
   width: 100%;
   display: block;
+  height: 60px;
 
   .underline-path {
-    transition: d 0.3s ease;
+    transition: stroke-dashoffset 0.3s ease;
     stroke-linecap: round;
     stroke-dasharray: 20, 10;
     stroke-dashoffset: 0;
@@ -226,7 +241,7 @@ export default defineComponent({
   width: 100%;
   overflow: hidden;
   position: relative;
-  background-color: #fff;
+  box-sizing: border-box;
 }
 
 .sun-moon-container {
@@ -252,8 +267,9 @@ export default defineComponent({
 :root {
   --watercolour-gradient: linear-gradient(to right, #3f87a6, #ebf8e1, #f69d3c);
 }
+
 .navbar-container {
-  width: 40px;
+  width: 60px;
   height: 100%;
   padding: 0;
   background: linear-gradient(to bottom, #1c1c1c, #454545);
@@ -276,15 +292,13 @@ export default defineComponent({
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    height: auto;
-    min-height: 3em;
+    min-height: 60px;
+    height: 60px;
     flex: 1;
-    background-color: transparent;
     top: 0;
     width: 100%;
-    box-sizing: border-box;
     min-width: 100%;
-    padding: 0.5rem;
+    position: absolute;
   }
 }
 
@@ -297,9 +311,7 @@ export default defineComponent({
   padding: 0;
   margin: 0;
   position: relative;
-  z-index: 9999999999;
   box-sizing: border-box;
-  overflow: hidden;
 }
 
 h1 {
@@ -309,19 +321,19 @@ h1 {
   padding: 0;
   margin: 0;
   font-family: 'Raleway', sans-serif;
-  font-weight: 300;
-  font-size: 20px;
+  font-weight: 400;
   color: #080808;
   transition: all 0.4s ease;
   -webkit-transition: all 0.4s ease;
-  letter-spacing: 1px;
-  line-height: 1em;
+  letter-spacing: 0.8px;
+  line-height: 1.2em;
   padding-bottom: 7.5px;
   white-space: pre-line;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+  font-size: 25px;
 }
 
 .paintbrush {
@@ -330,10 +342,9 @@ h1 {
   right: 0;
   transform-origin: center;
   z-index: 10000;
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   opacity: 1;
-  margin: 0.4rem 0.5rem 0 0;
   padding: 0;
   display: flex;
   align-items: center;

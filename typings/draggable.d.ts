@@ -215,9 +215,7 @@ declare class Draggable {
    * @memberof Draggable
    * @link https://greensock.com/docs/v3/Plugins/Draggable/getDirection()
    */
-  getDirection(
-    from: 'start' | 'velocity' | gsap.DOMTarget,
-  ): Draggable.Direction;
+  getDirection(from: 'start' | 'velocity' | gsap.DOMTarget): Draggable.Direction;
 
   /**
    * Test whether or not the target element overlaps with a particular element or the mouse position, optionally including a threshold.
@@ -232,10 +230,7 @@ declare class Draggable {
    * @memberof Draggable
    * @link https://greensock.com/docs/v3/Plugins/Draggable/static.hitTest()
    */
-  hitTest(
-    testObject: Draggable.TestObject,
-    threshold?: number | string,
-  ): boolean;
+  hitTest(testObject: Draggable.TestObject, threshold?: number | string): boolean;
 
   /**
    * Disables the Draggable instance and frees it for garbage collection
@@ -251,10 +246,7 @@ declare class Draggable {
    */
   kill(): this;
 
-  removeEventListener(
-    type: Draggable.CallbackType,
-    callback: gsap.Callback,
-  ): void;
+  removeEventListener(type: Draggable.CallbackType, callback: gsap.Callback): void;
 
   /**
    * Force the Draggable to start interactively dragging.
@@ -384,10 +376,7 @@ declare namespace Draggable {
     autoScroll?: number;
     bounds?: gsap.DOMTarget | BoundsMinMax | BoundsRectangle | BoundsRotation;
     callbackScope?: object;
-    clickableTest?: (
-      this: Draggable,
-      element: HTMLElement | SVGElement,
-    ) => void;
+    clickableTest?: (this: Draggable, element: HTMLElement | SVGElement) => void;
     cursor?: string;
     dragClickables?: boolean;
     dragResistance?: number;

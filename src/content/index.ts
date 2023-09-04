@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-console */
+// import * as monaco from 'monaco-editor';
+// import { ESLint } from 'eslint';
+import prettier from 'prettier';
 
 function evalInIframe(iframe: HTMLIFrameElement, code: string): any {
   console.log('Executing code:', code);
@@ -7,6 +10,20 @@ function evalInIframe(iframe: HTMLIFrameElement, code: string): any {
   console.log('Execution result:', result);
   return result;
 }
+
+// Function to format code using ESLint
+const formatWithPrettier = () => {
+  chrome.storage.sync.get(['prettierSettings'], (result) => {
+    const settings = result.prettierSettings || {};
+    // const text = editor.getValue();
+    // const formatted = prettier.format(Text, {
+    //   ...settings,
+    //   parser: 'babel',
+    // });
+    // editor.setValue(formatted);
+  });
+};
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 chrome.runtime.onMessage.addListener((message) => {
   console.log('Received message:', message);
@@ -34,10 +51,7 @@ chrome.runtime.onMessage.addListener((message) => {
 
       case 'setTabWidth': {
         if (message.width) {
-          evalInIframe(
-            iframe,
-            `editor.updateOptions({ tabSize: ${message.width} });`,
-          );
+          evalInIframe(iframe, `editor.updateOptions({ tabSize: ${message.width} });`);
         }
         break;
       }
@@ -76,10 +90,7 @@ chrome.runtime.onMessage.addListener((message) => {
       case 'sendMonacoTheme': {
         if (message.theme) {
           const themeDataString = JSON.stringify(message.theme);
-          evalInIframe(
-            iframe,
-            `editor.defineTheme('${message.theme.name}', ${themeDataString});`,
-          );
+          evalInIframe(iframe, `editor.defineTheme('${message.theme.name}', ${themeDataString});`);
           evalInIframe(iframe, `editor.setTheme('${message.theme.name}');`);
         } else {
           console.warn('Monaco theme data is incomplete or missing');

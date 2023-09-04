@@ -102,10 +102,7 @@ declare class ScrollSmoother {
    * @memberof ScrollSmoother
    * @link https://greensock.com/docs/v3/Plugins/ScrollSmoother/effects()
    */
-  effects(
-    targets: gsap.DOMTarget,
-    vars?: ScrollSmoother.EffectsVars | null,
-  ): ScrollTrigger[];
+  effects(targets: gsap.DOMTarget, vars?: ScrollSmoother.EffectsVars | null): ScrollTrigger[];
 
   /**
    * Gets the ScrollTrigger instances that are managing the effects (like "speed" and/or "lag")
@@ -217,11 +214,7 @@ declare class ScrollSmoother {
    * @memberof ScrollSmoother
    * @link https://greensock.com/docs/v3/Plugins/ScrollSmoother/scrollTo()
    */
-  scrollTo(
-    target: gsap.DOMTarget | number,
-    smooth?: boolean,
-    position?: string,
-  ): void;
+  scrollTo(target: gsap.DOMTarget | number, smooth?: boolean, position?: string): void;
 
   /**
    * Immediately scrolls to a particular numeric scroll position

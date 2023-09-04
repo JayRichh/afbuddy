@@ -7,33 +7,21 @@
       :class="{ selected: isActive(item.componentName) }"
       @click="handleClick($event, item)"
       class="icon-container draggable"
-      :id="item.ariaLabel"
+      :id="item.id"
       :aria-label="item.ariaLabel"
     >
-      <div
-        class="icon-mask"
-        :id="`${item.ariaLabel}-mask`"
-        :aria-label="item.ariaLabel"
-      >
-        <img
-          :src="item.iconSrc"
-          :alt="item.altText"
-          class="masked-icon black-icon"
-        />
-        <img
-          :src="item.iconMaskSrc"
-          :alt="item.altText"
-          class="masked-icon white-icon"
-        />
+      <div class="icon-mask" :id="`${item.ariaLabel}-mask`" :aria-label="item.ariaLabel">
+        <img :src="item.iconSrc" :alt="item.altText" class="masked-icon black-icon" />
+        <img :src="item.iconMaskSrc" :alt="item.altText" class="masked-icon white-icon" />
       </div>
     </a>
-    <div class="crazy-mode-toggle draggable">
+    <div class="crazy-mode-toggle">
       <input
         ref="crazyModeCheckbox"
         type="checkbox"
-        class="crazy-mode-checkbox"
+        class="crazy-mode-checkbox draggable"
         id="crazy-mode-checkbox"
-        :aria-label="'crazy-mode-checkbox'"
+        :aria-label="'Ready: ' + (crazyModeEnabled ? 'Yes 🍕🍕🍕' : 'No 🙍‍♂️') + ''"
         v-model="crazyModeEnabled"
         @change="crazyModeToggle"
       />
@@ -45,20 +33,8 @@
           :class="{ checked: crazyModeEnabled }"
           :style="{ fill: crazyModeEnabled ? 'green' : 'white' }"
         >
-          <rect
-            x="1"
-            y="1"
-            width="18"
-            height="18"
-            fill="none"
-            stroke="currentColor"
-          />
-          <path
-            v-if="crazyModeEnabled"
-            d="M5 9l3 3 7-7"
-            stroke="currentColor"
-            fill="none"
-          />
+          <rect x="1" y="1" width="18" height="18" fill="none" stroke="currentColor" />
+          <path v-if="crazyModeEnabled" d="M5 9l3 3 7-7" stroke="currentColor" fill="none" />
         </svg>
       </label>
     </div>
@@ -66,14 +42,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  ref,
-  reactive,
-  onMounted,
-  onBeforeUnmount,
-  computed,
-} from 'vue';
+import { defineComponent, ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useStore } from 'vuex';
 import { gsap, Elastic } from 'gsap';
 import { mapState, mapMutations } from 'vuex';
@@ -157,36 +126,32 @@ export default defineComponent({
 .hidden {
   display: none;
 }
+img {
+  width: 80%;
+  height: 80%;
+}
 
 .navbar {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  border-right: 1px solid #dddddde1;
   overflow-x: visible;
   overflow-y: visible;
   margin: 0;
   padding: 5px 0 0 0;
   height: 100%;
-  width: 40px;
+  width: 60px;
   scrollbar-width: none;
   -ms-overflow-style: none;
   scrollbar-color: transparent transparent;
 
-  .icon-container {
-    padding: 2px;
-  }
-
   .icon-mask {
     filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
-    transition:
-      filter 0.3s ease,
-      transform 0.1s ease;
     z-index: 100000000;
     position: relative;
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
 
     &:hover {
       cursor: pointer;
@@ -204,10 +169,11 @@ export default defineComponent({
 
   .masked-icon {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 40px;
+    height: 40px;
     object-fit: contain;
     z-index: 1000000000;
+    transition: opacity 0.3s ease;
   }
 
   .crazy-mode-toggle {
@@ -216,7 +182,7 @@ export default defineComponent({
     color: #fff;
     position: absolute;
     bottom: 0;
-    margin-bottom: 12px;
+    margin-bottom: 0.5rem;
     filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
 
     input[type='checkbox'] {
@@ -243,8 +209,6 @@ export default defineComponent({
       }
 
       &.checked {
-        transform: rotate(360deg);
-        transition: transform 0.3s ease;
         stroke: #fff;
         filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
         animation: glow 1s infinite alternate;
@@ -254,7 +218,7 @@ export default defineComponent({
 
   @keyframes glow {
     from {
-      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.514));
     }
     to {
       filter: drop-shadow(0 0 10px rgba(255, 255, 255, 1));

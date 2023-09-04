@@ -106,14 +106,12 @@ export const userAgents: UserAgent[] = [
     values: [
       {
         title: 'Firefox - Android Mobile',
-        value:
-          'Mozilla/5.0 (Android 4.4; Mobile; rv:70.0) Gecko/70.0 Firefox/70.0',
+        value: 'Mozilla/5.0 (Android 4.4; Mobile; rv:70.0) Gecko/70.0 Firefox/70.0',
         platform: 'Linux armv7l',
       },
       {
         title: 'Firefox - Android Tablet',
-        value:
-          'Mozilla/5.0 (Android 4.4; Tablet; rv:70.0) Gecko/70.0 Firefox/70.0',
+        value: 'Mozilla/5.0 (Android 4.4; Tablet; rv:70.0) Gecko/70.0 Firefox/70.0',
         platform: 'Linux armv7l',
       },
       {
@@ -130,14 +128,12 @@ export const userAgents: UserAgent[] = [
       },
       {
         title: 'Firefox - Mac',
-        value:
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:70.0) Gecko/20100101 Firefox/70.0',
+        value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:70.0) Gecko/20100101 Firefox/70.0',
         platform: 'MacIntel',
       },
       {
         title: 'Firefox - Windows',
-        value:
-          'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:70.0) Gecko/20100101 Firefox/70.0',
+        value: 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:70.0) Gecko/20100101 Firefox/70.0',
         platform: 'Win32',
       },
     ],
@@ -170,26 +166,22 @@ export const userAgents: UserAgent[] = [
     values: [
       {
         title: 'Internet Explorer 11',
-        value:
-          'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
+        value: 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
         platform: 'Win32',
       },
       {
         title: 'Internet Explorer 10',
-        value:
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+        value: 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
         platform: 'Win32',
       },
       {
         title: 'Internet Explorer 9',
-        value:
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)',
+        value: 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)',
         platform: 'Win32',
       },
       {
         title: 'Internet Explorer 8',
-        value:
-          'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)',
+        value: 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)',
         platform: 'Win32',
       },
       {
@@ -269,8 +261,7 @@ export const userAgents: UserAgent[] = [
       },
       {
         title: 'Opera (Presto) - Mac',
-        value:
-          'Opera/9.80 (Macintosh; Intel Mac OS X 10.9.1) Presto/2.12.388 Version/12.16',
+        value: 'Opera/9.80 (Macintosh; Intel Mac OS X 10.9.1) Presto/2.12.388 Version/12.16',
         platform: 'MacIntel',
       },
       {
@@ -286,8 +277,7 @@ export const userAgents: UserAgent[] = [
       },
       {
         title: 'Opera Mini - iOS',
-        value:
-          'Opera/9.80 (iPhone; Opera Mini/8.0.0/34.2336; U; en) Presto/2.8.119 Version/11.10',
+        value: 'Opera/9.80 (iPhone; Opera Mini/8.0.0/34.2336; U; en) Presto/2.8.119 Version/11.10',
         platform: 'iPhone',
       },
     ],

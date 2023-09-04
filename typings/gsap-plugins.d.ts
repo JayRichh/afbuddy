@@ -8,11 +8,7 @@ declare namespace gsap {
     targets: object[],
   ) => void;
 
-  type PluginRender = (
-    this: PropTween,
-    progress: number,
-    data: PluginScope,
-  ) => void;
+  type PluginRender = (this: PropTween, progress: number, data: PluginScope) => void;
   type PluginKill = (this: PluginScope) => void;
 
   interface PluginAliases {

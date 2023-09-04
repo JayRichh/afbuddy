@@ -769,8 +769,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '7a96fa08',
-        token:
-          'text.tex.latex meta.function.environment meta.function.environment',
+        token: 'text.tex.latex meta.function.environment meta.function.environment',
       },
       {
         foreground: 'fbde2d',
@@ -915,8 +914,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: 'ffffff66',
         background: '43800033',
-        token:
-          'string.regexp.group string.regexp.group string.regexp.group string.regexp.group',
+        token: 'string.regexp.group string.regexp.group string.regexp.group string.regexp.group',
       },
       {
         foreground: '86ff00',
@@ -1164,8 +1162,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '9799ff',
-        token:
-          'meta.function.method.with-arguments variable.parameter.function',
+        token: 'meta.function.method.with-arguments variable.parameter.function',
       },
       {
         foreground: '800004',
@@ -1181,8 +1178,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '782ec1',
-        token:
-          'meta.function-call entity.name.function -(meta.function-call meta.function)',
+        token: 'meta.function-call entity.name.function -(meta.function-call meta.function)',
       },
       {
         foreground: '782ec1',
@@ -1239,8 +1235,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'a88fc0',
-        token:
-          'meta.function-call.method.without-arguments entity.name.function',
+        token: 'meta.function-call.method.without-arguments entity.name.function',
       },
       {
         foreground: 'f800ff',
@@ -1587,8 +1582,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'bc80ff',
-        token:
-          'text.latex support.function -support.function.textit -support.function.emph',
+        token: 'text.latex support.function -support.function.textit -support.function.emph',
       },
       {
         foreground: 'ffffffbf',
@@ -1597,8 +1591,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '000000',
         background: 'ffffff',
-        token:
-          'text.latex entity.name.section -meta.group -keyword.operator.braces',
+        token: 'text.latex entity.name.section -meta.group -keyword.operator.braces',
       },
       {
         background: '00000080',
@@ -1666,8 +1659,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '33333333',
         background: '000000',
-        token:
-          'text.latex meta.environment.list meta.environment.list meta.environment.list',
+        token: 'text.latex meta.environment.list meta.environment.list meta.environment.list',
       },
       {
         foreground: '33333333',
@@ -1726,8 +1718,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '00fff8',
         background: '00fff81a',
-        token:
-          'punctuation.section.embedded -(source string source punctuation.section.embedded)',
+        token: 'punctuation.section.embedded -(source string source punctuation.section.embedded)',
       },
       {
         foreground: '00fff8',
@@ -1838,8 +1829,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: 'ffffff',
         background: '000000',
-        token:
-          'text.subversion-commit meta.scope.changed-files.svn meta.diff.separator',
+        token: 'text.subversion-commit meta.scope.changed-files.svn meta.diff.separator',
       },
       {
         foreground: '000000',
@@ -2232,13 +2222,11 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '151515',
-        token:
-          'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
+        token: 'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
       },
       {
         background: '151515',
-        token:
-          'meta.block.slate meta.block.slate meta.block.slate meta.block.slate',
+        token: 'meta.block.slate meta.block.slate meta.block.slate meta.block.slate',
       },
       {
         background: '151515',
@@ -2246,13 +2234,11 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '151515',
-        token:
-          'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
+        token: 'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
       },
       {
         background: '151515',
-        token:
-          'meta.paren-group meta.paren-group meta.paren-group meta.paren-group',
+        token: 'meta.paren-group meta.paren-group meta.paren-group meta.paren-group',
       },
       {
         background: '151515',
@@ -2288,8 +2274,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '191919',
-        token:
-          'meta.section meta.section meta.section meta.section meta.section',
+        token: 'meta.section meta.section meta.section meta.section meta.section',
       },
       {
         background: '1c1c1c',
@@ -2307,8 +2292,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '1c1c1c',
-        token:
-          'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
+        token: 'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
       },
       {
         background: '1c1c1c',
@@ -2322,8 +2306,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '1c1c1c',
-        token:
-          'meta.section meta.section meta.section meta.section meta.section meta.section',
+        token: 'meta.section meta.section meta.section meta.section meta.section meta.section',
       },
       {
         background: '1f1f1f',
@@ -2341,8 +2324,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '1f1f1f',
-        token:
-          'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
+        token: 'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
       },
       {
         background: '1f1f1f',
@@ -2441,13 +2423,11 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '1b95e2',
-        token:
-          'meta.property.vendor.microsoft.trident.4 support.type.property-name',
+        token: 'meta.property.vendor.microsoft.trident.4 support.type.property-name',
       },
       {
         foreground: '1b95e2',
-        token:
-          'meta.property.vendor.microsoft.trident.4 punctuation.terminator.rule',
+        token: 'meta.property.vendor.microsoft.trident.4 punctuation.terminator.rule',
       },
       {
         foreground: 'f5c034',
@@ -2455,18 +2435,15 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'f5c034',
-        token:
-          'meta.property.vendor.microsoft.trident.5 support.type.property-name',
+        token: 'meta.property.vendor.microsoft.trident.5 support.type.property-name',
       },
       {
         foreground: 'f5c034',
-        token:
-          'meta.property.vendor.microsoft.trident.5 punctuation.separator.key-value',
+        token: 'meta.property.vendor.microsoft.trident.5 punctuation.separator.key-value',
       },
       {
         foreground: 'f5c034',
-        token:
-          'meta.property.vendor.microsoft.trident.5 punctuation.terminator.rule',
+        token: 'meta.property.vendor.microsoft.trident.5 punctuation.terminator.rule',
       },
     ],
     colors: {
@@ -2594,8 +2571,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: 'ffffff66',
         background: '43800033',
-        token:
-          'string.regexp.group string.regexp.group string.regexp.group string.regexp.group',
+        token: 'string.regexp.group string.regexp.group string.regexp.group string.regexp.group',
       },
       {
         foreground: '80a659',
@@ -2854,8 +2830,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '8d809d',
-        token:
-          'meta.function-call entity.name.function -(meta.function-call meta.function)',
+        token: 'meta.function-call entity.name.function -(meta.function-call meta.function)',
       },
       {
         foreground: '8d809d',
@@ -2897,8 +2872,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: 'abacd2',
         background: '3c008033',
-        token:
-          'meta.function.method.with-arguments variable.parameter.function',
+        token: 'meta.function.method.with-arguments variable.parameter.function',
       },
       {
         foreground: 'cdcdcd',
@@ -3149,8 +3123,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'bdabd1',
-        token:
-          'text.latex support.function -support.function.textit -support.function.emph',
+        token: 'text.latex support.function -support.function.textit -support.function.emph',
       },
       {
         foreground: 'ffffffbf',
@@ -3159,8 +3132,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '000000',
         background: 'ffffff',
-        token:
-          'text.latex entity.name.section -meta.group -keyword.operator.braces',
+        token: 'text.latex entity.name.section -meta.group -keyword.operator.braces',
       },
       {
         background: '00000080',
@@ -3224,8 +3196,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '33333333',
         background: '000000',
-        token:
-          'text.latex meta.environment.list meta.environment.list meta.environment.list',
+        token: 'text.latex meta.environment.list meta.environment.list meta.environment.list',
       },
       {
         foreground: '33333333',
@@ -3284,8 +3255,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '56a5a4',
         background: '00fff81a',
-        token:
-          'punctuation.section.embedded -(source string source punctuation.section.embedded)',
+        token: 'punctuation.section.embedded -(source string source punctuation.section.embedded)',
       },
       {
         foreground: '56a5a4',
@@ -3398,8 +3368,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: 'ffffff',
         background: '000000',
-        token:
-          'text.subversion-commit meta.scope.changed-files.svn meta.diff.separator',
+        token: 'text.subversion-commit meta.scope.changed-files.svn meta.diff.separator',
       },
       {
         foreground: '000000',
@@ -3669,13 +3638,11 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '151515',
-        token:
-          'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
+        token: 'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
       },
       {
         background: '151515',
-        token:
-          'meta.block.slate meta.block.slate meta.block.slate meta.block.slate',
+        token: 'meta.block.slate meta.block.slate meta.block.slate meta.block.slate',
       },
       {
         background: '151515',
@@ -3683,13 +3650,11 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '151515',
-        token:
-          'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
+        token: 'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
       },
       {
         background: '151515',
-        token:
-          'meta.tell-block meta.tell-block meta.tell-block meta.tell-block',
+        token: 'meta.tell-block meta.tell-block meta.tell-block meta.tell-block',
       },
       {
         background: '191919',
@@ -3716,8 +3681,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '191919',
-        token:
-          'meta.tell-block meta.tell-block meta.tell-block meta.tell-block meta.tell-block',
+        token: 'meta.tell-block meta.tell-block meta.tell-block meta.tell-block meta.tell-block',
       },
       {
         background: '1c1c1c',
@@ -3735,8 +3699,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '1c1c1c',
-        token:
-          'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
+        token: 'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
       },
       {
         background: '1c1c1c',
@@ -3764,8 +3727,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '1f1f1f',
-        token:
-          'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
+        token: 'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
       },
       {
         background: '1f1f1f',
@@ -4230,8 +4192,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'e1efff',
-        token:
-          'punctuation - (punctuation.definition.string || punctuation.definition.comment)',
+        token: 'punctuation - (punctuation.definition.string || punctuation.definition.comment)',
       },
       {
         foreground: 'ff628c',
@@ -4484,8 +4445,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'e1efff',
-        token:
-          'punctuation - (punctuation.definition.string || punctuation.definition.comment)',
+        token: 'punctuation - (punctuation.definition.string || punctuation.definition.comment)',
       },
       {
         foreground: 'ff628c',
@@ -5669,13 +5629,11 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'eeeeee',
-        token:
-          'punctuation.definition.string.begin.json - meta.structure.dictionary.value.json',
+        token: 'punctuation.definition.string.begin.json - meta.structure.dictionary.value.json',
       },
       {
         foreground: 'eeeeee',
-        token:
-          'punctuation.definition.string.end.json - meta.structure.dictionary.value.json',
+        token: 'punctuation.definition.string.end.json - meta.structure.dictionary.value.json',
       },
       {
         foreground: '8be9fd',
@@ -5687,13 +5645,11 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '50fa7b',
-        token:
-          'meta meta meta meta meta meta meta.structure.dictionary.value string',
+        token: 'meta meta meta meta meta meta meta.structure.dictionary.value string',
       },
       {
         foreground: 'ffb86c',
-        token:
-          'meta meta meta meta meta meta.structure.dictionary.value string',
+        token: 'meta meta meta meta meta meta.structure.dictionary.value string',
       },
       {
         foreground: 'ff79c6',
@@ -5774,8 +5730,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '842b44',
-        token:
-          'source.js.embedded.html punctuation.definition.tag - source.php',
+        token: 'source.js.embedded.html punctuation.definition.tag - source.php',
       },
       {
         foreground: '842b44',
@@ -5783,8 +5738,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '842b44',
-        token:
-          'source.js.embedded entity.other.attribute-name - source.js string',
+        token: 'source.js.embedded entity.other.attribute-name - source.js string',
       },
       {
         foreground: '9a9a9a',
@@ -5872,8 +5826,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '8d00b7',
-        token:
-          'source.css.embedded entity.other.attribute-name - meta.selector',
+        token: 'source.css.embedded entity.other.attribute-name - meta.selector',
       },
       {
         foreground: '009c7f',
@@ -9162,8 +9115,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'c792ea',
-        token:
-          'meta.class meta.method.declaration meta.var.expr storage.type.jsm',
+        token: 'meta.class meta.method.declaration meta.var.expr storage.type.jsm',
       },
       {
         foreground: 'c792ea',
@@ -9595,8 +9547,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'ff5874',
-        token:
-          'meta.structure.dictionary.json meta.structure.dictionary.value constant.language',
+        token: 'meta.structure.dictionary.json meta.structure.dictionary.value constant.language',
       },
       {
         foreground: 'd6deeb',
@@ -10052,8 +10003,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '99c794',
         fontStyle: 'normal',
-        token:
-          'meta.group.braces.curly constant.other.object.key.js string.unquoted.label.js',
+        token: 'meta.group.braces.curly constant.other.object.key.js string.unquoted.label.js',
       },
       {
         foreground: 'fac863',
@@ -10106,8 +10056,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'cdd3de',
-        token:
-          'meta.group.braces.curly.js constant.other.object.key.js string.unquoted.label.js',
+        token: 'meta.group.braces.curly.js constant.other.object.key.js string.unquoted.label.js',
       },
       {
         foreground: 'd8dee9',
@@ -10179,8 +10128,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: 'ec5f67',
         fontStyle: 'italic',
-        token:
-          'source.js constant.other.object.key.js string.unquoted.label.js',
+        token: 'source.js constant.other.object.key.js string.unquoted.label.js',
       },
       {
         foreground: 'fac863',
@@ -11263,18 +11211,15 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '2aa198',
-        token:
-          'meta.preprocessor.c.include string.quoted.other.lt-gt.include.c',
+        token: 'meta.preprocessor.c.include string.quoted.other.lt-gt.include.c',
       },
       {
         foreground: '2aa198',
-        token:
-          'meta.preprocessor.c.include punctuation.definition.string.begin.c',
+        token: 'meta.preprocessor.c.include punctuation.definition.string.begin.c',
       },
       {
         foreground: '2aa198',
-        token:
-          'meta.preprocessor.c.include punctuation.definition.string.end.c',
+        token: 'meta.preprocessor.c.include punctuation.definition.string.end.c',
       },
       {
         foreground: '586e75',
@@ -12351,18 +12296,15 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '2aa198',
-        token:
-          'meta.preprocessor.c.include string.quoted.other.lt-gt.include.c',
+        token: 'meta.preprocessor.c.include string.quoted.other.lt-gt.include.c',
       },
       {
         foreground: '2aa198',
-        token:
-          'meta.preprocessor.c.include punctuation.definition.string.begin.c',
+        token: 'meta.preprocessor.c.include punctuation.definition.string.begin.c',
       },
       {
         foreground: '2aa198',
-        token:
-          'meta.preprocessor.c.include punctuation.definition.string.end.c',
+        token: 'meta.preprocessor.c.include punctuation.definition.string.end.c',
       },
       {
         foreground: '586e75',

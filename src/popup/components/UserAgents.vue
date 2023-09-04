@@ -5,11 +5,7 @@
       <div class="input-group">
         <select :id="agent.title" v-model="selectedAgents[agent.title]">
           <!-- @change="changeUserAgent(agent.title)" -->
-          <option
-            v-for="value in agent.values"
-            :key="value.title"
-            :value="value.value"
-          >
+          <option v-for="value in agent.values" :key="value.title" :value="value.value">
             {{ value.title }} ({{ value.platform }})
           </option>
         </select>
@@ -28,7 +24,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import userAgents from '../../../src/utils/userAgents';
+import userAgents from '../../../src/utils/store/data/userAgents';
 import { useStore } from 'vuex';
 
 export default defineComponent({
@@ -108,8 +104,7 @@ select {
   border: 1px solid #ced4da;
   border-radius: 4px;
   appearance: none;
-  background: url('../../../assets/dropdown-arrow.svg') no-repeat right 0.5rem
-    center;
+  background: url('../../../assets/dropdown-arrow.svg') no-repeat right 0.5rem center;
   padding-right: 2rem;
   background-size: 1rem;
   background-color: #fff;

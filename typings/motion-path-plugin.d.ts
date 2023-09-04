@@ -4,12 +4,7 @@ declare namespace gsap {
   }
 
   interface TweenVars {
-    motionPath?:
-      | SVGPathValue
-      | TweenValue
-      | Point2D[]
-      | PathObject[]
-      | MotionPath.Vars;
+    motionPath?: SVGPathValue | TweenValue | Point2D[] | PathObject[] | MotionPath.Vars;
   }
 }
 
@@ -86,11 +81,7 @@ declare namespace gsap.plugins {
      * @memberof MotionPathPlugin
      * @link https://greensock.com/docs/v3/Plugins/MotionPathPlugin/static.convertCoordinates()
      */
-    convertCoordinates(
-      fromElement: Element,
-      toElement: Element,
-      point: Point2D,
-    ): Point2D;
+    convertCoordinates(fromElement: Element, toElement: Element, point: Point2D): Point2D;
 
     /**
      * Converts SVG shapes into <path>s.
@@ -145,11 +136,7 @@ declare namespace gsap.plugins {
      * @memberof MotionPathPlugin
      * @link https://greensock.com/docs/v3/Plugins/MotionPathPlugin/static.getGlobalMatrix()
      */
-    getGlobalMatrix(
-      element: Element,
-      inverse?: boolean,
-      adjustGOffset?: boolean,
-    ): Matrix2D;
+    getGlobalMatrix(element: Element, inverse?: boolean, adjustGOffset?: boolean): Matrix2D;
 
     /**
      * Calculates the x/y position (and optionally the angle) corresponding to a
@@ -285,11 +272,7 @@ declare namespace MotionPath {
     end?: number;
     offsetX?: number;
     offsetY?: number;
-    path?:
-      | gsap.SVGPathValue
-      | gsap.TweenValue
-      | gsap.Point2D[]
-      | gsap.PathObject[];
+    path?: gsap.SVGPathValue | gsap.TweenValue | gsap.Point2D[] | gsap.PathObject[];
     relative?: boolean;
     resolution?: number;
     start?: number;

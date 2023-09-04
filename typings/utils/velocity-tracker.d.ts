@@ -18,11 +18,7 @@ declare namespace gsap {
     getByTarget(target: TweenTarget): VelocityTrackerInstance;
     getVelocity(target: TweenTarget, property: string): number;
     isTracking(target: TweenTarget, property?: string): boolean;
-    track(
-      target: TweenTarget,
-      properties: string,
-      type?: VelocityType,
-    ): VelocityTrackerInstance[];
+    track(target: TweenTarget, properties: string, type?: VelocityType): VelocityTrackerInstance[];
     untrack(target: TweenTarget, properties?: string): void;
   }
 

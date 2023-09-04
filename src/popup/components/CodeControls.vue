@@ -43,9 +43,7 @@ export default defineComponent({
     ...mapState(['jsonObjects', 'searchTerm']),
     filteredScripts() {
       if (!this.searchTerm) return this.jsonObjects;
-      return this.jsonObjects.filter((script: Script) =>
-        script.content.includes(this.searchTerm),
-      );
+      return this.jsonObjects.filter((script: Script) => script.content.includes(this.searchTerm));
     },
   },
   methods: {

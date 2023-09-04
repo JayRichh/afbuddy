@@ -56,11 +56,7 @@ declare namespace gsap.plugins {
      * @memberof MorphSVGPlugin
      * @link https://greensock.com/docs/v3/Plugins/MorphSVGPlugin/static.normalizeStrings()
      */
-    normalizeStrings(
-      shape1: string,
-      shape2: string,
-      config?: NormalizeVars,
-    ): string[];
+    normalizeStrings(shape1: string, shape2: string, config?: NormalizeVars): string[];
 
     /**
      * Converts a RawPath into a string of path data.

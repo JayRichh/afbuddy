@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, onMounted, computed, ref } from 'vue';
 import Tooltip from './Tooltip.vue';
 import { useStore, mapState } from 'vuex';
 import { NButton, NButtonGroup, NSelect, NText } from 'naive-ui';
@@ -61,16 +61,14 @@ export default defineComponent({
   props: {
     currentTheme: String,
   },
-  async setup(props) {
+  async setup(props: any) {
     const store = useStore();
 
     const state = ref({
       monacoContainer: null,
       editorInstance: null,
     });
-    const selectedThemeKey = ref(
-      props.currentTheme || store.state.selectedThemeKey,
-    );
+    const selectedThemeKey = ref(props.currentTheme || store.state.selectedThemeKey);
     const showTooltip = ref(false);
     const tooltipX = ref(0);
     const tooltipY = ref(0);

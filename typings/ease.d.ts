@@ -36,11 +36,7 @@ declare namespace gsap {
   }
 
   interface ExpoScaleEase {
-    config(
-      startingScale: number,
-      endingScale: number,
-      ease?: string | EaseFunction,
-    ): EaseFunction;
+    config(startingScale: number, endingScale: number, ease?: string | EaseFunction): EaseFunction;
   }
 
   interface Linear extends Ease {

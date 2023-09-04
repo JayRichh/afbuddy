@@ -1,37 +1,16 @@
 <template>
-  <div
-    v-if="showTooltip"
-    class="tooltip"
-    :style="{ left: `${tooltipX}px`, top: `${tooltipY}px` }"
-  >
-    <div
-      v-if="isCodeEditorPreview"
-      class="code-preview"
-      style="height: 100%; width: 100%"
-    >
-      <div
-        ref="monacoContainer"
-        class="monaco-instance"
-        style="height: 100%; width: 100%"
-      ></div>
+  <div v-if="showTooltip" class="tooltip" :style="{ left: `${tooltipX}px`, top: `${tooltipY}px` }">
+    <div v-if="isCodeEditorPreview" class="code-preview" style="height: 100%; width: 100%">
+      <div ref="monacoContainer" class="monaco-instance" style="height: 100%; width: 100%"></div>
     </div>
     <div v-else>{{ tooltipText }}</div>
   </div>
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  computed,
-  onMounted,
-  watch,
-  onBeforeUnmount,
-  ref,
-  Prop,
-} from 'vue';
+import { defineComponent, computed, onMounted, watch, onBeforeUnmount, ref, Prop } from 'vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { useStore } from 'vuex';
-import { updateTooltipNavItem } from '../../utils/editorUtils';
 
 interface Props {
   themeData: monaco.editor.IStandaloneThemeData;
@@ -56,10 +35,9 @@ export default defineComponent({
     const showTooltip = computed(() => store.state.showTooltip);
     const theme = computed(() => store.state.theme);
     const themeData = computed(() => store.state.themeData);
+
     const monacoContainer = ref<HTMLElement | null>(null);
-    const editorInstance = ref(
-      null as monaco.editor.IStandaloneCodeEditor | null,
-    );
+    const editorInstance = ref(null as monaco.editor.IStandaloneCodeEditor | null);
 
     const initializeEditor = () => {
       if (!monacoContainer.value || !editorInstance.value) {
@@ -72,7 +50,7 @@ export default defineComponent({
       });
     };
 
-    const applyThemeToEditor = () => {
+    const applyThemeToEditor = (): void => {
       if (editorInstance.value) {
         editorInstance.value.setValue(store.state.tooltipText);
         store.dispatch('applyTheme', {
@@ -85,20 +63,13 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      if (showTooltip.value && props.isCodeEditorPreview) {
-        initializeEditor();
-      }
-      updateTooltipNavItem(store.state.tooltipText);
+      // if (props.isCodeEditorPreview) {
+      //   initializeEditor();
+      // }
+      // if (props.isCodeEditorPreview && props.themeData) {
+      //   applyThemeToEditor();
+      // }
     });
-
-    watch(
-      () => showTooltip.value,
-      (newVal) => {
-        if (newVal && props.isCodeEditorPreview) {
-          applyThemeToEditor();
-        }
-      },
-    );
 
     onBeforeUnmount(() => {
       if (editorInstance.value) {
@@ -106,26 +77,23 @@ export default defineComponent({
       }
     });
 
-    watch(
-      () => tooltipText.value,
-      (newVal) => {
-        if (newVal && editorInstance.value) {
-          editorInstance.value.setValue(newVal);
-        }
-      },
-    );
+    watch(tooltipText, (newText) => {
+      if (editorInstance.value) {
+        editorInstance.value.setValue(newText);
+      }
+    });
 
-    watch(
-      () => props.themeData,
-      (newVal) => {
-        if (newVal && Object.keys(newVal).length > 0 && editorInstance.value) {
-          store.dispatch('applyTheme', {
-            theme: props.theme,
-            themeData: props.themeData,
-          });
-        }
-      },
-    );
+    // watch(
+    //   () => props.themeData,
+    //   (newVal) => {
+    //     if (newVal && Object.keys(newVal).length > 0 && editorInstance.value) {
+    //       store.dispatch('applyTheme', {
+    //         theme: props.theme,
+    //         themeData: props.themeData,
+    //       });
+    //     }
+    //   },
+    // );
 
     return {
       tooltipText,
@@ -153,6 +121,7 @@ export default defineComponent({
   line-height: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   font-family: 'Montserrat', sans-serif;
+  pointer-events: none;
 
   &::after {
     content: '';

@@ -1,6 +1,9 @@
-import React, { FC } from 'react';
-import { Container } from './styles';
+import React from 'react';
 
-const App: FC = () => <Container>Devtools app .js</Container>;
-
-export default App;
+export default function App() {
+  return (
+    <>
+      <h1>Welcome to my app</h1>
+    </>
+  );
+}

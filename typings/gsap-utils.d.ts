@@ -5,14 +5,7 @@ declare namespace gsap.utils {
     base?: number;
     each?: number;
     ease?: string | EaseFunction;
-    from?:
-      | 'start'
-      | 'center'
-      | 'end'
-      | 'edges'
-      | 'random'
-      | number
-      | [number, number];
+    from?: 'start' | 'center' | 'end' | 'edges' | 'random' | number | [number, number];
     grid?: 'auto' | [number, number];
   }
 
@@ -28,12 +21,8 @@ declare namespace gsap.utils {
   }
 
   interface SelectorFunc {
-    <K extends keyof HTMLElementTagNameMap>(
-      selectorText: string,
-    ): Array<HTMLElementTagNameMap[K]>;
-    <K extends keyof SVGElementTagNameMap>(
-      selectorText: string,
-    ): Array<SVGElementTagNameMap[K]>;
+    <K extends keyof HTMLElementTagNameMap>(selectorText: string): Array<HTMLElementTagNameMap[K]>;
+    <K extends keyof SVGElementTagNameMap>(selectorText: string): Array<SVGElementTagNameMap[K]>;
     <E extends Element = Element>(selectorText: string): Array<E>;
   }
 
@@ -67,15 +56,8 @@ declare namespace gsap.utils {
    * @returns {number | Function} The clamped number or function to clamp to given range
    * @memberof gsap.utils
    */
-  function clamp(
-    minimum: number,
-    maximum: number,
-    valueToClamp: number,
-  ): number;
-  function clamp(
-    minimum: number,
-    maximum: number,
-  ): (valueToClamp: number) => number;
+  function clamp(minimum: number, maximum: number, valueToClamp: number): number;
+  function clamp(minimum: number, maximum: number): (valueToClamp: number) => number;
 
   /**
    * Returns a function to distribute an array of values based on the inputs that you give it.
@@ -212,9 +194,7 @@ declare namespace gsap.utils {
    * @returns {Function} The function that pipes values from function to function given
    * @memberof gsap.utils
    */
-  function pipe<A extends Array<unknown>, B>(
-    ab: (...a: A) => B,
-  ): (...a: A) => B;
+  function pipe<A extends Array<unknown>, B>(ab: (...a: A) => B): (...a: A) => B;
   function pipe<A extends Array<unknown>, B, C>(
     ab: (...a: A) => B,
     bc: (b: B) => C,
@@ -294,11 +274,7 @@ declare namespace gsap.utils {
    * @returns {number | Function} The random number or random number generator function
    * @memberof gsap.utils
    */
-  function random(
-    minValue: number,
-    maxValue: number,
-    snapIncrement?: number,
-  ): number;
+  function random(minValue: number, maxValue: number, snapIncrement?: number): number;
   function random<T extends boolean>(
     minValue: number,
     maxValue: number,
@@ -380,13 +356,8 @@ declare namespace gsap.utils {
    * @returns {number | Function} The snapped number or snap function
    * @memberof gsap.utils
    */
-  function snap(
-    snapConfig: number | number[] | SnapNumberConfig,
-    valueToSnap: number,
-  ): number;
-  function snap(
-    snapConfig: number | number[] | SnapNumberConfig,
-  ): (valueToSnap: number) => number;
+  function snap(snapConfig: number | number[] | SnapNumberConfig, valueToSnap: number): number;
+  function snap(snapConfig: number | number[] | SnapNumberConfig): (valueToSnap: number) => number;
   /**
    * Snaps a value if within the given radius of a points (objects with "x" and "y" properties).
    * Or returns a function that does the above (if the second value is not provided).
@@ -405,9 +376,7 @@ declare namespace gsap.utils {
    * @memberof gsap.utils
    */
   function snap(snapConfig: SnapPoint2DConfig, valueToSnap: Point2D): Point2D;
-  function snap(
-    snapConfig: SnapPoint2DConfig,
-  ): (valueToSnap: Point2D) => Point2D;
+  function snap(snapConfig: SnapPoint2DConfig): (valueToSnap: Point2D) => Point2D;
 
   /**
    * Converts a string-based color value into an array consisting of RGB(A) or HSL values.

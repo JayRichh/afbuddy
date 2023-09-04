@@ -1,8 +1,7 @@
 {
 	"compilerOptions": {
-		"skipLibCheck": true,
 		"target": "ESNext",
-		"module": "commonjs",
+		"module": "ESNext",
 		"lib": ["DOM", "DOM.Iterable", "ESNext"],
 		"declaration": false,
 		"sourceMap": true,
@@ -15,14 +14,13 @@
 		"noImplicitThis": true,
 		"alwaysStrict": true,
 		"baseUrl": "./",
-		"paths": {},
 		"typeRoots": [
 			"node_modules/@types",
 			"node_modules/gsap/types/index.d.ts",
 			"./src/types",
 			"./types",
 			"./typings",
-			"* / * / * .d.ts"
+			"./* "
 		],
 		"forceConsistentCasingInFileNames": true,
 		"jsx": "react",
@@ -55,8 +53,11 @@
 		"typings/*",
 		"typings",
 		"declarations.d.ts",
+		"vite.config.ts",
 		"i18n.ts",
-		"* / * / * .d.ts"
+		"* / * / * .d.ts",
+		"vite.config.ts"
 	],
-	"files": ["./vue-shims.d.ts"]
+	"files": ["./vue-shims.d.ts", "./vite.config.ts", "./i18n.ts"],
+	"exclude": ["node_modules"]
 }

@@ -30,10 +30,7 @@ declare class Flip {
    * @returns {gsap.plugins.Matrix2D} A matrix to convert from one element's coordinate system to another's
    * @memberof Flip
    */
-  static convertCoordinates(
-    fromElement: Element,
-    toElement: Element,
-  ): gsap.plugins.Matrix2D;
+  static convertCoordinates(fromElement: Element, toElement: Element): gsap.plugins.Matrix2D;
 
   /**
    * Converts a point from one element's local coordinates into a
@@ -100,10 +97,7 @@ declare class Flip {
    * @memberof Flip
    * @link https://greensock.com/docs/v3/Plugins/Flip/static.from()
    */
-  static from(
-    state: Flip.FlipState,
-    vars?: Flip.FromToVars,
-  ): gsap.core.Timeline;
+  static from(state: Flip.FlipState, vars?: Flip.FromToVars): gsap.core.Timeline;
 
   /**
    * Captures information about the current state of the targets so that they can be flipped later.
@@ -119,10 +113,7 @@ declare class Flip {
    * @memberof Flip
    * @link https://greensock.com/docs/v3/Plugins/Flip/static.getState()
    */
-  static getState(
-    targets: gsap.DOMTarget,
-    vars?: Flip.FlipStateVars | string,
-  ): Flip.FlipState;
+  static getState(targets: gsap.DOMTarget, vars?: Flip.FlipStateVars | string): Flip.FlipState;
 
   /**
    * Gets the timeline for the most recently-created flip animation associated with the provided element
@@ -222,11 +213,7 @@ declare namespace Flip {
   };
 
   type EnterOrLeaveCallback = (elements: Element[]) => any;
-  type SpinFunction = (
-    index: number,
-    element: Element,
-    targets: Element[],
-  ) => number;
+  type SpinFunction = (index: number, element: Element, targets: Element[]) => number;
   type LoadStateFunction = (load: Function) => any;
   type BatchActionFunction = (self: FlipBatchAction) => any;
 
@@ -234,8 +221,7 @@ declare namespace Flip {
     scale?: boolean;
   }
 
-  interface AnimationVars
-    extends OverrideProps<gsap.TweenVars, TweenVarOverrides> {
+  interface AnimationVars extends OverrideProps<gsap.TweenVars, TweenVarOverrides> {
     absolute?: boolean | gsap.DOMTarget;
     simple?: boolean;
     props?: string;

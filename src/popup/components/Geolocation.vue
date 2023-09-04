@@ -14,13 +14,7 @@
 
       <div class="input-group">
         <label for="locale">Locale:</label>
-        <input
-          type="text"
-          id="locale"
-          placeholder="en-US"
-          v-model="locale"
-          aria-label="Locale"
-        />
+        <input type="text" id="locale" placeholder="en-US" v-model="locale" aria-label="Locale" />
       </div>
 
       <div class="input-group">
@@ -83,10 +77,7 @@ export default defineComponent({
         longitude: this.longitude,
         useDefault: this.useDefault,
       });
-      this.$store.commit(
-        'setFeedbackMessage',
-        'Location spoofed successfully!',
-      );
+      this.$store.commit('setFeedbackMessage', 'Location spoofed successfully!');
     },
   },
 });
