@@ -1,7 +1,9 @@
 <template>
   <div class="tab-manager-container">
     <div class="input-group">
-      <label for="tabWidth" class="input-label">Tab Width (Default: {{ defaultTabWidth }}):</label>
+      <label for="tabWidth" class="input-label"
+        >Tab Width (Default: {{ defaultTabWidth }}):</label
+      >
       <div class="input-wrapper">
         <input
           type="number"
@@ -20,14 +22,24 @@
     <div class="checkbox-group">
       <h3>Tab Management</h3>
       <label for="enableTabManagement">Enable:</label>
-      <input type="checkbox" id="enableTabManagement" v-model="tabManagementEnabled" />
+      <input
+        type="checkbox"
+        id="enableTabManagement"
+        v-model="tabManagementEnabled"
+      />
 
       <div v-if="tabManagementEnabled">
         <label for="excludeTabs">Exclude Specific Tabs:</label>
         <input type="checkbox" id="excludeTabs" v-model="excludeTabs" />
 
         <label for="tabSetPoint">Set Tab Limit:</label>
-        <input type="number" id="tabSetPoint" v-model="tabSetPoint" min="1" max="10" />
+        <input
+          type="number"
+          id="tabSetPoint"
+          v-model="tabSetPoint"
+          min="1"
+          max="10"
+        />
       </div>
     </div>
 
@@ -43,6 +55,7 @@ import { defineComponent, ref } from 'vue';
 import { useStore } from 'vuex';
 
 export default defineComponent({
+  name: 'TabManager',
   setup() {
     const store = useStore();
     const tabWidth = ref(store.state.tabWidth);

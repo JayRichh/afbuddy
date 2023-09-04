@@ -53,11 +53,9 @@
 		"typings/*",
 		"typings",
 		"declarations.d.ts",
-		"vite.config.ts",
 		"i18n.ts",
-		"* / * / * .d.ts",
-		"vite.config.ts"
+		"* / * / * .d.ts"
 	],
-	"files": ["./vue-shims.d.ts", "./vite.config.ts", "./i18n.ts"],
+	"files": ["./vue-shims.d.ts", "./i18n.ts"],
 	"exclude": ["node_modules"]
 }

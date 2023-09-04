@@ -1,8 +1,12 @@
 <template>
   <div class="code-controls-container">
     <div class="button-group">
-      <button class="control-btn" @click="saveJsonToLocalStorage">Save Code 💾</button>
-      <button class="control-btn" @click="loadJsonFromLocalStorage">Load Code 📂</button>
+      <button class="control-btn" @click="saveJsonToLocalStorage">
+        Save Code 💾
+      </button>
+      <button class="control-btn" @click="loadJsonFromLocalStorage">
+        Load Code 📂
+      </button>
     </div>
     <div class="history-panel">
       <input type="text" placeholder="Search scripts..." v-model="searchTerm" />
@@ -30,7 +34,7 @@
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue';
-import { useStore, mapState } from 'vuex';
+import { useStore } from 'vuex';
 
 type Script = {
   id: number;
@@ -39,27 +43,38 @@ type Script = {
 };
 
 export default defineComponent({
+  setup() {
+    const store = useStore();
+    return { store };
+  },
   computed: {
-    ...mapState(['jsonObjects', 'searchTerm']),
+    jsonObjects: function () {
+      return this.store.state.jsonObjects;
+    },
+    searchTerm: function () {
+      return this.store.state.searchTerm;
+    },
     filteredScripts() {
       if (!this.searchTerm) return this.jsonObjects;
-      return this.jsonObjects.filter((script: Script) => script.content.includes(this.searchTerm));
+      return this.jsonObjects.filter((script: Script) =>
+        script.content.includes(this.searchTerm),
+      );
     },
   },
   methods: {
     saveJsonToLocalStorage() {
-      this.$store.dispatch('saveJsonToLocalStorage', this.jsonObjects);
+      this.store.dispatch('saveJsonToLocalStorage', this.jsonObjects);
     },
     loadJsonFromLocalStorage() {
-      this.$store.dispatch('loadJsonFromLocalStorage');
+      this.store.dispatch('loadJsonFromLocalStorage');
     },
     showPreview(script: Script, event: MouseEvent) {
-      this.$store.dispatch('updateTooltipText', script.content);
-      this.$store.dispatch('updateTooltipX', event.pageX);
-      this.$store.dispatch('updateTooltipY', event.pageY);
+      this.store.dispatch('updateTooltipText', script.content);
+      this.store.dispatch('updateTooltipX', event.pageX);
+      this.store.dispatch('updateTooltipY', event.pageY);
     },
     hidePreview() {
-      this.$store.dispatch('updateTooltipText', '');
+      this.store.dispatch('updateTooltipText', '');
     },
     loadScriptIntoMainEditor(script: Script) {
       // Logic to load script into main editor
@@ -119,7 +134,7 @@ export default defineComponent({
   border: 1px solid #ccc;
   padding: 0.5rem;
   max-width: 300px;
-  z-index: 10;
+  z-index: 3;
   font-family: 'Courier New', monospace;
   white-space: pre-wrap;
   text-overflow: ellipsis;

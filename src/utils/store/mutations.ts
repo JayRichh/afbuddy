@@ -4,7 +4,10 @@ import { PIDState } from '../pidstate';
 import * as monaco from 'monaco-editor';
 
 export default {
-  setPIDState(state: State, { ariaLabel, pidState }: { ariaLabel: string; pidState: PIDState }) {
+  setPIDState(
+    state: State,
+    { ariaLabel, pidState }: { ariaLabel: string; pidState: PIDState },
+  ) {
     state.PIDStateMap.set(ariaLabel, pidState);
   },
   updateState(state: State, payload: Partial<State>) {
@@ -12,7 +15,11 @@ export default {
       (state as any)[key] = (payload as any)[key];
     });
   },
+  setNavItems(state: State, payload: any) {
+    state.navItems = payload;
+  },
   setDraggableElements(state: State, payload: HTMLElement[]) {
+    console.log('payload', payload, ' setting draggable elements');
     state.draggableElements = payload;
   },
   setTooltipVisible(state: State, value: boolean) {
@@ -38,7 +45,10 @@ export default {
       state.monacoContainer = payload;
     }
   },
-  setEditorInstance(state: State, payload: monaco.editor.IStandaloneCodeEditor | null) {
+  setEditorInstance(
+    state: State,
+    payload: monaco.editor.IStandaloneCodeEditor | null,
+  ) {
     if (payload) {
       state.editorInstance = payload;
     }

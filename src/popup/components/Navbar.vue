@@ -10,9 +10,21 @@
       :id="item.id"
       :aria-label="item.ariaLabel"
     >
-      <div class="icon-mask" :id="`${item.ariaLabel}-mask`" :aria-label="item.ariaLabel">
-        <img :src="item.iconSrc" :alt="item.altText" class="masked-icon black-icon" />
-        <img :src="item.iconMaskSrc" :alt="item.altText" class="masked-icon white-icon" />
+      <div
+        class="icon-mask"
+        :id="`${item.ariaLabel}-mask`"
+        :aria-label="item.ariaLabel"
+      >
+        <img
+          :src="item.iconSrc"
+          :alt="item.altText"
+          class="masked-icon black-icon"
+        />
+        <img
+          :src="item.iconMaskSrc"
+          :alt="item.altText"
+          class="masked-icon white-icon"
+        />
       </div>
     </a>
     <div class="crazy-mode-toggle">
@@ -21,7 +33,9 @@
         type="checkbox"
         class="crazy-mode-checkbox draggable"
         id="crazy-mode-checkbox"
-        :aria-label="'Ready: ' + (crazyModeEnabled ? 'Yes 🍕🍕🍕' : 'No 🙍‍♂️') + ''"
+        :aria-label="
+          'Ready: ' + (crazyModeEnabled ? 'Yes 🍕🍕🍕' : 'No 🙍‍♂️') + ''
+        "
         v-model="crazyModeEnabled"
         @change="crazyModeToggle"
       />
@@ -33,8 +47,20 @@
           :class="{ checked: crazyModeEnabled }"
           :style="{ fill: crazyModeEnabled ? 'green' : 'white' }"
         >
-          <rect x="1" y="1" width="18" height="18" fill="none" stroke="currentColor" />
-          <path v-if="crazyModeEnabled" d="M5 9l3 3 7-7" stroke="currentColor" fill="none" />
+          <rect
+            x="1"
+            y="1"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+          />
+          <path
+            v-if="crazyModeEnabled"
+            d="M5 9l3 3 7-7"
+            stroke="currentColor"
+            fill="none"
+          />
         </svg>
       </label>
     </div>
@@ -42,7 +68,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue';
+import {
+  defineComponent,
+  ref,
+  reactive,
+  onMounted,
+  onBeforeUnmount,
+  computed,
+} from 'vue';
 import { useStore } from 'vuex';
 import { gsap, Elastic } from 'gsap';
 import { mapState, mapMutations } from 'vuex';
@@ -76,7 +109,7 @@ export default defineComponent({
       'setCrazyModeEnabled',
     ]),
   },
-  setup(props, { emit }) {
+  setup(props) {
     const store = useStore();
     const displayNavItems = computed(() => {
       if (store.state.crazyModeEnabled) {
@@ -87,7 +120,9 @@ export default defineComponent({
     });
 
     const handleClick = (event: MouseEvent, item: NavItem) => {
-      emit('changeComponent', item.componentName);
+      console.log('Click event:', event);
+      console.log('Clicked item:', item);
+      store.dispatch('updateCurrentComponent', item.componentName);
     };
 
     const isActive = (componentName: string) => {
@@ -148,7 +183,7 @@ img {
 
   .icon-mask {
     filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
-    z-index: 100000000;
+    z-index: 3;
     position: relative;
     width: 40px;
     height: 40px;
@@ -157,13 +192,17 @@ img {
       cursor: pointer;
       filter: brightness(1.5) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
       transform: scale(1.1);
-      transition: filter 0.3s ease;
+      transition:
+        filter 0.3s ease,
+        transform 0.3s ease;
     }
 
     &:active {
       filter: drop-shadow(0 0 5px white) blur(1px);
       transform: scale(0.9);
-      transition: filter 0.3s ease;
+      transition:
+        filter 0.3s ease,
+        transform 0.3s ease;
     }
   }
 
@@ -172,7 +211,7 @@ img {
     width: 40px;
     height: 40px;
     object-fit: contain;
-    z-index: 1000000000;
+    z-index: 3;
     transition: opacity 0.3s ease;
   }
 
@@ -336,10 +375,6 @@ img {
     75% {
       filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
     }
-  }
-
-  a.paintbrushFlick {
-    animation: paintbrushFlick 2s infinite;
   }
   a.pyramidRoll {
     animation: pyramidRoll 3.5s cubic-bezier(0.32, 0, 0.67, 1);

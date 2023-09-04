@@ -6,7 +6,9 @@ import { State } from './types';
 
 export default {
   async initializeDraggableElements({ commit }: MyActionContext) {
-    const elements = Array.from(document.querySelectorAll('.global-draggable')) as HTMLElement[];
+    const elements = Array.from(
+      document.querySelectorAll('.draggable'),
+    ) as HTMLElement[];
     commit('setDraggableElements', elements);
   },
   async initializeStore({ dispatch }: MyActionContext) {
@@ -147,7 +149,10 @@ export default {
   updateAutoFormat({ commit }: MyActionContext, payload: boolean) {
     commit('setAutoFormat', payload);
   },
-  updateMonacoContainer({ commit }: MyActionContext, payload: HTMLElement | null) {
+  updateMonacoContainer(
+    { commit }: MyActionContext,
+    payload: HTMLElement | null,
+  ) {
     commit('setMonacoContainer', payload);
   },
 };

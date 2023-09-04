@@ -15,32 +15,6 @@
       <div class="app-header">
         <div class="title-icon-wrapper">
           <h1 class="title draggable">{{ $t(formattedTitle) }}</h1>
-          <svg
-            class="underline draggable"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 1000 200"
-          >
-            <defs>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-                <feMerge>
-                  <feMergeNode in="coloredBlur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color: #7ed4e6; stop-opacity: 1" />
-                <stop offset="100%" style="stop-color: #b493d3; stop-opacity: 1" />
-              </linearGradient>
-            </defs>
-            <path
-              class="underline-path"
-              stroke-width="10"
-              stroke="url(#gradient)"
-              d="M 0 100 L 1000 100"
-              filter="url(#glow)"
-            ></path>
-          </svg>
           <img
             ref="paintbrush"
             id="iconToChangeColor"
@@ -79,7 +53,7 @@ import { listenForKonamiCode as konamiCodeListener } from '../utils/z';
 gsap.registerPlugin(ExpoScaleEase, RoughEase, SlowMo, Draggable);
 
 interface Data {
-  currentComponent: Component;
+  currentComponent: string;
   scriptContentForTooltip: string;
   isDraggable: boolean;
 }
@@ -100,7 +74,7 @@ export default defineComponent({
 
   data(): Data {
     return {
-      currentComponent: ThemeSelector,
+      currentComponent: 'ThemeSelector',
       scriptContentForTooltip: '',
       isDraggable: false,
     };
@@ -148,7 +122,8 @@ export default defineComponent({
 
   setup() {
     let [firstIcon, popin, popout]: gsap.core.Timeline[] = [];
-    const currentComponent = ref(null);
+    const currentComponent = computed(() => store.state.currentComponent);
+    console.log(currentComponent);
 
     const store = useStore();
     const formattedTitle = computed(() => {
@@ -161,10 +136,7 @@ export default defineComponent({
 
     onMounted(() => {
       const animations = setupAnimations();
-      const tl = animations.tl;
-      popin = animations.popin;
-      popout = animations.popout;
-      firstIcon = animations.firstIcon;
+      const { tl, hoverAnim, activeAnim, spinAnim, popin, popout, firstIcon } = animations;
       tl.play();
 
       gsap.utils.toArray('.icon-mask').forEach((mask: any, index: number) => {
@@ -192,6 +164,7 @@ export default defineComponent({
     return {
       formattedTitle,
       crazyModeToggle,
+      currentComponent,
     };
   },
 
@@ -202,29 +175,36 @@ export default defineComponent({
 
     const store = useStore();
     await store.dispatch('initializeStore');
-    await this.handleComponentChange('ThemeSelector');
 
-    setupDraggable(store);
+    this.$nextTick(() => {
+      setupDraggable(store);
+    });
   },
 });
 </script>
 
 <style lang="scss">
-.underline {
-  z-index: 9999999992;
-  position: relative;
+.underline-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   width: 100%;
-  display: block;
-  height: 60px;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  box-sizing: border-box;
+}
 
-  .underline-path {
-    transition: stroke-dashoffset 0.3s ease;
-    stroke-linecap: round;
-    stroke-dasharray: 20, 10;
-    stroke-dashoffset: 0;
-    z-index: 9999999993;
-    display: block;
-  }
+.underline {
+  width: calc(2 * 50%);
+  height: 60px;
+}
+
+.underline-path {
+  stroke-dasharray: 20, 10;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.3s ease;
 }
 
 .hide-scrollbar {
@@ -248,7 +228,6 @@ export default defineComponent({
   position: absolute;
   bottom: 50%;
   left: 50%;
-  z-index: 9999;
   transform-origin: bottom;
   transition: transform 0.5s;
 }
@@ -274,7 +253,7 @@ export default defineComponent({
   padding: 0;
   background: linear-gradient(to bottom, #1c1c1c, #454545);
   position: relative;
-  z-index: 9999;
+  z-index: 2;
   box-sizing: border-box;
 }
 
@@ -300,6 +279,11 @@ export default defineComponent({
     min-width: 100%;
     position: absolute;
   }
+}
+
+.title {
+  padding-left: 0.25rem;
+  padding-top: 0.1rem;
 }
 
 .title-icon-wrapper {
@@ -340,36 +324,22 @@ h1 {
   position: absolute;
   top: 0;
   right: 0;
-  transform-origin: center;
-  z-index: 10000;
+  z-index: 2;
   width: 60px;
   height: 60px;
   opacity: 1;
-  padding: 0;
+  padding: 0.1rem 0.1rem 0 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.3s ease;
+}
 
-  &:hover {
-    animation: rockBrush 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
-    cursor: pointer;
-    opacity: calc(0.8 + 0.2 * var(--speed));
-    transform: scale(1.1);
-  }
+.paintbrush:hover {
+  cursor: pointer;
+}
 
-  &:active {
-    animation: throwBrush 1s ease forwards;
-    cursor: pointer;
-  }
-
-  &.spin {
-    animation-play-state: running;
-  }
-
-  &.speedUp {
-    animation: spinAndRubberBand 1s linear infinite;
-  }
+.paintbrush:active {
+  cursor: pointer;
 }
 
 // Animation Keyframes

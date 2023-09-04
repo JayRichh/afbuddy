@@ -200,7 +200,7 @@ button:active {
   font-family: 'Courier New', monospace;
   white-space: pre-wrap;
   text-overflow: ellipsis;
-  z-index: 10;
+  z-index: 1;
 }
 
 select {

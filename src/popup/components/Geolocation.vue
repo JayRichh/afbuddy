@@ -14,7 +14,13 @@
 
       <div class="input-group">
         <label for="locale">Locale:</label>
-        <input type="text" id="locale" placeholder="en-US" v-model="locale" aria-label="Locale" />
+        <input
+          type="text"
+          id="locale"
+          placeholder="en-US"
+          v-model="locale"
+          aria-label="Locale"
+        />
       </div>
 
       <div class="input-group">
@@ -55,30 +61,36 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
-import { useStore, mapState } from 'vuex';
+import { useStore } from 'vuex';
 
 export default defineComponent({
-  data() {
-    return {
-      timeZone: '',
-      locale: '',
-      latitude: '',
-      longitude: '',
-      useDefault: false,
-      feedbackMessage: '',
-    };
-  },
-  methods: {
-    setGeolocation() {
-      this.$store.dispatch('setGeolocation', {
-        timeZone: this.timeZone,
-        locale: this.locale,
-        latitude: this.latitude,
-        longitude: this.longitude,
-        useDefault: this.useDefault,
+  setup() {
+    const store = useStore();
+    const timeZone = ref('');
+    const locale = ref('');
+    const latitude = ref('');
+    const longitude = ref('');
+    const useDefault = ref(false);
+    const feedbackMessage = ref('');
+    const setGeolocation = () => {
+      store.dispatch('setGeolocation', {
+        timeZone: timeZone.value,
+        locale: locale.value,
+        latitude: latitude.value,
+        longitude: longitude.value,
+        useDefault: useDefault.value,
       });
-      this.$store.commit('setFeedbackMessage', 'Location spoofed successfully!');
-    },
+      store.commit('setFeedbackMessage', 'Location spoofed successfully!');
+    };
+    return {
+      timeZone,
+      locale,
+      latitude,
+      longitude,
+      useDefault,
+      feedbackMessage,
+      setGeolocation,
+    };
   },
 });
 </script>

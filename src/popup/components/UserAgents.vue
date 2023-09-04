@@ -11,7 +11,6 @@
         </select>
       </div>
     </div>
-
     <div class="button-group">
       <button @click="setUserAgent">Set User Agent</button>
       <button @click="resetUserAgent">Reset to Default</button>
@@ -35,6 +34,10 @@ export default defineComponent({
       feedbackMessage: '',
     };
   },
+  setup() {
+    const store = useStore();
+    return { store };
+  },
   methods: {
     setUserAgent() {
       let message = 'User agent set to:\n';
@@ -42,11 +45,11 @@ export default defineComponent({
         message += `${agentTitle}: ${this.selectedAgents[agentTitle]}\n`;
       }
       this.feedbackMessage = message;
-      this.$store.dispatch('setUserAgent', this.selectedAgents);
+      this.store.dispatch('setUserAgent', this.selectedAgents);
     },
     resetUserAgent() {
       this.feedbackMessage = 'User agent reset to default';
-      this.$store.dispatch('resetUserAgent');
+      this.store.dispatch('resetUserAgent');
     },
     initializeSelectedAgents() {
       const agents: { [key: string]: string } = {};

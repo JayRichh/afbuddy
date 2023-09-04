@@ -1,14 +1,34 @@
 <template>
-  <div v-if="showTooltip" class="tooltip" :style="{ left: `${tooltipX}px`, top: `${tooltipY}px` }">
-    <div v-if="isCodeEditorPreview" class="code-preview" style="height: 100%; width: 100%">
-      <div ref="monacoContainer" class="monaco-instance" style="height: 100%; width: 100%"></div>
+  <div
+    v-if="showTooltip"
+    class="tooltip"
+    :style="{ left: `${tooltipX}px`, top: `${tooltipY}px` }"
+  >
+    <div
+      v-if="isCodeEditorPreview"
+      class="code-preview"
+      style="height: 100%; width: 100%"
+    >
+      <div
+        ref="monacoContainer"
+        class="monaco-instance"
+        style="height: 100%; width: 100%"
+      ></div>
     </div>
     <div v-else>{{ tooltipText }}</div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted, watch, onBeforeUnmount, ref, Prop } from 'vue';
+import {
+  defineComponent,
+  computed,
+  onMounted,
+  watch,
+  onBeforeUnmount,
+  ref,
+  Prop,
+} from 'vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { useStore } from 'vuex';
 
@@ -37,7 +57,9 @@ export default defineComponent({
     const themeData = computed(() => store.state.themeData);
 
     const monacoContainer = ref<HTMLElement | null>(null);
-    const editorInstance = ref(null as monaco.editor.IStandaloneCodeEditor | null);
+    const editorInstance = ref(
+      null as monaco.editor.IStandaloneCodeEditor | null,
+    );
 
     const initializeEditor = () => {
       if (!monacoContainer.value || !editorInstance.value) {
@@ -112,7 +134,7 @@ export default defineComponent({
 <style scoped lang="scss">
 .tooltip {
   position: absolute;
-  z-index: 20000 !important;
+  z-index: 4 !important;
   background-color: #333;
   color: #fff;
   padding: 10px;
@@ -121,7 +143,7 @@ export default defineComponent({
   line-height: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   font-family: 'Montserrat', sans-serif;
-  pointer-events: none;
+  pointer-events: auto !important;
 
   &::after {
     content: '';
@@ -129,7 +151,7 @@ export default defineComponent({
     border-width: 5px 5px 5px 5px;
     border-style: solid;
     border-color: transparent transparent #333 transparent;
-    z-index: 20000 !important;
+    z-index: 4 !important;
   }
 }
 

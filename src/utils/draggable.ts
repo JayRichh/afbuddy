@@ -15,6 +15,8 @@ export async function setupDraggable(store: Store<State>) {
     let hideTooltipTimeoutId: number | null = null;
     let latestEvent: MouseEvent | null = null;
 
+    console.log('Initializing draggable element:', element.id);
+
     Draggable.create(element, {
       type: 'x,y',
       edgeResistance: 0.65,
@@ -26,28 +28,47 @@ export async function setupDraggable(store: Store<State>) {
           state.setPointX = this.x;
           state.setPointY = this.y;
         }
+        if (element.classList.contains('paintbrush')) {
+          gsap.set(element, { transformOrigin: `${this.x}px ${this.y}px` });
+        }
+      },
+      onDrag: function () {
+        if (element.classList.contains('paintbrush')) {
+          gsap.set(element, { transformOrigin: `${this.x}px ${this.y}px` });
+        }
       },
       onDragEnd: function () {
         const state = PIDStateMap.get(element.id);
+
         if (state) {
           state.setPointX = this.x;
           state.setPointY = this.y;
+        }
+        if (element.classList.contains('paintbrush')) {
+          gsap.set(element, { transformOrigin: `${this.x}px ${this.y}px` });
         }
       },
     });
 
     const updatePosition = () => {
       const state = PIDStateMap.get(element.id);
+
+      console.log('updatePosition:', element.id, state, latestEvent);
+
       if (state && latestEvent) {
         const rect = element.getBoundingClientRect();
         const center = {
           x: rect.left + rect.width / 2,
           y: rect.top + rect.height / 2,
         };
+        console.log('calculating distance for pos update:', element.id);
         const distance = calculateDistance(state.setPointX, state.setPointY, center.x, center.y);
+        console.log('calculated distance for pos update:', element.id);
 
         if (distance < config.maxDetachDistance) {
+          console.log('Updating calculate PID:', element.id);
           calculatePID(latestEvent, element.id, state, config, element);
+          console.log('Updated calculate PID:', element.id);
         }
 
         requestAnimationFrame(updatePosition);

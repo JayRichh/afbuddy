@@ -1,13 +1,18 @@
 <template>
   <div class="info-container">
     <p>
-      This application allows users to spoof their geolocation, customize their browsing experience,
-      and more. Use each section on the left navbar to access different functionalities.
+      This application allows users to spoof their geolocation, customize their
+      browsing experience, and more. Use each section on the left navbar to
+      access different functionalities.
     </p>
   </div>
   <div class="language-selector">
     <label for="language-select">{{ $t('Select Language') }}:</label>
-    <select v-model="selectedLanguage" id="language-select" @change="saveLanguage">
+    <select
+      v-model="selectedLanguage"
+      id="language-select"
+      @change="saveLanguage"
+    >
       <option value="en">{{ $t('English') }}</option>
       <option value="no">{{ $t('Norwegian') }}</option>
     </select>
@@ -24,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 import { mapState } from 'vuex';
@@ -35,7 +40,9 @@ export default defineComponent({
   },
   methods: {
     saveLanguage() {
-      this.$store.dispatch('saveLanguage', {
+      const store = useStore();
+      const i18n = useI18n();
+      store.dispatch('saveLanguage', {
         selectedLanguage: this.selectedLanguage,
         rememberLanguage: this.rememberLanguage,
       });
