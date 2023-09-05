@@ -1,6 +1,6 @@
 <p align="center">
   
-  <img src="https://github.com/JayRichh/afbuddy/assets/18374849/d4187421-6c7d-457d-8505-75c7c2a5e9aa" alt="image" />
+  <!-- <img src="https://github.com/JayRichh/afbuddy/assets/18374849/d4187421-6c7d-457d-8505-75c7c2a5e9aa" alt="image" /> -->
 
 </p>
 
@@ -24,13 +24,33 @@ Note: Project in development. Currently only 60% of the time, it works every tim
 
 <h2>🛠️ Features</h2>
 
-- **Web Tools**: A wide array of functionalities for web development, including code controls, player integration, and geolocation services.
-- **Tab Management**: Control the behavior of your tabs with the new tab management feature. You can set the tab width, enable or disable tab management, exclude specific tabs, and set a limit for the number of tabs.
-- **Compatibility**: Seamless integration across all URLs, browsers, and devices.
-- **Customizable Settings**: Personalize your development environment with adjustable themes, layouts, and preferences.
-- **Interactive Navigation**: A dynamic navigation bar that adapts to user needs, providing quick access to essential tools and features.
-- **Multi-Language Support**: Offers localization and internationalization, making the tool accessible to a global audience.
+- **Web Tools**: 
+  - **CodeControls**: Save, load, and manage code snippets with history panel.
+  - **Geolocation**: Manually set or use browser's default geolocation settings.
+  - **Json**: In-app JSON editor with auto-formatting.
+  - **UserAgents**: Select from predefined user agents or use default.
 
+- **Tab Management**: 
+  - **TabManager**: Enable/disable chrome tab management, exclude specific tabs, and set a tab limit.
+  - ~**TabSearch**: Search through open tabs and quickly navigate to them.~
+- **Compatibility**: 
+  - Seamless integration across all URLs, browsers, and devices.
+
+- **Customization**: 
+  - **ThemeSelector**: Instantly switch between available themes. Fine-tune layouts and preferences.
+  - **Formatting**: Customize monaco-editor tab width spacing.
+  - **Layout**: Customize the window layout.
+  - ~**CustomThemes**: Create your own themes.~
+
+- **Navigation**: 
+  - Dynamic navigation bar adapts to user activity for quick tool access.
+
+- **Multi-Language & Info**: 
+  - **Info**: Provides app functionalities and supports English and Norwegian languages.
+
+- **User Interactivity**: 
+  - **Tooltip**: Informative tooltips on hover for specific elements.
+<!-- 
 <details>
 <summary><i>Table of Contents:</i></summary>
 
@@ -87,4 +107,4 @@ AF Buddy supports multiple languages, including English and Norwegian. To switch
 1. Open the extension settings.
 2. Navigate to the 'Language' section.
 3. Select 'Norwegian' from the dropdown menu.
-4. Click 'Save' to apply the changes.
+4. Click 'Save' to apply the changes. -->
