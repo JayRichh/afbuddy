@@ -58,19 +58,19 @@ export function setupAnimations() {
   });
 
   // Attach event listeners
-  const paintbrush = document.querySelector('.paintbrush');
-  if (paintbrush) {
-    paintbrush.addEventListener('mouseenter', () => hoverAnim.play());
-    paintbrush.addEventListener('mouseleave', () => hoverAnim.pause());
-    paintbrush.addEventListener('mousedown', () => activeAnim.restart());
-    paintbrush.addEventListener('dblclick', () => {
-      if (spinAnim.isActive()) {
-        spinAnim.pause();
-      } else {
-        spinAnim.play();
-      }
-    });
-  }
+  // const paintbrush = document.querySelector('.paintbrush');
+  // if (paintbrush) {
+  //   paintbrush.addEventListener('mouseenter', () => hoverAnim.play());
+  //   paintbrush.addEventListener('mouseleave', () => hoverAnim.pause());
+  //   paintbrush.addEventListener('mousedown', () => activeAnim.restart());
+  //   paintbrush.addEventListener('dblclick', () => {
+  //     if (spinAnim.isActive()) {
+  //       spinAnim.pause();
+  //     } else {
+  //       spinAnim.play();
+  //     }
+  //   });
+  // }
 
   const popin = gsap.timeline();
   gsap.utils

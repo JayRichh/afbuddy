@@ -43,10 +43,8 @@ export const messages = {
   },
 };
 
-const i18n = createI18n({
+export const i18n = createI18n({
   legacy: false,
   locale: 'en',
   messages: messages,
 });
-
-export default i18n;

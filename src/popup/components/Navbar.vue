@@ -5,7 +5,7 @@
       :key="item.id"
       ref="iconRefs"
       :class="{ selected: isActive(item.componentName) }"
-      @click="handleClick($event, item)"
+      @click="handleClick(item)"
       class="icon-container draggable"
       :id="item.id"
       :aria-label="item.ariaLabel"
@@ -33,9 +33,7 @@
         type="checkbox"
         class="crazy-mode-checkbox draggable"
         id="crazy-mode-checkbox"
-        :aria-label="
-          'Ready: ' + (crazyModeEnabled ? 'Yes 🍕🍕🍕' : 'No 🙍‍♂️') + ''
-        "
+        :aria-label="'Ready: ' + (crazyModeEnabled ? 'Yes 🍕🍕🍕' : 'No 🙍‍♂️') + ''"
         v-model="crazyModeEnabled"
         @change="crazyModeToggle"
       />
@@ -68,6 +66,10 @@
 </template>
 
 <script lang="ts">
+interface MouseEvent extends Window {
+  MouseEvent: any;
+}
+
 import {
   defineComponent,
   ref,
@@ -119,8 +121,7 @@ export default defineComponent({
       }
     });
 
-    const handleClick = (event: MouseEvent, item: NavItem) => {
-      console.log('Click event:', event);
+    const handleClick = (item: NavItem) => {
       console.log('Clicked item:', item);
       store.dispatch('updateCurrentComponent', item.componentName);
     };

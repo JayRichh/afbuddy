@@ -149,10 +149,7 @@ export default {
   updateAutoFormat({ commit }: MyActionContext, payload: boolean) {
     commit('setAutoFormat', payload);
   },
-  updateMonacoContainer(
-    { commit }: MyActionContext,
-    payload: HTMLElement | null,
-  ) {
+  updateMonacoContainer({ commit }: MyActionContext, payload: HTMLElement | null) {
     commit('setMonacoContainer', payload);
   },
 };

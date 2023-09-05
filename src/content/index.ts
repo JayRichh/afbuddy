@@ -51,7 +51,10 @@ chrome.runtime.onMessage.addListener((message) => {
 
       case 'setTabWidth': {
         if (message.width) {
-          evalInIframe(iframe, `editor.updateOptions({ tabSize: ${message.width} });`);
+          evalInIframe(
+            iframe,
+            `editor.updateOptions({ tabSize: ${message.width} });`,
+          );
         }
         break;
       }
@@ -90,7 +93,10 @@ chrome.runtime.onMessage.addListener((message) => {
       case 'sendMonacoTheme': {
         if (message.theme) {
           const themeDataString = JSON.stringify(message.theme);
-          evalInIframe(iframe, `editor.defineTheme('${message.theme.name}', ${themeDataString});`);
+          evalInIframe(
+            iframe,
+            `editor.defineTheme('${message.theme.name}', ${themeDataString});`,
+          );
           evalInIframe(iframe, `editor.setTheme('${message.theme.name}');`);
         } else {
           console.warn('Monaco theme data is incomplete or missing');

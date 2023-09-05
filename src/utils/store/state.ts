@@ -1,11 +1,11 @@
 import { Theme, themeList } from './data/themesList';
 import { NavItems } from '../config';
-import { PIDState } from '../pidstate';
+import { PIDStateMap } from '../pidstate';
 import { userAgents } from './data/userAgents';
 import * as monaco from 'monaco-editor';
 
 const state = {
-  PIDStateMap: new Map<string, PIDState>(),
+  PIDStateMap: PIDStateMap,
   draggableElements: [] as HTMLElement[],
   tooltipText: '',
   tooltipX: 0,

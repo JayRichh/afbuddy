@@ -20,10 +20,16 @@
 
     <div class="label-button-wrapper">
       <div class="button-group-wrapper">
-        <button class="button-group-item button-group-item--right" @click="applySelectedTheme">
+        <button
+          class="button-group-item button-group-item--right"
+          @click="applySelectedTheme"
+        >
           Apply
         </button>
-        <button class="button-group-item button-group-item--left" @click="setDefaultTheme">
+        <button
+          class="button-group-item button-group-item--left"
+          @click="setDefaultTheme"
+        >
           Default
         </button>
       </div>

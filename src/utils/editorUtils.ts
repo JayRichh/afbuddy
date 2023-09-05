@@ -38,7 +38,10 @@ export const createEditor = (
   }
 };
 
-export const applyTheme = (theme: string, themeData: monaco.editor.IStandaloneThemeData) => {
+export const applyTheme = (
+  theme: string,
+  themeData: monaco.editor.IStandaloneThemeData,
+) => {
   if (Object.keys(themeData).length > 0) {
     monaco.editor.defineTheme(theme, themeData);
     monaco.editor.setTheme(theme);
@@ -54,7 +57,9 @@ export const isValidJSON = (text: string): boolean => {
   }
 };
 
-export const formatJSON = (editorInstance: Ref<monaco.editor.IStandaloneCodeEditor | null>) => {
+export const formatJSON = (
+  editorInstance: Ref<monaco.editor.IStandaloneCodeEditor | null>,
+) => {
   if (isValidJSON(editorInstance.value?.getValue() || '')) {
     editorInstance.value?.setValue(
       JSON.stringify(JSON.parse(editorInstance.value?.getValue() || ''), null, 2),

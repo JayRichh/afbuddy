@@ -3,7 +3,6 @@
 	"version": "1.0.3",
 	"description": "Basic tools to assist Web Development",
 	"private": true,
-	"type": "module",
 	"scripts": {
 		"build:bg": "parcel build src/background/index.ts --dist-dir dist/background --no-source-maps",
 		"build:content": "parcel build src/content/index.ts --dist-dir dist/content --no-source-maps",
@@ -14,8 +13,8 @@
 		"build": "npm run build:bg && npm run build:content && npm run build:options && npm run build:popup && npm run build:devtools && npm run build:devtools:app",
 		"clean": "rimraf dist",
 		"copy:static": "copyfiles manifest.json assets/**/* dist",
-		"dist": "npm run clean && npm run build && npm run copy:static",
-		"lint": "eslint --ext .ts,.tsx ./src",
+		"dist": "npm run clean && npm run build && npm run copy:static && prettier --write .",
+		"lint": "prettier --check .",
 		"test": "jest -c ./config/jest.config.js"
 	},
 	"license": "MIT",
@@ -39,11 +38,11 @@
 		"tsparticles-slim": "^2.12.0",
 		"vue": "^3.2.36",
 		"vue-axios": "^3.5.2",
-		"vue-i18n": "^9.2.2",
+		"vue-i18n": "^9.3.0",
 		"vue-loader": "^17.2.2",
 		"vue3-particles": "^2.12.0",
 		"vuetify": "^3.3.14",
-		"vuex": "^4.0.2"
+		"vuex": "^4.1.0"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.22.15",
@@ -64,7 +63,7 @@
 		"htmlnano": "2.0.3",
 		"naive-ui": "^2.34.4",
 		"parcel": "^2.9.3",
-		"prettier": "^3.0.2",
+		"prettier": "^3.0.3",
 		"process": "^0.11.10",
 		"rimraf": "^5.0.1",
 		"sass": "^1.55.0",

@@ -1,14 +1,34 @@
 <template>
-  <div v-if="showTooltip" class="tooltip" :style="{ left: `${tooltipX}px`, top: `${tooltipY}px` }">
-    <div v-if="isCodeEditorPreview" class="code-preview" style="height: 100%; width: 100%">
-      <div ref="monacoContainer" class="monaco-instance" style="height: 100%; width: 100%"></div>
+  <div
+    v-if="showTooltip"
+    class="tooltip"
+    :style="{ left: `${tooltipX}px`, top: `${tooltipY}px` }"
+  >
+    <div
+      v-if="isCodeEditorPreview"
+      class="code-preview"
+      style="height: 100%; width: 100%"
+    >
+      <div
+        ref="monacoContainer"
+        class="monaco-instance"
+        style="height: 100%; width: 100%"
+      ></div>
     </div>
     <div v-else>{{ tooltipText }}</div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted, watch, onBeforeUnmount, ref, Prop } from 'vue';
+import {
+  defineComponent,
+  computed,
+  onMounted,
+  watch,
+  onBeforeUnmount,
+  ref,
+  Prop,
+} from 'vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { useStore } from 'vuex';
 

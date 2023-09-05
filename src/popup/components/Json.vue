@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div id="two" class="button" @click="showModal = !showModal">
-      Open Editor
-    </div>
+    <div id="two" class="button" @click="showModal = !showModal">Open Editor</div>
     <div v-if="showModal" class="modal draggable two">
       <div class="modal-header">
         <h5 class="modal-title">JSON Editor</h5>
@@ -18,8 +16,7 @@
         ></div>
       </div>
       <div class="modal-footer">
-        <input type="checkbox" v-model="autoFormat" class="draggable" /> Auto
-        Format
+        <input type="checkbox" v-model="autoFormat" class="draggable" /> Auto Format
         <button @click="formatJSON" class="draggable">Format JSON</button>
       </div>
     </div>

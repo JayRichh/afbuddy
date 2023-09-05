@@ -1,7 +1,8 @@
 import { State } from './types';
 
 export default {
-  getPIDState: (state: State) => (ariaLabel: string) => state.PIDStateMap.get(ariaLabel),
+  getPIDState: (state: State) => (ariaLabel: string) =>
+    state.PIDStateMap?.get(ariaLabel),
   getDraggableElements: (state: State) => state.draggableElements,
   getTooltipText: (state: State) => state.tooltipText,
   getTooltipX: (state: State) => state.tooltipX,

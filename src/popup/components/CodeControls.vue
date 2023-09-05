@@ -1,8 +1,12 @@
 <template>
   <div class="code-controls-container">
     <div class="button-group">
-      <button class="control-btn" @click="saveJsonToLocalStorage">Save Code 💾</button>
-      <button class="control-btn" @click="loadJsonFromLocalStorage">Load Code 📂</button>
+      <button class="control-btn" @click="saveJsonToLocalStorage">
+        Save Code 💾
+      </button>
+      <button class="control-btn" @click="loadJsonFromLocalStorage">
+        Load Code 📂
+      </button>
     </div>
     <div class="history-panel">
       <input type="text" placeholder="Search scripts..." v-model="searchTerm" />
@@ -52,7 +56,9 @@ export default defineComponent({
     },
     filteredScripts() {
       if (!this.searchTerm) return this.jsonObjects;
-      return this.jsonObjects.filter((script: Script) => script.content.includes(this.searchTerm));
+      return this.jsonObjects.filter((script: Script) =>
+        script.content.includes(this.searchTerm),
+      );
     },
   },
   methods: {

@@ -136,6 +136,16 @@ interface NavbarOptions {
   };
 }
 
+//* High Range:
+//? Kp: 1.0, Ki: 0.5, Kd: 0.1
+//? Kp: 1.2, Ki: 0.6, Kd: 0.12
+//? Kp: 1.5, Ki: 0.7, Kd: 0.15
+
+//* Low Range:
+//? Kp: 0.1, Ki: 0.05, Kd: 0.005
+//? Kp: 0.2, Ki: 0.1, Kd: 0.01
+//? Kp: 0.3, Ki: 0.15, Kd: 0.015
+
 export const config: NavbarOptions = {
   particleIntensity: 0.5,
   opacity: 0.7,

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NavItem } from './config';
+import { NavItem, NavItems } from './config';
 import { calculateDistance } from './calculations';
 
 export interface PIDState {
@@ -14,7 +14,20 @@ export interface PIDState {
   integralY: number;
 }
 
-export const PIDStateMap = new Map<string, PIDState>();
+export const initialPIDState: PIDState = {
+  originalX: 0,
+  originalY: 0,
+  previousErrorX: 0,
+  previousErrorY: 0,
+  setPointX: 0,
+  setPointY: 0,
+  integralX: 0,
+  integralY: 0,
+};
+
+export const PIDStateMap = new Map<string, PIDState>(
+  NavItems.map((item) => [item.ariaLabel, { ...initialPIDState }]),
+);
 
 export interface PIDStateBase {
   [x: string]: number;
@@ -30,13 +43,12 @@ export interface PIDStateBase {
 
 export const calculatePID = (
   event: MouseEvent,
-  item: NavItem | string,
   state: PIDState,
   config: any,
-  icon: HTMLElement,
+  element: HTMLElement,
 ) => {
   const now = performance.now();
-  state.lastTime = state.lastTime ? state.lastTime : performance.now();
+  state.lastTime = state.lastTime ? state.lastTime : now;
   const dt = (now - state.lastTime) / 1000;
 
   const errorX = event.clientX - state.setPointX;
@@ -48,10 +60,11 @@ export const calculatePID = (
 
   const proportionalX = KpScaled * errorX;
   const proportionalY = KpScaled * errorY;
-  state.integralX += KiScaled * errorX * dt;
-  state.integralY += KiScaled * errorY * dt;
-  const derivativeX = (KdScaled * (errorX - state.previousErrorX)) / dt;
-  const derivativeY = (KdScaled * (errorY - state.previousErrorY)) / dt;
+  state.integralX += config.Ki * errorX * dt;
+  state.integralY += config.Ki * errorY * dt;
+
+  const derivativeX = config.Kd * ((errorX - state.previousErrorX) / dt);
+  const derivativeY = config.Kd * ((errorY - state.previousErrorY) / dt);
 
   const dx = proportionalX + state.integralX + derivativeX;
   const dy = proportionalY + state.integralY + derivativeY;
@@ -60,7 +73,7 @@ export const calculatePID = (
   state.previousErrorY = errorY;
   state.setPointX += dx;
   state.setPointY += dy;
-  icon.style.transform = `translate(${state.setPointX}px, ${state.setPointY}px) scale(1.1)`;
+  element.style.transform = `translate(${state.setPointX}px, ${state.setPointY}px) scale(1.1)`;
 
   return state;
 };

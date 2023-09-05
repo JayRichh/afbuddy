@@ -136,7 +136,8 @@ export default defineComponent({
 
     onMounted(() => {
       const animations = setupAnimations();
-      const { tl, hoverAnim, activeAnim, spinAnim, popin, popout, firstIcon } = animations;
+      const { tl, hoverAnim, activeAnim, spinAnim, popin, popout, firstIcon } =
+        animations;
       tl.play();
 
       gsap.utils.toArray('.icon-mask').forEach((mask: any, index: number) => {
@@ -170,7 +171,9 @@ export default defineComponent({
 
   async mounted() {
     this.listenForKonamiCode = this.listenForKonamiCode.bind(this) as () => void;
-    this.activatePixelPerfection = this.activatePixelPerfection.bind(this) as () => void;
+    this.activatePixelPerfection = this.activatePixelPerfection.bind(
+      this,
+    ) as () => void;
     konamiCodeListener(this.activatePixelPerfection);
 
     const store = useStore();

@@ -8,7 +8,7 @@ export default {
     state: State,
     { ariaLabel, pidState }: { ariaLabel: string; pidState: PIDState },
   ) {
-    state.PIDStateMap.set(ariaLabel, pidState);
+    state.PIDStateMap?.set(ariaLabel, pidState);
   },
   updateState(state: State, payload: Partial<State>) {
     Object.keys(payload).forEach((key) => {
