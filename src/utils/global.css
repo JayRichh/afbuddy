@@ -1,0 +1,14 @@
+@font-face {
+  font-family: 'Roboto';
+  src: url('/assets/fonts/roboto/Roboto[wdth,wght].ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto Italic';
+  src: url('/assets/fonts/roboto/Roboto-Italic[wdth,wght].ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto Slab';
+  src: url('/assets/fonts/robotoslab/RobotoSlab[wght].ttf') format('truetype');
+}

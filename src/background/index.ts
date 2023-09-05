@@ -75,44 +75,44 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'sendMonacoTheme') {
-    console.log('Received Monaco theme:', message.theme);
-    sendResponse({ status: 'success' });
-  }
-});
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+//   if (message.action === 'sendMonacoTheme') {
+//     console.log('Received Monaco theme:', message.theme);
+//     sendResponse({ status: 'success' });
+//   }
+// });
 
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  if (request.action === 'getdata') {
-    // ... (existing code)
-  } else if (request.action === 'sendMonacoTheme') {
-    console.log('Received Monaco theme:', request.theme);
-    sendResponse({ status: 'success' });
-  }
-  return false;
-});
+// chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+//   if (request.action === 'getdata') {
+//     // ... (existing code)
+//   } else if (request.action === 'sendMonacoTheme') {
+//     console.log('Received Monaco theme:', request.theme);
+//     sendResponse({ status: 'success' });
+//   }
+//   return false;
+// });
 
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  if (request.action === 'getdata') {
-    try {
-      const response = await fetch(request.url);
-      const data = await response.text();
-      console.log('Data fetched:', data);
-      sendResponse({ themeData: data });
-    } catch (error) {
-      console.log('Error fetching data:', error);
-    }
-    return true;
-  }
-  return false;
-});
+// chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+//   if (request.action === 'getdata') {
+//     try {
+//       const response = await fetch(request.url);
+//       const data = await response.text();
+//       console.log('Data fetched:', data);
+//       sendResponse({ themeData: data });
+//     } catch (error) {
+//       console.log('Error fetching data:', error);
+//     }
+//     return true;
+//   }
+//   return false;
+// });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request === 'getWeatherData') {
-    console.log('Sending weather data:', request);
-    sendResponse(request);
-  }
-});
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//   if (request === 'getWeatherData') {
+//     console.log('Sending weather data:', request);
+//     sendResponse(request);
+//   }
+// });
 
 // chrome.webRequest.onBeforeSendHeaders.addListener(
 //   function (details) {

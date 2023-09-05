@@ -4,30 +4,30 @@
 	"version": "1.0.3",
 	"description": "Web tools to support development.",
 	"icons": {
-		"16": "./assets/icons/logo-bg-16.png",
-		"48": "./assets/icons/logo-bg-48.png",
-		"128": "./assets/icons/logo-bg-128.png"
+		"16": "assets/icons/logo-bg-16.png",
+		"48": "assets/icons/logo-bg-48.png",
+		"128": "assets/icons/logo-bg-128.png"
 	},
 	"action": {
 		"default_icon": {
-			"16": "./assets/icons/logo-bg-16.png",
-			"48": "./assets/icons/logo-bg-48.png"
+			"16": "assets/icons/logo-bg-16.png",
+			"48": "assets/icons/logo-bg-48.png"
 		},
-		"default_popup": "./popup/index.html",
+		"default_popup": "popup/index.html",
 		"default_title": "Web Tools"
 	},
 	"background": {
-		"service_worker": "./background/index.js"
+		"service_worker": "background/index.js"
 	},
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
-			"js": ["./content/index.js"],
+			"js": ["content/index.js"],
 			"run_at": "document_end"
 		}
 	],
-	"devtools_page": "./devtools/index.html",
-	"options_page": "./options/index.html",
+	"devtools_page": "devtools/index.html",
+	"options_page": "options/index.html",
 	"permissions": [
 		"storage",
 		"scripting",

@@ -24,7 +24,7 @@
           />
         </div>
       </div>
-      <component :is="currentComponent" class="app-content draggable" />
+      <component :is="currentComponent" class="app-content" />
     </div>
   </div>
 </template>
