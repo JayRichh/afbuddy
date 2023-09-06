@@ -22,24 +22,14 @@
     <div class="checkbox-group">
       <h3>Tab Management</h3>
       <label for="enableTabManagement">Enable:</label>
-      <input
-        type="checkbox"
-        id="enableTabManagement"
-        v-model="tabManagementEnabled"
-      />
+      <input type="checkbox" id="enableTabManagement" v-model="tabManagementEnabled" />
 
       <div v-if="tabManagementEnabled">
         <label for="excludeTabs">Exclude Specific Tabs:</label>
         <input type="checkbox" id="excludeTabs" v-model="excludeTabs" />
 
         <label for="tabSetPoint">Set Tab Limit:</label>
-        <input
-          type="number"
-          id="tabSetPoint"
-          v-model="tabSetPoint"
-          min="1"
-          max="10"
-        />
+        <input type="number" id="tabSetPoint" v-model="tabSetPoint" min="1" max="10" />
       </div>
     </div>
 

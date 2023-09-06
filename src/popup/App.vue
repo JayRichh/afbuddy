@@ -14,7 +14,7 @@
     <div class="app-container">
       <div class="app-header">
         <div class="title-icon-wrapper">
-          <h1 class="title draggable">{{ $t(formattedTitle) }}</h1>
+          <h1 class="title draggable no-tooltip">{{ $t(formattedTitle) }}</h1>
           <img
             ref="paintbrush"
             id="iconToChangeColor"
@@ -30,7 +30,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, Component, ref, onMounted } from 'vue';
+import { defineComponent, computed, ref, onMounted } from 'vue';
+import { useStore } from 'vuex';
 import Navbar from './components/Navbar.vue';
 import ThemeSelector from './components/ThemeSelector.vue';
 import Json from './components/Json.vue';
@@ -44,11 +45,12 @@ import DoomPlayer from './components/DoomPlayer.vue';
 import { ExpoScaleEase, RoughEase, SlowMo } from 'gsap/EasePack';
 import Draggable from 'gsap/Draggable';
 import { gsap } from 'gsap';
-import { setupDraggable } from '../utils/draggable';
+import { setupDraggable } from '../utils/setupDraggable';
 import { mapState, mapMutations } from 'vuex';
-import { useStore } from 'vuex';
 import { setupAnimations } from '../utils/animations';
 import { listenForKonamiCode as konamiCodeListener } from '../utils/z';
+import state from '../utils/store/state';
+import { setupHoverEffects } from '../utils/hoverEffects';
 
 gsap.registerPlugin(ExpoScaleEase, RoughEase, SlowMo, Draggable);
 
@@ -90,6 +92,7 @@ export default defineComponent({
       'navItems',
       'theme',
       'themeData',
+      'pidState',
     ]),
   },
 
@@ -122,10 +125,9 @@ export default defineComponent({
 
   setup() {
     let [firstIcon, popin, popout]: gsap.core.Timeline[] = [];
-    const currentComponent = computed(() => store.state.currentComponent);
-    console.log(currentComponent);
-
     const store = useStore();
+    const currentComponent = computed(() => store.state.currentComponent);
+
     const formattedTitle = computed(() => {
       const title = store.state.currentComponent;
       return title
@@ -136,8 +138,7 @@ export default defineComponent({
 
     onMounted(() => {
       const animations = setupAnimations();
-      const { tl, hoverAnim, activeAnim, spinAnim, popin, popout, firstIcon } =
-        animations;
+      const { tl, popin, popout, firstIcon } = animations;
       tl.play();
 
       gsap.utils.toArray('.icon-mask').forEach((mask: any, index: number) => {
@@ -171,15 +172,14 @@ export default defineComponent({
 
   async mounted() {
     this.listenForKonamiCode = this.listenForKonamiCode.bind(this) as () => void;
-    this.activatePixelPerfection = this.activatePixelPerfection.bind(
-      this,
-    ) as () => void;
+    this.activatePixelPerfection = this.activatePixelPerfection.bind(this) as () => void;
     konamiCodeListener(this.activatePixelPerfection);
 
     const store = useStore();
     await store.dispatch('initializeStore');
 
     this.$nextTick(() => {
+      setupHoverEffects(store);
       setupDraggable(store);
     });
   },
@@ -256,7 +256,6 @@ export default defineComponent({
   padding: 0;
   background: linear-gradient(to bottom, #1c1c1c, #454545);
   position: relative;
-  z-index: 2;
   box-sizing: border-box;
 }
 
@@ -268,7 +267,6 @@ export default defineComponent({
   position: relative;
   overflow: auto;
   overflow-x: hidden;
-  z-index: 0;
 
   .app-header {
     display: flex;
@@ -327,7 +325,6 @@ h1 {
   position: absolute;
   top: 0;
   right: 0;
-  z-index: 2;
   width: 60px;
   height: 60px;
   opacity: 1;

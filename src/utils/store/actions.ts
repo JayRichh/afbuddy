@@ -1,14 +1,12 @@
+import { PIDState } from '../pidstate';
 import { MyActionContext } from './types';
 import { getThemes } from './data/themesList';
 import { NavItem, NavItems } from '../config';
-import { PIDState } from '../pidstate';
 import { State } from './types';
 
 export default {
   async initializeDraggableElements({ commit }: MyActionContext) {
-    const elements = Array.from(
-      document.querySelectorAll('.draggable'),
-    ) as HTMLElement[];
+    const elements = Array.from(document.querySelectorAll('.draggable')) as HTMLElement[];
     commit('setDraggableElements', elements);
   },
   async initializeStore({ dispatch }: MyActionContext) {

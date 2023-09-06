@@ -10,6 +10,17 @@ export default {
   ) {
     state.PIDStateMap?.set(ariaLabel, pidState);
   },
+  updatePIDState(
+    state: State,
+    { ariaLabel, pidState }: { ariaLabel: string; pidState: PIDState },
+  ) {
+    const stateToUpdate = state.PIDStateMap?.get(ariaLabel);
+    if (stateToUpdate) {
+      Object.keys(pidState).forEach((key) => {
+        (stateToUpdate as any)[key] = (pidState as any)[key];
+      });
+    }
+  },
   updateState(state: State, payload: Partial<State>) {
     Object.keys(payload).forEach((key) => {
       (state as any)[key] = (payload as any)[key];
@@ -45,10 +56,7 @@ export default {
       state.monacoContainer = payload;
     }
   },
-  setEditorInstance(
-    state: State,
-    payload: monaco.editor.IStandaloneCodeEditor | null,
-  ) {
+  setEditorInstance(state: State, payload: monaco.editor.IStandaloneCodeEditor | null) {
     if (payload) {
       state.editorInstance = payload;
     }

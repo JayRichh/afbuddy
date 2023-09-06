@@ -1834,8 +1834,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: 'ffffff',
         background: '000000',
-        token:
-          'text.subversion-commit meta.scope.changed-files.svn meta.diff.separator',
+        token: 'text.subversion-commit meta.scope.changed-files.svn meta.diff.separator',
       },
       {
         foreground: '000000',
@@ -2228,8 +2227,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '151515',
-        token:
-          'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
+        token: 'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
       },
       {
         background: '151515',
@@ -2241,8 +2239,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '151515',
-        token:
-          'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
+        token: 'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
       },
       {
         background: '151515',
@@ -2300,8 +2297,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '1c1c1c',
-        token:
-          'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
+        token: 'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
       },
       {
         background: '1c1c1c',
@@ -2438,8 +2434,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '1b95e2',
-        token:
-          'meta.property.vendor.microsoft.trident.4 punctuation.terminator.rule',
+        token: 'meta.property.vendor.microsoft.trident.4 punctuation.terminator.rule',
       },
       {
         foreground: 'f5c034',
@@ -2451,13 +2446,11 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'f5c034',
-        token:
-          'meta.property.vendor.microsoft.trident.5 punctuation.separator.key-value',
+        token: 'meta.property.vendor.microsoft.trident.5 punctuation.separator.key-value',
       },
       {
         foreground: 'f5c034',
-        token:
-          'meta.property.vendor.microsoft.trident.5 punctuation.terminator.rule',
+        token: 'meta.property.vendor.microsoft.trident.5 punctuation.terminator.rule',
       },
     ],
     colors: {
@@ -3387,8 +3380,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: 'ffffff',
         background: '000000',
-        token:
-          'text.subversion-commit meta.scope.changed-files.svn meta.diff.separator',
+        token: 'text.subversion-commit meta.scope.changed-files.svn meta.diff.separator',
       },
       {
         foreground: '000000',
@@ -3658,8 +3650,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '151515',
-        token:
-          'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
+        token: 'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
       },
       {
         background: '151515',
@@ -3671,8 +3662,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '151515',
-        token:
-          'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
+        token: 'meta.group.braces meta.group.braces meta.group.braces meta.group.braces',
       },
       {
         background: '151515',
@@ -3722,8 +3712,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '1c1c1c',
-        token:
-          'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
+        token: 'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
       },
       {
         background: '1c1c1c',
@@ -5674,8 +5663,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '50fa7b',
-        token:
-          'meta meta meta meta meta meta meta.structure.dictionary.value string',
+        token: 'meta meta meta meta meta meta meta.structure.dictionary.value string',
       },
       {
         foreground: 'ffb86c',

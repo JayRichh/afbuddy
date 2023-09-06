@@ -168,14 +168,12 @@ export const userAgents: UserAgent[] = [
     values: [
       {
         title: 'Internet Explorer 11',
-        value:
-          'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
+        value: 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
         platform: 'Win32',
       },
       {
         title: 'Internet Explorer 10',
-        value:
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+        value: 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
         platform: 'Win32',
       },
       {

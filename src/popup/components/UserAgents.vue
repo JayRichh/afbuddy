@@ -5,11 +5,7 @@
       <div class="input-group">
         <select :id="agent.title" v-model="selectedAgents[agent.title]">
           <!-- @change="changeUserAgent(agent.title)" -->
-          <option
-            v-for="value in agent.values"
-            :key="value.title"
-            :value="value.value"
-          >
+          <option v-for="value in agent.values" :key="value.title" :value="value.value">
             {{ value.title }} ({{ value.platform }})
           </option>
         </select>

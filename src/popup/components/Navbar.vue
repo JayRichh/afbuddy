@@ -1,30 +1,22 @@
 <template>
   <nav class="navbar">
     <a
-      v-for="item in displayNavItems"
+      v-for="(item, index) in displayNavItems"
       :key="item.id"
-      ref="iconRefs"
+      :ref="
+        (el) => {
+          if (el) iconRefs[index] = el;
+        }
+      "
       :class="{ selected: isActive(item.componentName) }"
       @click="handleClick(item)"
       class="icon-container draggable"
       :id="item.id"
       :aria-label="item.ariaLabel"
     >
-      <div
-        class="icon-mask"
-        :id="`${item.ariaLabel}-mask`"
-        :aria-label="item.ariaLabel"
-      >
-        <img
-          :src="item.iconSrc"
-          :alt="item.altText"
-          class="masked-icon black-icon"
-        />
-        <img
-          :src="item.iconMaskSrc"
-          :alt="item.altText"
-          class="masked-icon white-icon"
-        />
+      <div class="icon-mask" :id="`${item.ariaLabel}-mask`" :aria-label="item.ariaLabel">
+        <img :src="item.iconSrc" :alt="item.altText" class="masked-icon black-icon" />
+        <img :src="item.iconMaskSrc" :alt="item.altText" class="masked-icon white-icon" />
       </div>
     </a>
     <div class="crazy-mode-toggle">
@@ -45,14 +37,7 @@
           :class="{ checked: crazyModeEnabled }"
           :style="{ fill: crazyModeEnabled ? 'green' : 'white' }"
         >
-          <rect
-            x="1"
-            y="1"
-            width="18"
-            height="18"
-            fill="none"
-            stroke="currentColor"
-          />
+          <rect x="1" y="1" width="18" height="18" fill="none" stroke="currentColor" />
           <path
             v-if="crazyModeEnabled"
             d="M5 9l3 3 7-7"
@@ -83,35 +68,20 @@ import { gsap, Elastic } from 'gsap';
 import { mapState, mapMutations } from 'vuex';
 import { Draggable } from 'gsap/Draggable';
 import { NavItem } from '../../utils/config';
+import { PIDStateMap } from '../../utils/pidstate';
 
 gsap.registerPlugin(Draggable);
-
 export default defineComponent({
   props: {
     currentComponent: String,
   },
-  computed: {
-    ...mapState([
-      'tooltipText',
-      'tooltipX',
-      'tooltipY',
-      'showTooltip',
-      'crazyModeEnabled',
-      'currentComponent',
-      'navItems',
-    ]),
-  },
-  methods: {
-    ...mapMutations([
-      'setTooltipText',
-      'setTooltipX',
-      'setTooltipY',
-      'setShowTooltip',
-      'setCurrentComponent',
-      'setCrazyModeEnabled',
-    ]),
-  },
   setup(props) {
+    const crazyModeEnabled = computed(() => store.state.crazyModeEnabled);
+    const iconRefs = ref([]) as any;
+    onMounted(() => {
+      console.log(iconRefs.value);
+    });
+
     const store = useStore();
     const displayNavItems = computed(() => {
       if (store.state.crazyModeEnabled) {
@@ -133,19 +103,26 @@ export default defineComponent({
     const crazyModeToggle = () => {
       store.commit('setCrazyModeEnabled', !store.state.crazyModeEnabled);
       const checkboxSvg = document.querySelector('.checkbox-svg');
-      if (store.state.crazyModeEnabled) {
-        gsap.to(checkboxSvg, {
-          rotation: 360,
-          duration: 1,
-          ease: Elastic.easeOut.config(1, 0.3),
-        });
-      } else {
-        gsap.to(checkboxSvg, {
-          rotation: 0,
-          duration: 1,
-          ease: Elastic.easeOut.config(1, 0.3),
-        });
-      }
+      //   if (store.state.crazyModeEnabled) {
+      //     gsap.to(checkboxSvg, {
+      //       rotation: 360,
+      //       duration: 1,
+      //       ease: Elastic.easeOut.config(1, 0.3),
+      //     });
+      //     iconRefs.value.forEach((icon: any) => {
+      //       const state = PIDStateMap.get(icon.getAttribute('aria-label') || '');
+      //       if (state) {
+      //         state.setPointX = state.originalX;
+      //         state.setPointY = state.originalY;
+      //       }
+      //     });
+      //   } else {
+      //     gsap.to(checkboxSvg, {
+      //       rotation: 0,
+      //       duration: 1,
+      //       ease: Elastic.easeOut.config(1, 0.3),
+      //     });
+      //   }
     };
 
     return {
@@ -153,6 +130,8 @@ export default defineComponent({
       handleClick,
       isActive,
       crazyModeToggle,
+      iconRefs,
+      crazyModeEnabled,
     };
   },
 });
@@ -162,6 +141,7 @@ export default defineComponent({
 .hidden {
   display: none;
 }
+
 img {
   width: 80%;
   height: 80%;
@@ -184,7 +164,6 @@ img {
 
   .icon-mask {
     filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
-    z-index: 3;
     position: relative;
     width: 40px;
     height: 40px;
@@ -192,18 +171,10 @@ img {
     &:hover {
       cursor: pointer;
       filter: brightness(1.5) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
-      transform: scale(1.1);
-      transition:
-        filter 0.3s ease,
-        transform 0.3s ease;
     }
 
     &:active {
       filter: drop-shadow(0 0 5px white) blur(1px);
-      transform: scale(0.9);
-      transition:
-        filter 0.3s ease,
-        transform 0.3s ease;
     }
   }
 
@@ -212,8 +183,6 @@ img {
     width: 40px;
     height: 40px;
     object-fit: contain;
-    z-index: 3;
-    transition: opacity 0.3s ease;
   }
 
   .crazy-mode-toggle {
@@ -446,3 +415,4 @@ img {
   }
 }
 </style>
+../../utils/hoverEffects

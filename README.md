@@ -24,33 +24,42 @@ Note: Project in development. Currently only 60% of the time, it works every tim
 
 <h2>🛠️ Features</h2>
 
-- **Web Tools**: 
+- **Web Tools**:
+
   - **CodeControls**: Save, load, and manage code snippets with history panel.
   - **Geolocation**: Manually set or use browser's default geolocation settings.
   - **Json**: In-app JSON editor with auto-formatting.
   - **UserAgents**: Select from predefined user agents or use default.
+  - ~**CustomSnippets**: Create your own code snippets.~
 
-- **Tab Management**: 
-  - **TabManager**: Enable/disable chrome tab management, exclude specific tabs, and set a tab limit.
+- **Tab Management**:
+  - **TabManager**: Manage Chrome tabs with adjustable limits and auto-close unused ones.
+    Exclude key tabs to avoid errors. Customize filters for control.
   - ~**TabSearch**: Search through open tabs and quickly navigate to them.~
-- **Compatibility**: 
+- **Compatibility**:
+
   - Seamless integration across all URLs, browsers, and devices.
 
-- **Customization**: 
+- **Customization**:
+
   - **ThemeSelector**: Instantly switch between available themes. Fine-tune layouts and preferences.
   - **Formatting**: Customize monaco-editor tab width spacing.
   - **Layout**: Customize the window layout.
-  - ~**CustomThemes**: Create your own themes.~
+  - **CustomThemes**: Craft your own unique themes.
+  - **FontSelector**: Choose from a diverse range of fonts.
 
-- **Navigation**: 
+- **Navigation**:
+
   - Dynamic navigation bar adapts to user activity for quick tool access.
 
-- **Multi-Language & Info**: 
+- **Multi-Language & Info**:
+
   - **Info**: Provides app functionalities and supports English and Norwegian languages.
 
-- **User Interactivity**: 
+- **User Interactivity**:
   - **Tooltip**: Informative tooltips on hover for specific elements.
-<!-- 
+
+<!--
 <details>
 <summary><i>Table of Contents:</i></summary>
 
@@ -100,6 +109,14 @@ Refer to the [project documentation](link-to-documentation) for detailed instruc
 
 MIT.
 
+<h2>🖋️ Credits</h2>
+
+Fonts used in this project are provided by JetBrains. Special thanks to:
+
+Philipp Nurullin <philipp.nurullin@jetbrains.com>
+Konstantin Bulenkov <kb@jetbrains.com>
+
+
 <h2>🌍 Internationalization</h2>
 
 AF Buddy supports multiple languages, including English and Norwegian. To switch the front-facing text to Norwegian, follow these steps:
@@ -108,3 +125,7 @@ AF Buddy supports multiple languages, including English and Norwegian. To switch
 2. Navigate to the 'Language' section.
 3. Select 'Norwegian' from the dropdown menu.
 4. Click 'Save' to apply the changes. -->
+
+## Note
+
+This is a personal project, developed independently with the aim of enhancing the development experience.

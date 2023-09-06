@@ -1,6 +1,6 @@
 import { Theme } from './data/themesList';
 import { NavItems } from '../config';
-import { PIDState } from '../pidstate';
+import { PIDState } from '../hoverEffects';
 import { userAgents } from './data/userAgents';
 import * as monaco from 'monaco-editor';
 import { ActionContext } from 'vuex';

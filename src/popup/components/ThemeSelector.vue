@@ -10,7 +10,12 @@
 
     <label for="theme-selector" class="theme-label">Select Theme:</label>
     <select id="theme-selector" v-model="selectedThemeKey">
-      <option v-for="theme in themeNamesArray" :key="theme" :value="theme">
+      <option
+        v-for="theme in themeNamesArray"
+        :key="theme"
+        :value="theme"
+        :selected="theme === currentTheme"
+      >
         {{ theme }}
       </option>
     </select>
@@ -52,11 +57,9 @@ export default defineComponent({
   },
   setup(props: any) {
     const store = useStore();
-
     const themes = computed(() => store.state.themes);
     const themeNamesArray = computed(() => themes.value.themeNamesArray);
-
-    const selectedThemeKey = ref('');
+    const selectedThemeKey = ref(props.currentTheme);
     const showTooltip = ref(false);
     const tooltipX = ref(0);
     const tooltipY = ref(0);
@@ -82,15 +85,6 @@ export default defineComponent({
           theme: selectedThemeKey.value,
         });
       }
-    }
-
-    function adjustTooltipPosition(event: MouseEvent) {
-      tooltipX.value = event.clientX + 10;
-      tooltipY.value = event.clientY + 10;
-    }
-
-    function handleMouseOut() {
-      showTooltip.value = false;
     }
 
     async function applySelectedTheme() {
@@ -119,8 +113,6 @@ export default defineComponent({
       tooltipX,
       tooltipY,
       handleThemeMouseOver,
-      adjustTooltipPosition,
-      handleMouseOut,
       applySelectedTheme,
       setDefaultTheme,
       themeNamesArray,

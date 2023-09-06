@@ -24,14 +24,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  ref,
-  watch,
-  onMounted,
-  onBeforeUnmount,
-  computed,
-} from 'vue';
+import { defineComponent, ref, watch, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useStore } from 'vuex';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 export default defineComponent({
@@ -88,7 +81,6 @@ export default defineComponent({
   top: 0;
   left: 0;
   transform: scale(0);
-  z-index: 1;
   &.two {
     transform: scale(1);
     .modal-background {
@@ -112,35 +104,23 @@ export default defineComponent({
 }
 .modal {
   position: fixed;
-  z-index: 1000;
 }
 .draggable {
   cursor: move;
-  z-index: 1001;
-}
-.modal-header,
-.modal-footer {
-  z-index: 1002;
 }
 
 .modal-dialog {
   max-width: 80%;
-  z-index: 1002;
   .modal-content {
     .modal-body {
       .monaco-editor {
         height: 80vh;
         width: 100%;
-        z-index: 1003;
       }
     }
   }
 }
-.icon-container {
-  z-index: 1004;
-}
 .crazy-mode-toggle {
-  z-index: 1005;
   position: fixed;
   right: 10px;
   top: 10px;

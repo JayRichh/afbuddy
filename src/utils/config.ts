@@ -156,9 +156,9 @@ export const config: NavbarOptions = {
   pulseScale: 1.05,
   transitionDuration: '0.3s',
   pulseDuration: '1s',
-  Kp: 0.5,
-  Ki: 0.1,
-  Kd: 0.01,
+  Kp: 0.01,
+  Ki: 0.001,
+  Kd: 0.0005,
   maxDetachDistance: 20,
   maxMovement: 10,
   size: {

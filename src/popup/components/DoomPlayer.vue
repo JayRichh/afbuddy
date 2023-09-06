@@ -1,11 +1,6 @@
 <template>
   <div>
-    <iframe
-      ref="doomIframe"
-      frameborder="0"
-      :src="iframeSrc"
-      allowfullscreen
-    ></iframe>
+    <iframe ref="doomIframe" frameborder="0" :src="iframeSrc" allowfullscreen></iframe>
   </div>
 </template>
 
@@ -22,76 +17,73 @@ export default {
       'https://dos.zone/player/?bundleUrl=https%3A%2F%2Fcdn.dos.zone%2Fcustom%2Fdos%2Fdoom.jsdos&anonymous=1';
 
     onMounted(() => {
-      doomIframe.value.contentWindow?.document.addEventListener(
-        'keydown',
-        (event) => {
-          switch (event.key) {
-            case 'ArrowUp':
-              doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent('keydown', {
-                  key: 'w',
-                }),
-              );
-              break;
-            case 'ArrowDown':
-              doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent('keydown', {
-                  key: 's',
-                }),
-              );
-              break;
-            case 'ArrowLeft':
-              doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent('keydown', {
-                  key: 'a',
-                }),
-              );
-              break;
-            case 'ArrowRight':
-              doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent('keydown', {
-                  key: 'd',
-                }),
-              );
-              break;
-            case ' ':
-              doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent('keydown', {
-                  key: ' ',
-                }),
-              );
-              break;
-            case 'Enter':
-              doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent('keydown', {
-                  key: 'Enter',
-                }),
-              );
-              break;
-            case 'Escape':
-              doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent('keydown', {
-                  key: 'Escape',
-                }),
-              );
-            case 'f':
-              doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent('keydown', {
-                  key: 'f',
-                }),
-              );
-            case 'e':
-              doomIframe.value.contentWindow?.document.dispatchEvent(
-                new KeyboardEvent('keydown', {
-                  key: 'e',
-                }),
-              );
-              break;
-            default:
-              break;
-          }
-        },
-      );
+      doomIframe.value.contentWindow?.document.addEventListener('keydown', (event) => {
+        switch (event.key) {
+          case 'ArrowUp':
+            doomIframe.value.contentWindow?.document.dispatchEvent(
+              new KeyboardEvent('keydown', {
+                key: 'w',
+              }),
+            );
+            break;
+          case 'ArrowDown':
+            doomIframe.value.contentWindow?.document.dispatchEvent(
+              new KeyboardEvent('keydown', {
+                key: 's',
+              }),
+            );
+            break;
+          case 'ArrowLeft':
+            doomIframe.value.contentWindow?.document.dispatchEvent(
+              new KeyboardEvent('keydown', {
+                key: 'a',
+              }),
+            );
+            break;
+          case 'ArrowRight':
+            doomIframe.value.contentWindow?.document.dispatchEvent(
+              new KeyboardEvent('keydown', {
+                key: 'd',
+              }),
+            );
+            break;
+          case ' ':
+            doomIframe.value.contentWindow?.document.dispatchEvent(
+              new KeyboardEvent('keydown', {
+                key: ' ',
+              }),
+            );
+            break;
+          case 'Enter':
+            doomIframe.value.contentWindow?.document.dispatchEvent(
+              new KeyboardEvent('keydown', {
+                key: 'Enter',
+              }),
+            );
+            break;
+          case 'Escape':
+            doomIframe.value.contentWindow?.document.dispatchEvent(
+              new KeyboardEvent('keydown', {
+                key: 'Escape',
+              }),
+            );
+          case 'f':
+            doomIframe.value.contentWindow?.document.dispatchEvent(
+              new KeyboardEvent('keydown', {
+                key: 'f',
+              }),
+            );
+          case 'e':
+            doomIframe.value.contentWindow?.document.dispatchEvent(
+              new KeyboardEvent('keydown', {
+                key: 'e',
+              }),
+            );
+            break;
+          default:
+            break;
+        }
+      });
 
       doomIframe.value.contentWindow?.document.addEventListener(
         'fullscreenchange',

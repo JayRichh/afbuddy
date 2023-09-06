@@ -11,52 +11,6 @@ export function setupAnimations() {
     .to('.paintbrush', { rotation: 10, duration: 0.1, ease: 'power1.inOut' })
     .to('.paintbrush', { rotation: 0, duration: 0.1, ease: 'power1.inOut' });
 
-  const hoverAnim = gsap.timeline({ paused: true, repeat: -1, yoyo: true });
-  hoverAnim
-    .to('.paintbrush', {
-      rotation: 10,
-      duration: 0.375,
-      ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-    })
-    .to('.paintbrush', {
-      rotation: -10,
-      duration: 0.75,
-      ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-    })
-    .to('.paintbrush', {
-      rotation: 5,
-      duration: 0.375,
-      ease: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-    });
-
-  const activeAnim = gsap.timeline({ paused: true });
-  activeAnim
-    .to('.paintbrush', {
-      rotation: 360,
-      y: '+=10',
-      duration: 1,
-      ease: 'ease',
-    })
-    .to('.paintbrush', {
-      rotation: 365,
-      y: '+=5',
-      duration: 0.1,
-      ease: 'back.out(4)',
-    })
-    .to('.paintbrush', {
-      rotation: 360,
-      y: '+=0',
-      duration: 0.1,
-      ease: 'power1.inOut',
-    });
-
-  const spinAnim = gsap.timeline({ paused: true, repeat: -1 });
-  spinAnim.to('.paintbrush', {
-    rotation: '+=360',
-    duration: 1,
-    ease: 'linear',
-  });
-
   // Attach event listeners
   // const paintbrush = document.querySelector('.paintbrush');
   // if (paintbrush) {
@@ -119,5 +73,5 @@ export function setupAnimations() {
     { y: '0%', autoAlpha: 1, duration: 0.5, ease: 'power3.out' },
   );
 
-  return { tl, hoverAnim, activeAnim, spinAnim, popin, popout, firstIcon };
+  return { tl, popin, popout, firstIcon };
 }

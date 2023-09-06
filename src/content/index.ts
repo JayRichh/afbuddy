@@ -51,10 +51,7 @@ chrome.runtime.onMessage.addListener((message) => {
 
       case 'setTabWidth': {
         if (message.width) {
-          evalInIframe(
-            iframe,
-            `editor.updateOptions({ tabSize: ${message.width} });`,
-          );
+          evalInIframe(iframe, `editor.updateOptions({ tabSize: ${message.width} });`);
         }
         break;
       }

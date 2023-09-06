@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { NavItem, NavItems } from './config';
-import { calculateDistance } from './calculations';
+import { NavItems } from './config';
 
 export interface PIDState {
-  [x: string]: number;
+  [x: string]: number | undefined;
   originalX: number;
   originalY: number;
   previousErrorX: number;
@@ -12,6 +10,7 @@ export interface PIDState {
   setPointY: number;
   integralX: number;
   integralY: number;
+  lastTime?: number;
 }
 
 export const initialPIDState: PIDState = {
@@ -29,18 +28,6 @@ export const PIDStateMap = new Map<string, PIDState>(
   NavItems.map((item) => [item.ariaLabel, { ...initialPIDState }]),
 );
 
-export interface PIDStateBase {
-  [x: string]: number;
-  originalX: number;
-  originalY: number;
-  previousErrorX: number;
-  previousErrorY: number;
-  setPointX: number;
-  setPointY: number;
-  integralX: number;
-  integralY: number;
-}
-
 export const calculatePID = (
   event: MouseEvent,
   state: PIDState,
@@ -55,8 +42,8 @@ export const calculatePID = (
   const errorY = event.clientY - state.setPointY;
 
   const KpScaled = config.Kp * errorX;
-  const KiScaled = config.Ki * errorY;
-  const KdScaled = config.Kd;
+  // const KiScaled = config.Ki * errorY; //
+  // const KdScaled = config.Kd; //
 
   const proportionalX = KpScaled * errorX;
   const proportionalY = KpScaled * errorY;

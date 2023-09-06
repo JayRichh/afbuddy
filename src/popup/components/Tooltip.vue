@@ -15,7 +15,7 @@
         style="height: 100%; width: 100%"
       ></div>
     </div>
-    <div v-else>{{ tooltipText }}</div>
+    <span v-else>{{ tooltipText }}</span>
   </div>
 </template>
 
@@ -132,7 +132,7 @@ export default defineComponent({
 <style scoped lang="scss">
 .tooltip {
   position: absolute;
-  z-index: 2;
+  z-index: 1;
   background-color: #333;
   color: #fff;
   padding: 1rem;
