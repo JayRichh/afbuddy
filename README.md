@@ -31,6 +31,7 @@ Note: Project in development. Currently only 60% of the time, it works every tim
   - **Json**: In-app JSON editor with auto-formatting.
   - **UserAgents**: Select from predefined user agents or use default.
   - ~**CustomSnippets**: Create your own code snippets.~
+  - ~**Clipboard**: Capture copy/paste events, save/ load with congiruable store.~
 
 - **Tab Management**:
   - **TabManager**: Manage Chrome tabs with adjustable limits and auto-close unused ones.
