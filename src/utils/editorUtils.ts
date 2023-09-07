@@ -1,11 +1,11 @@
 import { Ref } from 'vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
-export const createEditor = (
+export function createEditor(
   monacoContainer: Ref<HTMLElement | null>,
   editorInstance: Ref<monaco.editor.IStandaloneCodeEditor | null>,
   store: any,
-) => {
+) {
   if (monacoContainer.value) {
     const config = {
       value: store.state.tooltipText,
@@ -36,17 +36,14 @@ export const createEditor = (
 
     editorInstance.value = monaco.editor.create(monacoContainer.value, config);
   }
-};
+}
 
-export const applyTheme = (
-  theme: string,
-  themeData: monaco.editor.IStandaloneThemeData,
-) => {
+export function applyTheme(theme: string, themeData: monaco.editor.IStandaloneThemeData) {
   if (Object.keys(themeData).length > 0) {
     monaco.editor.defineTheme(theme, themeData);
     monaco.editor.setTheme(theme);
   }
-};
+}
 
 export const isValidJSON = (text: string): boolean => {
   try {

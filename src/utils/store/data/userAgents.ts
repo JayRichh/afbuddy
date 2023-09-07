@@ -134,8 +134,7 @@ export const userAgents: UserAgent[] = [
       },
       {
         title: 'Firefox - Windows',
-        value:
-          'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:70.0) Gecko/20100101 Firefox/70.0',
+        value: 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:70.0) Gecko/20100101 Firefox/70.0',
         platform: 'Win32',
       },
     ],
@@ -263,8 +262,7 @@ export const userAgents: UserAgent[] = [
       },
       {
         title: 'Opera (Presto) - Mac',
-        value:
-          'Opera/9.80 (Macintosh; Intel Mac OS X 10.9.1) Presto/2.12.388 Version/12.16',
+        value: 'Opera/9.80 (Macintosh; Intel Mac OS X 10.9.1) Presto/2.12.388 Version/12.16',
         platform: 'MacIntel',
       },
       {

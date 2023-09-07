@@ -38,12 +38,7 @@
           :style="{ fill: crazyModeEnabled ? 'green' : 'white' }"
         >
           <rect x="1" y="1" width="18" height="18" fill="none" stroke="currentColor" />
-          <path
-            v-if="crazyModeEnabled"
-            d="M5 9l3 3 7-7"
-            stroke="currentColor"
-            fill="none"
-          />
+          <path v-if="crazyModeEnabled" d="M5 9l3 3 7-7" stroke="currentColor" fill="none" />
         </svg>
       </label>
     </div>
@@ -55,14 +50,7 @@ interface MouseEvent extends Window {
   MouseEvent: any;
 }
 
-import {
-  defineComponent,
-  ref,
-  reactive,
-  onMounted,
-  onBeforeUnmount,
-  computed,
-} from 'vue';
+import { defineComponent, ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useStore } from 'vuex';
 import { gsap, Elastic } from 'gsap';
 import { mapState, mapMutations } from 'vuex';

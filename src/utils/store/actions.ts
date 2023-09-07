@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { PIDState } from '../pidstate';
 import { MyActionContext } from './types';
-import { getThemes } from './data/themesList';
+import { getTheme, getThemes } from './data/themesList';
 import { NavItem, NavItems } from '../config';
 import { State } from './types';
 
@@ -15,6 +16,13 @@ export default {
   async updateThemes({ commit }: MyActionContext) {
     const themes = await getThemes();
     commit('setThemes', themes);
+  },
+  async getTheme({ commit }: MyActionContext, themeName: string) {
+    const themeData = await getTheme(themeName);
+    if (!themeData) {
+      throw new Error(`Theme ${themeName} not found`);
+    }
+    return themeData;
   },
   initializePIDState({ commit }: MyActionContext, item: NavItem) {
     const initialState: PIDState = {

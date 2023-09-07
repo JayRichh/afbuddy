@@ -27,44 +27,40 @@ export function setupAnimations() {
   // }
 
   const popin = gsap.timeline();
-  gsap.utils
-    .toArray('.icon-mask:not(:first-child)')
-    .forEach((mask: any, index: number) => {
-      popin
-        .to(
-          mask,
-          {
-            y: `${10 + index * 2}%`,
-            duration: 0.2,
-            ease: 'power1.inOut',
-          },
-          `0.${index}`,
-        )
-        .to(
-          mask,
-          {
-            y: '0%',
-            duration: 0.2,
-            ease: 'power1.inOut',
-          },
-          `0.${index + 2}`,
-        );
-    });
-
-  const popout = gsap.timeline();
-  gsap.utils
-    .toArray('.icon-mask:not(:first-child)')
-    .forEach((mask: any, index: number) => {
-      popout.to(
+  gsap.utils.toArray('.icon-mask:not(:first-child)').forEach((mask: any, index: number) => {
+    popin
+      .to(
+        mask,
+        {
+          y: `${10 + index * 2}%`,
+          duration: 0.2,
+          ease: 'power1.inOut',
+        },
+        `0.${index}`,
+      )
+      .to(
         mask,
         {
           y: '0%',
           duration: 0.2,
           ease: 'power1.inOut',
         },
-        `0.${index}`,
+        `0.${index + 2}`,
       );
-    });
+  });
+
+  const popout = gsap.timeline();
+  gsap.utils.toArray('.icon-mask:not(:first-child)').forEach((mask: any, index: number) => {
+    popout.to(
+      mask,
+      {
+        y: '0%',
+        duration: 0.2,
+        ease: 'power1.inOut',
+      },
+      `0.${index}`,
+    );
+  });
 
   const firstIcon = gsap.timeline();
   firstIcon.fromTo(

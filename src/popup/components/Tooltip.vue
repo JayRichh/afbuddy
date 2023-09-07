@@ -4,11 +4,7 @@
     class="tooltip"
     :style="{ left: `${tooltipX}px`, top: `${tooltipY}px` }"
   >
-    <div
-      v-if="isCodeEditorPreview"
-      class="code-preview"
-      style="height: 100%; width: 100%"
-    >
+    <div v-if="isCodeEditorPreview" class="code-preview" style="height: 100%; width: 100%">
       <div
         ref="monacoContainer"
         class="monaco-instance"
@@ -20,17 +16,10 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  computed,
-  onMounted,
-  watch,
-  onBeforeUnmount,
-  ref,
-  Prop,
-} from 'vue';
+import { defineComponent, computed, onMounted, watch, onBeforeUnmount, ref, Prop } from 'vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { useStore } from 'vuex';
+import { createEditor, applyTheme } from '../../utils/editorUtils';
 
 interface Props {
   themeData: monaco.editor.IStandaloneThemeData;
@@ -56,39 +45,14 @@ export default defineComponent({
     const theme = computed(() => store.state.theme);
     const themeData = computed(() => store.state.themeData);
 
-    const monacoContainer = ref<HTMLElement | null>(null);
+    const monacoContainer = ref<HTMLElement>(null as unknown as HTMLElement);
     const editorInstance = ref(null as monaco.editor.IStandaloneCodeEditor | null);
 
-    const initializeEditor = () => {
-      if (!monacoContainer.value || !editorInstance.value) {
-        console.error('Monaco container or editor instance is not set');
-        return;
-      }
-      store.dispatch('createEditor', {
-        monacoContainer: monacoContainer.value,
-        editorInstance: editorInstance.value,
-      });
-    };
-
-    const applyThemeToEditor = (): void => {
-      if (editorInstance.value) {
-        editorInstance.value.setValue(store.state.tooltipText);
-        store.dispatch('applyTheme', {
-          theme: props.theme,
-          themeData: props.themeData,
-        });
-      } else {
-        store.dispatch('createEditor', { monacoContainer, editorInstance });
-      }
-    };
-
     onMounted(() => {
-      // if (props.isCodeEditorPreview) {
-      //   initializeEditor();
-      // }
-      // if (props.isCodeEditorPreview && props.themeData) {
-      //   applyThemeToEditor();
-      // }
+      if (props.isCodeEditorPreview && monacoContainer.value) {
+        createEditor(monacoContainer, editorInstance, store);
+        applyTheme(theme.value, themeData.value);
+      }
     });
 
     onBeforeUnmount(() => {
@@ -102,18 +66,6 @@ export default defineComponent({
         editorInstance.value.setValue(newText);
       }
     });
-
-    // watch(
-    //   () => props.themeData,
-    //   (newVal) => {
-    //     if (newVal && Object.keys(newVal).length > 0 && editorInstance.value) {
-    //       store.dispatch('applyTheme', {
-    //         theme: props.theme,
-    //         themeData: props.themeData,
-    //       });
-    //     }
-    //   },
-    // );
 
     return {
       tooltipText,

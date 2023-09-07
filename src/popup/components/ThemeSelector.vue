@@ -9,10 +9,10 @@
     ></Tooltip>
 
     <label for="theme-selector" class="theme-label">Select Theme:</label>
-    <select id="theme-selector" v-model="selectedThemeKey">
+    <select id="theme-selector" v-model="selectedThemeKey" @change="applySelectedTheme">
       <option
-        v-for="theme in themeNamesArray"
-        :key="theme"
+        v-for="(theme, index) in themeNamesArray"
+        :key="index"
         :value="theme"
         :selected="theme === currentTheme"
       >
@@ -25,23 +25,16 @@
 
     <div class="label-button-wrapper">
       <div class="button-group-wrapper">
-        <button
-          class="button-group-item button-group-item--right"
-          @click="applySelectedTheme"
-        >
+        <button class="button-group-item button-group-item--right" @click="applySelectedTheme">
           Apply
         </button>
-        <button
-          class="button-group-item button-group-item--left"
-          @click="setDefaultTheme"
-        >
+        <button class="button-group-item button-group-item--left" @click="setDefaultTheme">
           Default
         </button>
       </div>
     </div>
   </div>
 </template>
-
 <script lang="ts">
 import { defineComponent, onMounted, computed, ref } from 'vue';
 import Tooltip from './Tooltip.vue';
@@ -59,7 +52,7 @@ export default defineComponent({
     const store = useStore();
     const themes = computed(() => store.state.themes);
     const themeNamesArray = computed(() => themes.value.themeNamesArray);
-    const selectedThemeKey = ref(props.currentTheme);
+    const selectedThemeKey = ref(props.currentTheme || 'Amy');
     const showTooltip = ref(false);
     const tooltipX = ref(0);
     const tooltipY = ref(0);
@@ -68,6 +61,7 @@ export default defineComponent({
       if (selectedThemeKey.value) {
         await store.dispatch('applySelectedTheme', selectedThemeKey.value);
       }
+      setDefaultTheme();
     });
 
     function handleThemeMouseOver(event: MouseEvent) {
@@ -88,18 +82,19 @@ export default defineComponent({
     }
 
     async function applySelectedTheme() {
-      const themeName = selectedThemeKey.value;
-      const themeData = await store.getters.getThemeData(themeName);
-      if (themeData) {
-        store.dispatch('applyTheme', {
-          theme: themeData,
-        });
+      if (selectedThemeKey.value) {
+        const themeData = await store.dispatch('getTheme', selectedThemeKey.value);
+        if (themeData) {
+          store.dispatch('applyTheme', {
+            theme: themeData,
+          });
+        }
       }
     }
 
     async function setDefaultTheme() {
       const defaultTheme = 'GitHub';
-      const themeData = await store.getters.getThemeData(defaultTheme);
+      const themeData = await store.dispatch('getTheme', defaultTheme);
       if (themeData) {
         store.dispatch('applyTheme', {
           theme: themeData,

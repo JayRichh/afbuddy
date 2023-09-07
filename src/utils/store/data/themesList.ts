@@ -1179,8 +1179,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '782ec1',
-        token:
-          'meta.function-call entity.name.function -(meta.function-call meta.function)',
+        token: 'meta.function-call entity.name.function -(meta.function-call meta.function)',
       },
       {
         foreground: '782ec1',
@@ -1584,8 +1583,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'bc80ff',
-        token:
-          'text.latex support.function -support.function.textit -support.function.emph',
+        token: 'text.latex support.function -support.function.textit -support.function.emph',
       },
       {
         foreground: 'ffffffbf',
@@ -1662,8 +1660,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '33333333',
         background: '000000',
-        token:
-          'text.latex meta.environment.list meta.environment.list meta.environment.list',
+        token: 'text.latex meta.environment.list meta.environment.list meta.environment.list',
       },
       {
         foreground: '33333333',
@@ -2311,8 +2308,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '1c1c1c',
-        token:
-          'meta.section meta.section meta.section meta.section meta.section meta.section',
+        token: 'meta.section meta.section meta.section meta.section meta.section meta.section',
       },
       {
         background: '1f1f1f',
@@ -2838,8 +2834,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: '8d809d',
-        token:
-          'meta.function-call entity.name.function -(meta.function-call meta.function)',
+        token: 'meta.function-call entity.name.function -(meta.function-call meta.function)',
       },
       {
         foreground: '8d809d',
@@ -3132,8 +3127,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'bdabd1',
-        token:
-          'text.latex support.function -support.function.textit -support.function.emph',
+        token: 'text.latex support.function -support.function.textit -support.function.emph',
       },
       {
         foreground: 'ffffffbf',
@@ -3206,8 +3200,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '33333333',
         background: '000000',
-        token:
-          'text.latex meta.environment.list meta.environment.list meta.environment.list',
+        token: 'text.latex meta.environment.list meta.environment.list meta.environment.list',
       },
       {
         foreground: '33333333',
@@ -5650,8 +5643,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'eeeeee',
-        token:
-          'punctuation.definition.string.end.json - meta.structure.dictionary.value.json',
+        token: 'punctuation.definition.string.end.json - meta.structure.dictionary.value.json',
       },
       {
         foreground: '8be9fd',
@@ -10022,8 +10014,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '99c794',
         fontStyle: 'normal',
-        token:
-          'meta.group.braces.curly constant.other.object.key.js string.unquoted.label.js',
+        token: 'meta.group.braces.curly constant.other.object.key.js string.unquoted.label.js',
       },
       {
         foreground: 'fac863',
@@ -16375,18 +16366,21 @@ export const getThemes = (): Promise<{
 //   return themesArray;
 // };
 
-// /**
-//  * Get a theme object by name.
-//  * @param {string} themeName - Theme base name.
-//  * @returns {Theme} - Theme object.
-//  */
-// export const getTheme = (themeName: string): Theme => {
-//   const theme = themesArray.find((theme) => theme.base === themeName);
-//   if (!theme) {
-//     throw new Error(`Theme ${themeName} not found`);
-//   }
-//   return theme;
-// };
+/**
+ * Get a theme object by name.
+ * @param {string} themeName - Theme base name.
+ * @returns {Theme} - Theme object.
+ */
+export const getTheme = async (themeName: string): Promise<Theme> => {
+  return new Promise((resolve, reject) => {
+    const theme: Theme | undefined = themesArray[themeName];
+
+    if (!theme) {
+      reject(new Error(`Theme ${themeName} not found`));
+    }
+    resolve(theme);
+  });
+};
 
 // /**
 //  * Check if a color is light or dark.

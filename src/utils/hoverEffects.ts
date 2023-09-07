@@ -9,7 +9,12 @@ export function setupHoverEffects(store: Store<State>) {
   const updatePosition = () => {
     if (latestEvent) {
       const element = document.elementFromPoint(latestEvent.clientX, latestEvent.clientY);
-      const draggableElement = element?.closest('.draggable') as HTMLElement | null;
+      const themeSelectorElement = element?.closest(
+        '#theme-selector',
+      ) as HTMLSelectElement | null;
+      const draggableElement = element?.closest(
+        '.draggable:not(.no-tooltip)',
+      ) as HTMLElement | null;
 
       if (draggableElement) {
         const state = PIDStateMap.get(draggableElement.getAttribute('aria-label') || '');
@@ -26,6 +31,24 @@ export function setupHoverEffects(store: Store<State>) {
             visible: true,
           });
         }
+      } else if (themeSelectorElement) {
+        const selectedThemeIndex = themeSelectorElement.selectedIndex;
+        const selectedTheme = themeSelectorElement.options[selectedThemeIndex].value;
+        const monacoTheme = store.getters.getMonacoTheme(selectedTheme);
+        store.dispatch('updateTooltip', {
+          text: `Monaco Theme: ${monacoTheme}`,
+          x: latestEvent.clientX,
+          y: latestEvent.clientY,
+          visible: true,
+          isMonaco: true,
+        });
+      } else {
+        store.dispatch('updateTooltip', {
+          text: '',
+          x: 0,
+          y: 0,
+          visible: false,
+        });
       }
     }
     requestAnimationFrame(updatePosition);
@@ -35,14 +58,5 @@ export function setupHoverEffects(store: Store<State>) {
 
   document.addEventListener('mousemove', (event: MouseEvent) => {
     latestEvent = event;
-  });
-
-  document.addEventListener('mouseleave', () => {
-    store.dispatch('updateTooltip', {
-      text: '',
-      x: 0,
-      y: 0,
-      visible: false,
-    });
   });
 }

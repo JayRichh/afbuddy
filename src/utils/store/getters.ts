@@ -21,7 +21,7 @@ export default {
   getTabWidth: (state: State) => state.tabWidth,
   getTabManagementEnabled: (state: State) => state.tabManagementEnabled,
   getTabSetPoint: (state: State) => state.tabSetPoint,
-  getThemeData: (state: State) => state.themeData,
+  getTheme: (state: State) => state.themeData,
   getTooltipTheme: (state: State) => state.tooltipTheme,
   getUserAgent: (state: State) => state.userAgent,
   getSelectedTheme: (state: State) => state.selectedTheme,
