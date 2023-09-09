@@ -46,71 +46,65 @@
 </template>
 
 <script lang="ts">
-interface MouseEvent extends Window {
-  MouseEvent: any;
-}
-
-import { defineComponent, ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue';
+import { defineComponent, ref, computed, Ref, inject, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { gsap, Elastic } from 'gsap';
 import { mapState, mapMutations } from 'vuex';
 import { Draggable } from 'gsap/Draggable';
 import { NavItem } from '../../utils/config';
-import { PIDStateMap } from '../../utils/pidstate';
 
 gsap.registerPlugin(Draggable);
 export default defineComponent({
   props: {
     currentComponent: String,
   },
-  setup(props) {
-    const crazyModeEnabled = computed(() => store.state.crazyModeEnabled);
-    const iconRefs = ref([]) as any;
+  setup(props, context) {
     onMounted(() => {
-      console.log(iconRefs.value);
+      setActiveIcon('ThemeSelector');
+    });
+    const store = useStore();
+    const iconMaskStyles = inject('iconMaskStyles') as Ref<Record<string, string>>;
+    const iconRefs = ref([]) as any;
+
+    watch(iconMaskStyles, (newStyles) => {
+      iconRefs.value.forEach((icon: any) => {
+        const newStyle = newStyles[icon.id];
+        if (newStyle) {
+          const whiteIcon = icon.querySelector('.white-icon');
+          whiteIcon.style.clipPath = newStyle;
+
+          if (icon.id === 'ThemeSelector') {
+            icon.classList.add('active');
+          }
+        }
+      });
     });
 
-    const store = useStore();
-    const displayNavItems = computed(() => {
-      if (store.state.crazyModeEnabled) {
-        return store.state.navItems;
-      } else {
-        return store.state.navItems.slice(1);
-      }
-    });
+    const setActiveIcon = (iconId: string) => {
+      iconRefs.value.forEach((icon: any) => {
+        icon.classList.remove('active');
+        if (icon.id === iconId) {
+          icon.classList.add('active');
+        }
+      });
+    };
+
+    const crazyModeEnabled = computed(() => store.state.crazyModeEnabled);
+    const displayNavItems = computed(() =>
+      store.state.crazyModeEnabled ? store.state.navItems : store.state.navItems.slice(1),
+    );
 
     const handleClick = (item: NavItem) => {
-      console.log('Clicked item:', item);
       store.dispatch('updateCurrentComponent', item.componentName);
+      setActiveIcon(item.id as string);
+      context.emit('changeComponent', item.componentName);
     };
 
-    const isActive = (componentName: string) => {
-      return componentName === props.currentComponent;
-    };
+    const isActive = (componentName: string) => componentName === props.currentComponent;
 
     const crazyModeToggle = () => {
       store.commit('setCrazyModeEnabled', !store.state.crazyModeEnabled);
-      const checkboxSvg = document.querySelector('.checkbox-svg');
-      //   if (store.state.crazyModeEnabled) {
-      //     gsap.to(checkboxSvg, {
-      //       rotation: 360,
-      //       duration: 1,
-      //       ease: Elastic.easeOut.config(1, 0.3),
-      //     });
-      //     iconRefs.value.forEach((icon: any) => {
-      //       const state = PIDStateMap.get(icon.getAttribute('aria-label') || '');
-      //       if (state) {
-      //         state.setPointX = state.originalX;
-      //         state.setPointY = state.originalY;
-      //       }
-      //     });
-      //   } else {
-      //     gsap.to(checkboxSvg, {
-      //       rotation: 0,
-      //       duration: 1,
-      //       ease: Elastic.easeOut.config(1, 0.3),
-      //     });
-      //   }
+      // Animate
     };
 
     return {
@@ -120,12 +114,14 @@ export default defineComponent({
       crazyModeToggle,
       iconRefs,
       crazyModeEnabled,
+      setActiveIcon,
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
+@import '../animation-keyframes.scss';
 .hidden {
   display: none;
 }
@@ -155,14 +151,23 @@ img {
     position: relative;
     width: 40px;
     height: 40px;
+    mask-position: 0% 0px;
+    -webkit-mask-position: 0% 0px;
 
     &:hover {
       cursor: pointer;
       filter: brightness(1.5) drop-shadow(0 0 10px rgba(255, 255, 255, 0.814));
     }
 
-    &:active {
+    .active {
       filter: drop-shadow(0 0 5px white) blur(1px);
+      background: transparent;
+      mask-image: linear-gradient(-45deg, #52bcba, #f5a553, #3575b3, #061a34);
+      -webkit-mask-image: linear-gradient(-45deg, #52bcba, #f5a553, #3575b3, #061a34);
+      mask-size: 400% 400%;
+      -webkit-mask-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      -webkit-animation: gradient 15s ease infinite;
     }
   }
 
@@ -171,6 +176,12 @@ img {
     width: 40px;
     height: 40px;
     object-fit: contain;
+    z-index: 2;
+  }
+  .masked-icon.white-icon {
+    clip-path: inset(0 0 0 0) !important;
+    -webkit-clip-path: inset(0 0 0 0) !important;
+    z-index: 2;
   }
 
   .crazy-mode-toggle {
@@ -213,127 +224,6 @@ img {
     }
   }
 
-  @keyframes glow {
-    from {
-      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.514));
-    }
-    to {
-      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 1));
-    }
-  }
-
-  @keyframes paintbrushFlick {
-    0% {
-      transform: rotate(0deg) translateX(20px);
-    }
-    20% {
-      transform: rotate(-100deg) translateX(20px);
-    }
-    40% {
-      transform: rotate(70deg) translateX(20px);
-    }
-    60% {
-      transform: rotate(-50deg) translateX(20px);
-    }
-    80% {
-      transform: rotate(30deg) translateX(20px);
-    }
-    100% {
-      transform: rotate(0deg) translateX(20px);
-    }
-  }
-  @keyframes pyramidRoll {
-    0%,
-    100% {
-      transform: scaleY(1) rotate(0deg) translateX(20px);
-    }
-    25% {
-      transform: scaleY(0.7) rotate(1200deg) translateX(20px);
-    }
-    50% {
-      transform: scaleY(0.9) rotate(2400deg) translateX(20px);
-    }
-    75% {
-      transform: scaleY(0.8) rotate(3600deg) translateX(20px);
-    }
-  }
-  @keyframes wheelSpin {
-    0% {
-      transform: rotate(0deg);
-    }
-    40% {
-      transform: rotate(-365deg);
-    }
-    70% {
-      transform: rotate(-355deg);
-    }
-    90% {
-      transform: rotate(-360deg);
-    }
-    100% {
-      transform: rotate(-358deg);
-    }
-  }
-  @keyframes gamePulse {
-    0%,
-    100% {
-      filter: hue-rotate(0deg);
-      transform: translateY(0);
-    }
-    30% {
-      filter: hue-rotate(15deg);
-      transform: translateY(-5px);
-    }
-    70% {
-      filter: hue-rotate(-15deg);
-      transform: translateY(5px);
-    }
-  }
-  @keyframes markerPulse {
-    0%,
-    100% {
-      transform: scale(1) translateY(0);
-    }
-    50% {
-      transform: scale(1.05) translateY(-2px);
-    }
-  }
-  @keyframes magnifyZoom {
-    0%,
-    100% {
-      transform: scale(1) rotate(0deg);
-    }
-    50% {
-      transform: scale(1.1) translateX(10%) translateY(-10%) rotate(5deg);
-    }
-  }
-  @keyframes infoAwesome {
-    0%,
-    100% {
-      transform: translateY(0);
-      filter: brightness(1);
-    }
-    50% {
-      transform: translateY(-3px);
-      filter: brightness(1.2);
-    }
-  }
-
-  @keyframes pulseGlow {
-    0%,
-    100% {
-      filter: brightness(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-    }
-    25% {
-      filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
-    }
-    50% {
-      filter: brightness(1) drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
-    }
-    75% {
-      filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
-    }
-  }
   a.pyramidRoll {
     animation: pyramidRoll 3.5s cubic-bezier(0.32, 0, 0.67, 1);
   }
@@ -357,50 +247,5 @@ img {
       drop-shadow(0 0 10px #d4a5a5) drop-shadow(0 0 10px #392343);
     animation: GradientShadow 3s ease infinite;
   }
-
-  @keyframes GradientShadow {
-    0% {
-      filter: drop-shadow(0 0 10px #ffc3a0);
-    }
-    25% {
-      filter: drop-shadow(0 0 10px #ffafbd);
-    }
-    50% {
-      filter: drop-shadow(0 0 10px #d4a5a5);
-    }
-    75% {
-      filter: drop-shadow(0 0 10px #392343);
-    }
-    100% {
-      filter: drop-shadow(0 0 10px #ffc3a0);
-    }
-  }
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-      filter: brightness(1);
-    }
-    20% {
-      transform: scale(1.3);
-      filter: brightness(1.3);
-    }
-    40% {
-      transform: scale(1.6);
-      filter: brightness(1.6);
-    }
-    60% {
-      transform: scale(1.3);
-      filter: brightness(1.3);
-    }
-    80% {
-      transform: scale(1);
-      filter: brightness(1);
-    }
-    100% {
-      transform: scale(1);
-      filter: brightness(1);
-    }
-  }
 }
 </style>
-../../utils/hoverEffects

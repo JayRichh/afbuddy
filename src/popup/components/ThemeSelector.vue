@@ -33,9 +33,20 @@
         </button>
       </div>
     </div>
+
+    <div class="font-selector-container">
+      <label for="font-selector" class="font-label">Select Font:</label>
+      <select id="font-selector" v-model="selectedFont" @change="applyFont">
+        <option v-for="font in fonts" :key="font" :value="font" :selected="font === font">
+          {{ font }}
+        </option>
+      </select>
+    </div>
   </div>
 </template>
+
 <script lang="ts">
+import Fonts from './Fonts.vue';
 import { defineComponent, onMounted, computed, ref } from 'vue';
 import Tooltip from './Tooltip.vue';
 import { useStore } from 'vuex';
@@ -52,34 +63,22 @@ export default defineComponent({
     const store = useStore();
     const themes = computed(() => store.state.themes);
     const themeNamesArray = computed(() => themes.value.themeNamesArray);
-    const selectedThemeKey = ref(props.currentTheme || 'Amy');
+    const selectedThemeKey = ref(props.currentTheme);
     const showTooltip = ref(false);
     const tooltipX = ref(0);
     const tooltipY = ref(0);
 
+    const fonts = ref(['Roboto', 'Roboto Italic', 'Roboto Slab']);
+    const selectedFont = ref(fonts.value[0]);
+    const currentFont = computed(() => store.state.font);
+
     onMounted(async () => {
-      if (selectedThemeKey.value) {
-        await store.dispatch('applySelectedTheme', selectedThemeKey.value);
+      if (!selectedThemeKey.value) {
+        selectedThemeKey.value = 'github-dark';
       }
+      await store.dispatch('applySelectedTheme', selectedThemeKey.value);
       setDefaultTheme();
     });
-
-    function handleThemeMouseOver(event: MouseEvent) {
-      if (!store.state.monacoContainer || !store.state.editorInstance) {
-        console.error('Monaco container or editor instance is not set');
-        return;
-      }
-      showTooltip.value = true;
-      store.dispatch('createEditor', {
-        monacoContainer: store.state.monacoContainer,
-        editorInstance: store.state.editorInstance,
-      });
-      if (selectedThemeKey.value) {
-        store.dispatch('applyTheme', {
-          theme: selectedThemeKey.value,
-        });
-      }
-    }
 
     async function applySelectedTheme() {
       if (selectedThemeKey.value) {
@@ -90,10 +89,20 @@ export default defineComponent({
           });
         }
       }
+      if (selectedFont.value) {
+        document.documentElement.style.setProperty('--editor-font', selectedFont.value);
+      }
+    }
+
+    async function applyFont() {
+      if (selectedFont.value) {
+        // document.documentElement.style.setProperty('--editor-font', selectedFont.value);
+        console.log('selectedFont.value', selectedFont.value);
+      }
     }
 
     async function setDefaultTheme() {
-      const defaultTheme = 'GitHub';
+      const defaultTheme = selectedThemeKey.value;
       const themeData = await store.dispatch('getTheme', defaultTheme);
       if (themeData) {
         store.dispatch('applyTheme', {
@@ -107,17 +116,20 @@ export default defineComponent({
       showTooltip,
       tooltipX,
       tooltipY,
-      handleThemeMouseOver,
       applySelectedTheme,
       setDefaultTheme,
       themeNamesArray,
+      fonts,
+      selectedFont,
+      applyFont,
     };
   },
 });
 </script>
 
 <style scoped lang="scss">
-.theme-selector-container {
+.theme-selector-container,
+.font-selector-container {
   position: relative;
   display: flex;
   flex-direction: column;

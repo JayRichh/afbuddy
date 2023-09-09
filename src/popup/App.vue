@@ -30,40 +30,37 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, onMounted } from 'vue';
-import { useStore } from 'vuex';
-import Navbar from './components/Navbar.vue';
-import ThemeSelector from './components/ThemeSelector.vue';
-import Json from './components/Json.vue';
-import TabManager from './components/TabManager.vue';
-import CodeControls from './components/CodeControls.vue';
-import Geolocation from './components/Geolocation.vue';
-import UserAgents from './components/UserAgents.vue';
-import Info from './components/Info.vue';
-import Tooltip from './components/Tooltip.vue';
-import DoomPlayer from './components/DoomPlayer.vue';
+import { defineComponent, computed, ref, onMounted, provide, nextTick } from 'vue';
+import { mapState, mapActions, mapMutations, useStore } from 'vuex';
+import gsap from 'gsap';
 import { ExpoScaleEase, RoughEase, SlowMo } from 'gsap/EasePack';
 import Draggable from 'gsap/Draggable';
-import { gsap } from 'gsap';
-import { setupDraggable } from '../utils/setupDraggable';
-import { mapState, mapMutations } from 'vuex';
-import { setupAnimations } from '../utils/animations';
-import { listenForKonamiCode as konamiCodeListener } from '../utils/z';
-import state from '../utils/store/state';
-import { setupHoverEffects } from '../utils/hoverEffects';
+import {
+  Navbar,
+  ThemeSelector,
+  Json,
+  TabManager,
+  CodeControls,
+  Geolocation,
+  UserAgents,
+  Info,
+  Tooltip,
+  DoomPlayer,
+} from './components';
+
+import {
+  setupDraggable,
+  setupAnimations,
+  listenForKonamiCode as konamiCodeListener,
+  setupHoverEffects,
+} from '../utils';
 
 gsap.registerPlugin(ExpoScaleEase, RoughEase, SlowMo, Draggable);
 
-interface Data {
-  currentComponent: string;
-  scriptContentForTooltip: string;
-  isDraggable: boolean;
-}
-
 export default defineComponent({
   components: {
-    Navbar: Navbar,
-    ThemeSelector: ThemeSelector,
+    Navbar,
+    ThemeSelector,
     Json,
     TabManager,
     CodeControls,
@@ -73,17 +70,9 @@ export default defineComponent({
     Tooltip,
     DoomPlayer,
   },
-
-  data(): Data {
-    return {
-      currentComponent: 'ThemeSelector',
-      scriptContentForTooltip: '',
-      isDraggable: false,
-    };
-  },
-
   computed: {
     ...mapState([
+      'currentComponent',
       'tooltipText',
       'tooltipX',
       'tooltipY',
@@ -94,53 +83,47 @@ export default defineComponent({
       'themeData',
       'pidState',
     ]),
-  },
-
-  methods: {
-    ...mapMutations([
-      'setTooltipText',
-      'setTooltipX',
-      'setTooltipY',
-      'setShowTooltip',
-      'setCurrentComponent',
-      'setCrazyModeEnabled',
-    ]),
-    handleComponentChange(componentName: string) {
-      const store = useStore();
-      store.commit('setCurrentComponent', componentName);
-    },
-    listenForKonamiCode() {
-      let input = '';
-      const secret = '38384040373937396665';
-      window.addEventListener('keyup', (e: KeyboardEvent) => {
-        input += '' + e.keyCode;
-        if (input === secret) {
-          this.activatePixelPerfection();
-          input = '';
-        }
-      });
-    },
-    activatePixelPerfection() {},
-  },
-
-  setup() {
-    let [firstIcon, popin, popout]: gsap.core.Timeline[] = [];
-    const store = useStore();
-    const currentComponent = computed(() => store.state.currentComponent);
-
-    const formattedTitle = computed(() => {
-      const title = store.state.currentComponent;
+    formattedTitle() {
+      const title = this.currentComponent;
       return title
         .replace(/([A-Z])/g, ' $1')
         .trim()
         .replace(' ', '\n');
-    });
+    },
+  },
+  methods: {
+    ...mapActions(['initializeStore']),
+    ...mapMutations(['setCurrentComponent', 'setCrazyModeEnabled']),
+  },
+  setup() {
+    const store = useStore();
+    const iconMaskStyles = ref<Record<string, string>>({});
+    let [firstIcon, popin, popout]: gsap.core.Timeline[] = [];
+    const secret = '38384040373937396665';
+    let input = '';
+    provide('iconMaskStyles', iconMaskStyles);
 
-    onMounted(() => {
+    const listenForKonamiCode = () => {
+      window.addEventListener('keyup', (e: KeyboardEvent) => {
+        input += '' + e.keyCode;
+        if (input === secret) {
+          // Activate Pixel Perfection
+          input = '';
+        }
+      });
+    };
+
+    onMounted(async () => {
+      listenForKonamiCode();
+      konamiCodeListener(() => {
+        // Activate Pixel Perfection
+      });
+
+      await store.dispatch('initializeStore');
+
       const animations = setupAnimations();
       const { tl, popin, popout, firstIcon } = animations;
       tl.play();
-
       gsap.utils.toArray('.icon-mask').forEach((mask: any, index: number) => {
         if (index === 0) {
           firstIcon.play();
@@ -149,44 +132,33 @@ export default defineComponent({
           popout.play();
         }
       });
+
+      nextTick(() => {
+        setupHoverEffects(store);
+        setupDraggable(store, iconMaskStyles);
+      });
     });
-
-    const crazyModeToggle = () => {
-      store.commit('setCrazyModeEnabled', !store.state.crazyModeEnabled);
-
-      if (store.state.crazyModeEnabled) {
-        firstIcon.play();
-        popin.play();
-      } else {
-        firstIcon.reverse();
-        popout.play();
-      }
-    };
 
     return {
-      formattedTitle,
-      crazyModeToggle,
-      currentComponent,
+      handleComponentChange: (componentName: string) => {
+        store.dispatch('updateCurrentComponent', componentName);
+      },
+      store,
+      iconMaskStyles,
+      listenForKonamiCode,
+      secret,
+      input,
+      firstIcon,
+      popin,
+      popout,
     };
-  },
-
-  async mounted() {
-    this.listenForKonamiCode = this.listenForKonamiCode.bind(this) as () => void;
-    this.activatePixelPerfection = this.activatePixelPerfection.bind(this) as () => void;
-    konamiCodeListener(this.activatePixelPerfection);
-
-    const store = useStore();
-    await store.dispatch('initializeStore');
-
-    this.$nextTick(() => {
-      setupHoverEffects(store);
-      setupDraggable(store);
-    });
   },
 });
 </script>
 
 <style lang="scss">
+@import './animation-keyframes.scss';
+
 .underline-wrapper {
   display: flex;
   align-items: flex-start;
@@ -340,64 +312,5 @@ h1 {
 
 .paintbrush:active {
   cursor: pointer;
-}
-
-// Animation Keyframes
-@keyframes rockBrush {
-  0% {
-    transform: rotate(-5deg);
-  }
-  25% {
-    transform: rotate(10deg);
-  }
-  50% {
-    transform: rotate(-10deg);
-  }
-  75% {
-    transform: rotate(5deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes spinAndRubberBand {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(180deg);
-  }
-}
-
-@keyframes throwBrush {
-  0% {
-    transform: translateY(0) scaleX(1) scaleY(1);
-  }
-  10% {
-    transform: translateY(10px) scaleX(1) scaleY(1);
-  }
-  20% {
-    transform: translateY(-10px) rotate(180deg) scaleX(1) scaleY(1);
-  }
-  60% {
-    transform: translateY(0) rotate(360deg) scaleX(1) scaleY(1);
-  }
-  70%,
-  80%,
-  90% {
-    transform: translateY(10px) rotate(360deg - 15deg) scaleX(1) scaleY(1);
-  }
-  75%,
-  85% {
-    transform: translateY(0) rotate(360deg + 15deg) scaleX(1) scaleY(1);
-  }
-  95% {
-    transform: translateY(0) rotate(365deg) scaleX(1) scaleY(1);
-  }
-  100% {
-    transform: translateY(0) rotate(360deg) scaleX(1) scaleY(1);
-  }
 }
 </style>

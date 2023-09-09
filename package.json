@@ -14,6 +14,7 @@
 		"clean": "rimraf dist",
 		"copy:static": "copyfiles manifest.json assets/**/* dist",
 		"dist": "npm run clean && npm run build && npm run copy:static && prettier --write .",
+		"postbuild": "open http://reload.extensions",
 		"lint": "prettier --check .",
 		"test": "jest -c ./config/jest.config.js"
 	},

@@ -1,11 +1,12 @@
 import { Theme } from './data/themesList';
 import { NavItems } from '../config';
-import { PIDState } from '../hoverEffects';
+import { PIDState } from '../pidstate';
 import { userAgents } from './data/userAgents';
 import * as monaco from 'monaco-editor';
 import { ActionContext } from 'vuex';
 
 export interface State {
+  selectedThemeKey: string;
   PIDStateMap?: Map<string, PIDState>;
   draggableElements?: HTMLElement[];
   tooltipText?: string;

@@ -43,6 +43,16 @@ const state = {
   tooltipTheme: {} as object,
   userAgents: userAgents,
   userAgent: '',
+  fonts: {
+    'DejaVu Sans Mono': { params: {} },
+    'JetBrains Mono': { params: {} },
+    'Source Code Pro': { params: {} },
+    Roboto: { params: {} },
+    'Roboto Slab': { params: {} },
+  },
+  font: '',
+  fontSizes: [10, 12, 14, 16, 18, 20, 22, 24, 26, 28],
+  fontSize: 0,
 };
 
 export default state;

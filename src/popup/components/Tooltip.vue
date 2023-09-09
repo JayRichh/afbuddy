@@ -16,7 +16,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted, watch, onBeforeUnmount, ref, Prop } from 'vue';
+import {
+  defineComponent,
+  computed,
+  onMounted,
+  watch,
+  onBeforeUnmount,
+  ref,
+  Prop,
+  Ref,
+} from 'vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { useStore } from 'vuex';
 import { createEditor, applyTheme } from '../../utils/editorUtils';
@@ -33,7 +42,7 @@ export default defineComponent({
       type: Object as () => monaco.editor.IStandaloneThemeData,
       default: () => ({}),
     },
-    theme: { type: String, default: 'GitHub' },
+    theme: { type: String, default: 'github-dark' },
     isCodeEditorPreview: { type: Boolean, default: false },
   },
   setup(props: Props) {
@@ -45,13 +54,17 @@ export default defineComponent({
     const theme = computed(() => store.state.theme);
     const themeData = computed(() => store.state.themeData);
 
-    const monacoContainer = ref<HTMLElement>(null as unknown as HTMLElement);
-    const editorInstance = ref(null as monaco.editor.IStandaloneCodeEditor | null);
+    const monacoContainer = ref<HTMLElement>();
+    const editorInstance = ref<monaco.editor.IStandaloneCodeEditor>();
 
     onMounted(() => {
       if (props.isCodeEditorPreview && monacoContainer.value) {
-        createEditor(monacoContainer, editorInstance, store);
-        applyTheme(theme.value, themeData.value);
+        createEditor(
+          monacoContainer as Ref<HTMLElement | null>,
+          editorInstance as Ref<monaco.editor.IStandaloneCodeEditor | null>,
+          store,
+        );
+        applyTheme(props.theme, props.themeData);
       }
     });
 
