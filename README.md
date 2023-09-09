@@ -48,6 +48,7 @@ Note: Project in development. Currently only 60% of the time, it works every tim
   - **Layout**: Customize the window layout.
   - **CustomThemes**: Craft your own unique themes.
   - **FontSelector**: Choose from a diverse range of fonts.
+  - ~**IntelliSense**: Adjust and control sentivity or active focus to the IntelliSense dropdown.~
 
 - **Navigation**:
 
