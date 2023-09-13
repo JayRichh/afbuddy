@@ -62,3 +62,6 @@ wwwroot/
 *.pem
 *.crt
 *.key
+*.zip
+*.gz
+*.crx
