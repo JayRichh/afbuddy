@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="two" class="button" @click="showModal = !showModal">Open Editor</div>
-    <div v-if="showModal" class="modal draggable two">
+    <div v-if="showModal" class="modal two">
       <div class="modal-header">
         <h5 class="modal-title">JSON Editor</h5>
         <button type="button" class="close" @click="showModal = false">
@@ -9,15 +9,11 @@
         </button>
       </div>
       <div class="modal-body">
-        <div
-          ref="monacoContainer"
-          class="monaco-instance draggable"
-          style="height: 100%; width: 100%"
-        ></div>
+        <div ref="monacoContainer" class="monaco-instance" style="height: 100%; width: 100%"></div>
       </div>
       <div class="modal-footer">
-        <input type="checkbox" v-model="autoFormat" class="draggable" /> Auto Format
-        <button @click="formatJSON" class="draggable">Format JSON</button>
+        <input type="checkbox" v-model="autoFormat" class="" /> Auto Format
+        <button @click="formatJSON" class="">Format JSON</button>
       </div>
     </div>
   </div>
@@ -104,9 +100,6 @@ export default defineComponent({
 }
 .modal {
   position: fixed;
-}
-.draggable {
-  cursor: move;
 }
 
 .modal-dialog {

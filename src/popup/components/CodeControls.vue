@@ -1,29 +1,35 @@
 <template>
   <div class="code-controls-container">
+    <label for="search-scripts" class="search-label">Search Scripts:</label>
+    <input id="search-scripts" type="text" placeholder="Search scripts..." v-model="searchTerm" />
+
+    <label class="history-label">Script History:</label>
+    <ul id="history">
+      <li v-for="script in filteredScripts" :key="script.id">
+        <div
+          class="script-info"
+          @mouseover="showPreview(script, $event)"
+          @mouseleave="hidePreview"
+          @click="loadScriptIntoMainEditor(script)"
+        >
+          <span class="script-icon">📄</span>
+          <span class="script-date">{{ script.date }}</span>
+        </div>
+        <div class="script-actions">
+          <button class="action-btn load-btn">Load</button>
+          <button class="action-btn delete-btn">Delete</button>
+          <button class="action-btn rename-btn">Rename</button>
+        </div>
+      </li>
+    </ul>
+
     <div class="button-group">
-      <button class="control-btn" @click="saveJsonToLocalStorage">Save Code 💾</button>
-      <button class="control-btn" @click="loadJsonFromLocalStorage">Load Code 📂</button>
-    </div>
-    <div class="history-panel">
-      <input type="text" placeholder="Search scripts..." v-model="searchTerm" />
-      <ul id="history">
-        <li v-for="script in filteredScripts" :key="script.id">
-          <div
-            class="script-info"
-            @mouseover="showPreview(script, $event)"
-            @mouseleave="hidePreview"
-            @click="loadScriptIntoMainEditor(script)"
-          >
-            <span class="script-icon">📄</span>
-            <span class="script-date">{{ script.date }}</span>
-          </div>
-          <div class="script-actions">
-            <button class="load-btn action-btn">Load</button>
-            <button class="delete-btn action-btn">Delete</button>
-            <button class="rename-btn action-btn">Rename</button>
-          </div>
-        </li>
-      </ul>
+      <button class="button-group-item button-group-item--left" @click="saveJsonToLocalStorage">
+        Save Code 💾
+      </button>
+      <button class="button-group-item button-group-item--right" @click="loadJsonFromLocalStorage">
+        Load Code 📂
+      </button>
     </div>
   </div>
 </template>
@@ -52,9 +58,7 @@ export default defineComponent({
     },
     filteredScripts() {
       if (!this.searchTerm) return this.jsonObjects;
-      return this.jsonObjects.filter((script: Script) =>
-        script.content.includes(this.searchTerm),
-      );
+      return this.jsonObjects.filter((script: Script) => script.content.includes(this.searchTerm));
     },
   },
   methods: {
@@ -81,83 +85,92 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .code-controls-container {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  width: calc(100% - 50px);
-  background-color: rgba(255, 255, 255, 0.8);
-  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 60px 0 0 0;
+  width: 100%;
 }
 
-.button-group {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
+.search-label,
+.history-label {
+  text-align: left;
+  color: #555;
+  width: 85%;
+  font-weight: 500;
   margin-bottom: 1rem;
 }
 
-.control-btn {
-  flex: 1;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  background: linear-gradient(45deg, #ffd3b6, #b2ebf2);
-  color: #333;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  text-align: center;
+input {
+  color: #555;
+  border-radius: 5px;
+  width: 87.5%;
+  margin-bottom: 20px;
+  padding: 5px;
+  font-size: 1.1em;
+  font-weight: 500;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:active {
+    cursor: pointer;
+  }
 }
 
-.control-btn:hover {
-  background: linear-gradient(45deg, #ffb299, #80d8ff);
-}
-
-.history-panel {
+.button-group {
   margin-top: 1rem;
-  max-height: 200px;
-  overflow: auto;
-}
-
-.script-tooltip {
+  bottom: 1rem;
   position: absolute;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  padding: 0.5rem;
-  max-width: 300px;
-  z-index: 1;
-  white-space: pre-wrap;
-  text-overflow: ellipsis;
 }
 
-.script-info {
-  display: flex;
-  align-items: center;
+.button-group-item {
+  cursor: pointer;
+  text-transform: uppercase;
+  height: 38px;
+  width: 90px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 0.25rem;
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
-.script-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+.button-group-item--left {
+  background-color: #dc3545;
+  color: white;
+  border: 1px solid darken(#dc3545, 10%);
+
+  &:hover,
+  &:active {
+    background-color: darken(#dc3545, 10%);
+    border-color: darken(#dc3545, 20%);
+  }
 }
 
-.script-icon {
-  margin-right: 0.5rem;
+.button-group-item--right {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid darken(#007bff, 10%);
+
+  &:hover,
+  &:active {
+    background-color: darken(#007bff, 10%);
+    border-color: darken(#007bff, 20%);
+  }
 }
 
-.script-date {
-  font-size: 0.8rem;
-  color: #888;
-}
-
-.load-btn,
-.delete-btn,
-.rename-btn {
+.action-btn {
   background: #f9f9f9;
   border: 1px solid #ccc;
   padding: 0.3rem 0.5rem;
@@ -167,11 +180,5 @@ export default defineComponent({
 
 .action-btn:hover {
   background: #e6e6e6;
-}
-
-.tooltip-date {
-  font-size: 0.8rem;
-  color: #888;
-  margin-top: 0.5rem;
 }
 </style>

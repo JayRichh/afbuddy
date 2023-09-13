@@ -128,8 +128,7 @@ export const userAgents: UserAgent[] = [
       },
       {
         title: 'Firefox - Mac',
-        value:
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:70.0) Gecko/20100101 Firefox/70.0',
+        value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:70.0) Gecko/20100101 Firefox/70.0',
         platform: 'MacIntel',
       },
       {
@@ -278,8 +277,7 @@ export const userAgents: UserAgent[] = [
       },
       {
         title: 'Opera Mini - iOS',
-        value:
-          'Opera/9.80 (iPhone; Opera Mini/8.0.0/34.2336; U; en) Presto/2.8.119 Version/11.10',
+        value: 'Opera/9.80 (iPhone; Opera Mini/8.0.0/34.2336; U; en) Presto/2.8.119 Version/11.10',
         platform: 'iPhone',
       },
     ],

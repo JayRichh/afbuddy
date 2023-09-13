@@ -10,9 +10,9 @@ module.exports = {
     '^.+\\.ts?$': 'babel-jest',
   },
   setupFilesAfterEnv: ['../config/jest.setup.js'],
-  globals: {
-    chrome: true,
-  },
+  // globals: {
+  //   chrome: true,
+  // },
   collectCoverage: true,
   coverageThreshold: {
     global: {

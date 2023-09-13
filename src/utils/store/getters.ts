@@ -12,6 +12,7 @@ export default {
   getTooltipX: (state: State) => state.tooltipX,
   getTooltipY: (state: State) => state.tooltipY,
   getTooltipTheme: (state: State) => state.tooltipTheme,
+  getIsCodeEditorPreview: (state: State) => state.isCodeEditorPreview,
 
   // Component
   getCurrentComponent: (state: State) => state.currentComponent,

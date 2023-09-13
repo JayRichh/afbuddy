@@ -5,6 +5,12 @@ import { userAgents } from './data/userAgents';
 import * as monaco from 'monaco-editor';
 
 const state = {
+  monacoEditor: null,
+  selectedThemeKey: 'github-dark',
+  selectedFontKey: 'DejaVu Sans Mono',
+  themesArray: themeList as unknown as Record<string, Theme>,
+  themeNamesArray: Object.keys(themeList),
+  themeList: themeList as unknown as Record<string, any>,
   PIDStateMap: PIDStateMap,
   draggableElements: [] as HTMLElement[],
   tooltipText: '',
@@ -32,13 +38,9 @@ const state = {
   tabManagementEnabled: false,
   tabSetPoint: 0,
   themeData: {} as Theme,
-  themes: {
-    themesArray: themeList as unknown as Record<string, Theme>,
-    themeNamesArray: Object.keys(themeList),
-    themeList: themeList as unknown as Record<string, string>,
-  },
   selectedTheme: {} as Theme,
-  isCodeEditorPreview: false,
+  showCodeEditor: false,
+  isCodeEditorPreview: false as boolean,
   showTooltip: false,
   tooltipTheme: {} as object,
   userAgents: userAgents,
@@ -47,7 +49,7 @@ const state = {
     'DejaVu Sans Mono': { params: {} },
     'JetBrains Mono': { params: {} },
     'Source Code Pro': { params: {} },
-    Roboto: { params: {} },
+    'Roboto': { params: {} },
     'Roboto Slab': { params: {} },
   },
   font: '',

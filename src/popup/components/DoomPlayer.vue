@@ -87,9 +87,7 @@ export default {
 
       doomIframe.value.contentWindow?.document.addEventListener('fullscreenchange', () => {
         if (!doomIframe.value.contentWindow?.document.fullscreenElement) {
-          doomIframe.value.contentWindow?.document
-            .querySelector('canvas')
-            ?.requestFullscreen();
+          doomIframe.value.contentWindow?.document.querySelector('canvas')?.requestFullscreen();
         }
       });
 

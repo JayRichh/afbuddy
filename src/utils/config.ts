@@ -10,6 +10,7 @@ export interface NavItem {
   ariaLabel: string;
   selected?: boolean;
   crazyMode?: boolean;
+  tooltipText?: string;
 }
 
 export const NavItems = [
@@ -23,6 +24,7 @@ export const NavItems = [
     selected: false,
     crazyMode: true,
     position: { x: 0, y: 0 },
+    tooltipText: '?',
   },
   {
     id: '2',
@@ -34,6 +36,7 @@ export const NavItems = [
     selected: true,
     crazyMode: false,
     position: { x: 0, y: 0 },
+    tooltipText: 'UI Themes',
   },
   {
     id: '3',
@@ -45,6 +48,7 @@ export const NavItems = [
     selected: false,
     crazyMode: false,
     position: { x: 0, y: 0 },
+    tooltipText: 'Tab Toolkit',
   },
   {
     id: '4',
@@ -56,6 +60,7 @@ export const NavItems = [
     selected: true,
     crazyMode: false,
     position: { x: 0, y: 0 },
+    tooltipText: 'JSON Controls',
   },
   {
     id: '5',
@@ -67,17 +72,19 @@ export const NavItems = [
     selected: false,
     crazyMode: false,
     position: { x: 0, y: 0 },
+    tooltipText: '2nd 🧠',
   },
   {
     id: '6',
-    componentName: 'Geolocations',
+    componentName: 'Geolocation',
     iconSrc: require('../../assets/icons/geolocation.png'),
     iconMaskSrc: require('../../assets/icons/geolocationWhite.png'),
     altText: 'geolocation-icon',
-    ariaLabel: 'Geolocations',
+    ariaLabel: 'Geolocation',
     selected: false,
     crazyMode: false,
     position: { x: 0, y: 0 },
+    tooltipText: 'Geolocation',
   },
   {
     id: '7',
@@ -89,6 +96,7 @@ export const NavItems = [
     selected: false,
     crazyMode: false,
     position: { x: 0, y: 0 },
+    tooltipText: '🥸',
   },
   {
     id: '8',
@@ -100,10 +108,17 @@ export const NavItems = [
     selected: false,
     crazyMode: false,
     position: { x: 0, y: 0 },
+    tooltipText: 'Lang. & Info',
   },
 ];
 
 interface NavbarOptions {
+  magnetRadius: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  };
   particleIntensity: number;
   opacity: number;
   length: number;
@@ -147,6 +162,12 @@ interface NavbarOptions {
 //? Kp: 0.3, Ki: 0.15, Kd: 0.015
 
 export const config: NavbarOptions = {
+  magnetRadius: {
+    top: 20,
+    right: 100,
+    bottom: 20,
+    left: 10,
+  },
   particleIntensity: 0.5,
   opacity: 0.7,
   length: 10,

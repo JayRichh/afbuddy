@@ -1,26 +1,25 @@
 <template>
   <div class="info-container">
     <p>
-      This application allows users to spoof their geolocation, customize their browsing
-      experience, and more. Use each section on the left navbar to access different
-      functionalities.
+      This application allows users to spoof their geolocation, customize their browsing experience,
+      and more. Use each section on the left navbar to access different functionalities.
     </p>
   </div>
   <div class="language-selector">
-    <label for="language-select">{{ $t('Select Language') }}:</label>
-    <select v-model="selectedLanguage" id="language-select" @change="saveLanguage">
-      <option value="en">{{ $t('English') }}</option>
-      <option value="no">{{ $t('Norwegian') }}</option>
-    </select>
+    <!-- <label for="language-select">{{ getSafeTranslation('Select Language') }}:</label> -->
+    <!-- <select v-model="selectedLanguage" id="language-select" @change="saveLanguage"> -->
+    <!-- <option value="en">{{ getSafeTranslation('English') }}</option> -->
+    <!-- <option value="no">{{ getSafeTranslation('Norwegian') }}</option> -->
+    <!-- </select> -->
   </div>
   <div>
-    <input
+    <!-- <input
       type="checkbox"
       id="remember-language"
       v-model="rememberLanguage"
-      @change="saveLanguage"
-    />
-    <label for="remember-language">Remember Language</label>
+      @change="saveLanguage" 
+    /> -->
+    <!-- <label for="remember-language">{{ getSafeTranslation('Remember Language') }}</label> -->
   </div>
 </template>
 
@@ -28,21 +27,38 @@
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
-import { mapState } from 'vuex';
 
 export default defineComponent({
-  computed: {
-    ...mapState(['selectedLanguage', 'rememberLanguage']),
-  },
-  methods: {
-    saveLanguage() {
-      const store = useStore();
-      const i18n = useI18n();
-      store.dispatch('saveLanguage', {
-        selectedLanguage: this.selectedLanguage,
-        rememberLanguage: this.rememberLanguage,
-      });
-    },
+  setup() {
+    const store = useStore();
+    // const selectedLanguage = ref(store.state.selectedLanguage);
+    // const rememberLanguage = ref(store.state.rememberLanguage);
+    // const { t } = useI18n();
+
+    // const saveLanguage = () => {
+    //   store.dispatch('saveLanguage', {
+    //     selectedLanguage: selectedLanguage.value,
+    //     rememberLanguage: rememberLanguage.value,
+    //   });
+    // };
+
+    // const getSafeTranslation = (key: string) => {
+    //   const translation = t(key, selectedLanguage.value);
+    //   return sanitizeHTML(translation);
+    // };
+
+    // const sanitizeHTML = (str: string) => {
+    //   const temp = document.createElement('div');
+    //   temp.textContent = str;
+    //   return temp.innerHTML;
+    // };
+
+    return {
+      // selectedLanguage,
+      // rememberLanguage,
+      // saveLanguage,
+      // getSafeTranslation,
+    };
   },
 });
 </script>

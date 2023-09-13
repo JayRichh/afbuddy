@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import * as monaco from 'monaco-editor';
 import { PIDState } from '../pidstate';
 import { MyActionContext } from './types';
 import { getTheme, getThemes } from './data/themesList';
@@ -6,15 +7,45 @@ import { NavItem, NavItems } from '../config';
 import { State } from './types';
 
 export default {
+  // State Update Actions
+  updateTooltip(
+    { commit }: MyActionContext,
+    payload: {
+      text: string;
+      x: number;
+      y: number;
+      visible?: boolean;
+      isCodeEditorPreview?: boolean;
+    },
+  ) {
+    commit('setTooltip', payload);
+  },
+  updateCurrentComponent({ commit }: MyActionContext, componentName) {
+    commit('setCurrentComponent', componentName);
+  },
+  updateFeedbackMessage({ commit }: MyActionContext, payload: string) {
+    commit('setFeedbackMessage', payload);
+  },
+  updateNavItems({ commit }: MyActionContext, payload: typeof NavItems) {
+    commit('setNavItems', payload);
+  },
+  updateIsCodeEditorPreview({ commit }: MyActionContext, payload: boolean) {
+    commit('setIsCodeEditorPreview', payload);
+  },
+  updateShowTooltip({ commit }: MyActionContext, payload: boolean) {
+    commit('setShowTooltip', payload);
+  },
+  updateJsonViewerTheme({ commit }: MyActionContext, payload: string) {
+    commit('setJsonViewerTheme', payload);
+  },
+  updateAutoFormat({ commit }: MyActionContext, payload: boolean) {
+    commit('setAutoFormat', payload);
+  },
   updateState({ commit }: MyActionContext, payload: Partial<State>) {
     commit('updateState', payload);
   },
-
-  // PID Actions
-  updatePIDState(
-    { commit }: MyActionContext,
-    payload: { ariaLabel: string; pidState: PIDState },
-  ) {
+  // PID
+  updatePIDState({ commit }: MyActionContext, payload: { ariaLabel: string; pidState: PIDState }) {
     commit('setPIDState', payload);
   },
   resetPIDState({ commit }: MyActionContext, ariaLabel: string) {
@@ -35,10 +66,6 @@ export default {
   },
 
   // Initialization Actions
-  async initializeDraggableElements({ commit }: MyActionContext) {
-    const elements = Array.from(document.querySelectorAll('.draggable')) as HTMLElement[];
-    commit('setDraggableElements', elements);
-  },
   async initializeStore({ dispatch }: MyActionContext) {
     await dispatch('updateCurrentComponent', 'ThemeSelector');
   },
@@ -61,8 +88,21 @@ export default {
   },
 
   // THEME ACTIONS
+  async applySelectedTheme({ commit, state }: MyActionContext) {
+    commit('setSelectedThemeKey', state.selectedThemeKey);
+
+    const theme = await getTheme(state.selectedThemeKey);
+
+    if (theme) {
+      monaco.editor.defineTheme(state.selectedThemeKey, theme);
+      if (state.monacoEditor) {
+        state.monacoEditor.updateOptions({ theme: state.selectedThemeKey });
+      }
+    }
+  },
   async updateThemes({ commit }: MyActionContext) {
     const themes = await getThemes();
+    console.log(themes);
     commit('setThemes', themes);
   },
   async getTheme({ commit }: MyActionContext, themeName: string) {
@@ -72,16 +112,41 @@ export default {
     }
     return themeData;
   },
-  applySelectedTheme({ commit }: MyActionContext, selectedThemeKey: string) {
-    commit('setSelectedThemeKey', selectedThemeKey);
-  },
-
+  // applySelectedTheme({ commit }: MyActionContext, selectedThemeKey: string) {
+  //   commit('setSelectedThemeKey', selectedThemeKey);
+  // },
   applyTheme({ commit, dispatch }: MyActionContext, payload: any) {
     commit('updateState', {
       themeData: payload.themeData,
       tooltipTheme: payload.tooltipTheme,
     });
     dispatch('createEditor', { theme: payload.themeData });
+  },
+
+  // FONT ACTIONS
+  updateFont({ commit }: MyActionContext, payload: string) {
+    commit('setFont', payload);
+  },
+  updateFontSize({ commit }: MyActionContext, payload: number) {
+    commit('setFontSize', payload);
+  },
+  updateFonts({ commit }: MyActionContext, payload: any) {
+    commit('setFonts', payload);
+  },
+  updateFontSizes({ commit }: MyActionContext, payload: number[]) {
+    commit('setFontSizes', payload);
+  },
+  getFont({ state }: MyActionContext) {
+    return state.font;
+  },
+  getFontSize({ state }: MyActionContext) {
+    return state.fontSize;
+  },
+  getFonts({ state }: MyActionContext) {
+    return state.fonts;
+  },
+  getFontSizes({ state }: MyActionContext) {
+    return state.fontSizes;
   },
 
   // MONACO ACTIONS
@@ -159,40 +224,6 @@ export default {
   ) {
     commit('setLanguage', payload.selectedLanguage);
     commit('setRememberLanguage', payload.rememberLanguage);
-  },
-
-  // State Update Actions
-  updateTooltip(
-    { commit }: MyActionContext,
-    payload: { text: string; x: number; y: number; visible?: boolean },
-  ) {
-    commit('setTooltipText', payload.text);
-    commit('setTooltipX', payload.x);
-    commit('setTooltipY', payload.y);
-    if (payload.visible !== undefined) {
-      commit('setTooltipVisible', payload.visible);
-    }
-  },
-  updateCurrentComponent({ commit }: MyActionContext, componentName) {
-    commit('setCurrentComponent', componentName);
-  },
-  updateFeedbackMessage({ commit }: MyActionContext, payload: string) {
-    commit('setFeedbackMessage', payload);
-  },
-  updateNavItems({ commit }: MyActionContext, payload: typeof NavItems) {
-    commit('setNavItems', payload);
-  },
-  updateIsCodeEditorPreview({ commit }: MyActionContext, payload: boolean) {
-    commit('setIsCodeEditorPreview', payload);
-  },
-  updateShowTooltip({ commit }: MyActionContext, payload: boolean) {
-    commit('setShowTooltip', payload);
-  },
-  updateJsonViewerTheme({ commit }: MyActionContext, payload: string) {
-    commit('setJsonViewerTheme', payload);
-  },
-  updateAutoFormat({ commit }: MyActionContext, payload: boolean) {
-    commit('setAutoFormat', payload);
   },
 };
 function dispatch(arg0: string, arg1: string) {

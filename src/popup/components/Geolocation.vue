@@ -1,69 +1,78 @@
 <template>
   <div class="geo-container">
-    <form @submit.prevent="setGeolocation">
-      <div class="input-group">
-        <label for="timeZone">TimeZone:</label>
-        <input
-          type="text"
-          id="timeZone"
-          placeholder="Asia/Kolkata"
-          v-model="timeZone"
-          aria-label="Time Zone"
-        />
+    <div class="input-group">
+      <label for="timeZone" class="input-label">TimeZone:</label>
+      <input
+        type="text"
+        id="timeZone"
+        placeholder="Asia/Kolkata"
+        v-model="timeZone"
+        class="text-input"
+        aria-label="Time Zone"
+      />
+    </div>
+
+    <div class="input-group">
+      <label for="locale" class="input-label">Locale:</label>
+      <input
+        type="text"
+        id="locale"
+        placeholder="en-US"
+        v-model="locale"
+        class="text-input"
+        aria-label="Locale"
+      />
+    </div>
+
+    <div class="input-group">
+      <label for="latitude" class="input-label">Latitude:</label>
+      <input
+        type="text"
+        id="latitude"
+        placeholder="19.0760"
+        v-model="latitude"
+        class="text-input"
+        aria-label="Latitude"
+      />
+    </div>
+
+    <div class="input-group">
+      <label for="longitude" class="input-label">Longitude:</label>
+      <input
+        type="text"
+        id="longitude"
+        placeholder="72.8777"
+        v-model="longitude"
+        class="text-input"
+        aria-label="Longitude"
+      />
+    </div>
+
+    <div class="checkbox-group">
+      <div class="checkbox-wrapper">
+        <input type="checkbox" id="defaultGeo" v-model="useDefault" class="checkbox-input" />
+        <label for="defaultGeo" class="checkbox-label">Use Browser's Default Geolocation</label>
       </div>
+    </div>
 
-      <div class="input-group">
-        <label for="locale">Locale:</label>
-        <input
-          type="text"
-          id="locale"
-          placeholder="en-US"
-          v-model="locale"
-          aria-label="Locale"
-        />
-      </div>
-
-      <div class="input-group">
-        <label for="latitude">Latitude:</label>
-        <input
-          type="text"
-          id="latitude"
-          placeholder="19.0760"
-          v-model="latitude"
-          aria-label="Latitude"
-        />
-      </div>
-
-      <div class="input-group">
-        <label for="longitude">Longitude:</label>
-        <input
-          type="text"
-          id="longitude"
-          placeholder="72.8777"
-          v-model="longitude"
-          aria-label="Longitude"
-        />
-      </div>
-
-      <div class="checkbox-group">
-        <input type="checkbox" id="defaultGeo" v-model="useDefault" />
-        <label style="cursor: pointer; font-size: 1rem" for="defaultGeo"
-          >Use Browser's Default Geolocation</label
-        >
-      </div>
-
-      <button type="submit">Spoof Location</button>
-    </form>
-
-    <p v-if="feedbackMessage" class="feedback">{{ feedbackMessage }}</p>
+    <div class="button-group">
+      <button
+        @click="setGeolocation"
+        class="button-group-item button-group-item--right"
+        type="button"
+      >
+        Spoof
+      </button>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useStore } from 'vuex';
 
 export default defineComponent({
+  name: 'Geolocation',
   setup() {
     const store = useStore();
     const timeZone = ref('');
@@ -71,7 +80,7 @@ export default defineComponent({
     const latitude = ref('');
     const longitude = ref('');
     const useDefault = ref(false);
-    const feedbackMessage = ref('');
+
     const setGeolocation = () => {
       store.dispatch('setGeolocation', {
         timeZone: timeZone.value,
@@ -80,15 +89,14 @@ export default defineComponent({
         longitude: longitude.value,
         useDefault: useDefault.value,
       });
-      store.commit('setFeedbackMessage', 'Location spoofed successfully!');
     };
+
     return {
       timeZone,
       locale,
       latitude,
       longitude,
       useDefault,
-      feedbackMessage,
       setGeolocation,
     };
   },
@@ -97,88 +105,71 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .geo-container {
-  padding: 0.5rem 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  overflow-x: hidden;
+  align-items: center;
+  justify-content: center;
+  margin: 40px 0;
+  width: 100%;
+  height: 100%;
 }
 
 .input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  width: 85%;
+  margin-bottom: 0.4rem;
 }
 
-label {
-  color: #888;
-  font-size: 1rem;
+.input-label,
+.checkbox-label {
+  text-align: left;
+  color: #555;
+  font-weight: 500;
+  margin-bottom: 0.2rem;
 }
 
-input[type='text'] {
-  padding: 0.5rem;
-  border: 2px solid #b2ebf2;
-  border-radius: 4px;
-  color: #333;
-  transition: border-color 0.3s ease;
+.text-input {
+  color: #555;
+  border-radius: 5px;
+  width: 70%;
+  padding: 5px;
+  font-size: 1.1em;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
 }
 
-input[type='text']:focus {
-  border-color: #00bcd4;
-  outline: none;
-}
-
-.checkbox-group {
+.checkbox-wrapper {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.3rem;
 }
 
-input[type='checkbox'] {
-  appearance: none;
+.checkbox-input {
   width: 20px;
   height: 20px;
-  background-color: #b2ebf2;
-  border-radius: 4px;
-  position: relative;
+  margin-right: 10px;
+}
+
+.button-group {
+  margin-top: 0.4rem;
+}
+
+.button-group-item {
   cursor: pointer;
-}
-
-input[type='checkbox']:checked::before {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background-color: #ffd3b6;
-  border-radius: 2px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-button {
-  padding: 0.5rem 1rem;
+  text-transform: uppercase;
+  height: 38px;
+  width: 45%;
+  margin: 0 5px;
   border: none;
-  border-radius: 4px;
-  background: linear-gradient(45deg, #ffd3b6, #b2ebf2);
-  color: #333;
-  cursor: pointer;
-  transition: background 0.3s ease;
+  border-radius: 0.25rem;
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
-button:hover {
-  background: linear-gradient(45deg, #ffb299, #80d8ff);
-}
-
-.feedback {
-  color: #4caf50;
-  font-weight: bold;
+.button-group-item--right {
+  background-color: #007bff;
+  color: white;
 }
 </style>

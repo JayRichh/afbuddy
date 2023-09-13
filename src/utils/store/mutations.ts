@@ -5,16 +5,10 @@ import * as monaco from 'monaco-editor';
 
 export default {
   // PIDState
-  setPIDState(
-    state: State,
-    { ariaLabel, pidState }: { ariaLabel: string; pidState: PIDState },
-  ) {
+  setPIDState(state: State, { ariaLabel, pidState }: { ariaLabel: string; pidState: PIDState }) {
     state.PIDStateMap?.set(ariaLabel, pidState);
   },
-  updatePIDState(
-    state: State,
-    { ariaLabel, pidState }: { ariaLabel: string; pidState: PIDState },
-  ) {
+  updatePIDState(state: State, { ariaLabel, pidState }: { ariaLabel: string; pidState: PIDState }) {
     const stateToUpdate = state.PIDStateMap?.get(ariaLabel);
     if (stateToUpdate) {
       Object.keys(pidState).forEach((key) => {
@@ -42,6 +36,17 @@ export default {
   },
 
   // Tooltip
+  setTooltip(state: State, payload: any) {
+    state.tooltipText = payload.text;
+    state.tooltipX = payload.x;
+    state.tooltipY = payload.y;
+    if (payload.visible !== undefined) {
+      state.showTooltip = payload.visible;
+    }
+    if (payload.isCodeEditorPreview !== undefined) {
+      state.isCodeEditorPreview = payload.isCodeEditorPreview;
+    }
+  },
   setTooltipVisible(state: State, value: boolean) {
     state.showTooltip = value;
   },
@@ -54,6 +59,9 @@ export default {
   setTooltipY(state: State, payload: number) {
     state.tooltipY = payload;
   },
+  setisCodeEditorPreview(state: State, payload: boolean) {
+    state.isCodeEditorPreview = payload;
+  },
 
   // Component
   setCurrentComponent(state: State, payload: string) {
@@ -61,8 +69,8 @@ export default {
   },
 
   // Theme
-  setThemes(state: State, payload: any) {
-    state.themes = payload;
+  setThemes(state, themes) {
+    state.themes = themes;
   },
   setThemeData(state: State, payload: Theme) {
     state.themeData = payload;
@@ -86,6 +94,21 @@ export default {
     if (payload) {
       state.editorInstance = payload;
     }
+  },
+  setMonacoEditor(state: State, editor: monaco.editor.IStandaloneCodeEditor) {
+    state.monacoEditor = editor;
+  },
+  setFont(state: State, payload: string) {
+    state.font = payload;
+  },
+  setFonts(state: State, payload: object) {
+    state.fonts = payload;
+  },
+  setFontSizes(state: State, payload: number[]) {
+    state.fontSizes = payload;
+  },
+  setFontSize(state: State, payload: number) {
+    state.fontSize = payload;
   },
 
   // JSON Objects

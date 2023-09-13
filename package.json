@@ -22,6 +22,7 @@
 	"dependencies": {
 		"@parcel/transformer-vue": "^2.9.3",
 		"@types/cpx": "^1.5.3",
+		"@types/lodash": "^4.14.198",
 		"@types/react": "16.4.9",
 		"@vespaiach/axios-fetch-adapter": "^0.3.1",
 		"@vue/compiler-sfc": "^3.3.4",
@@ -29,6 +30,7 @@
 		"cpx": "^1.5.0",
 		"gsap": "^3.12.2",
 		"load-json-file": "^7.0.1",
+		"lodash": "^4.17.21",
 		"monaco-editor": "^0.41.0",
 		"monaco-themes": "^0.4.4",
 		"monaco-typescript": "^4.10.0",

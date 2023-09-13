@@ -8,9 +8,9 @@
       :visible="showTooltip"
       :theme="theme"
       :themeData="themeData"
-      :isCodeEditorPreview="!!theme"
+      :isCodeEditorPreview="isCodeEditorPreview"
     />
-    <Navbar class="navbar-container" @changeComponent="handleComponentChange" />
+    <Navbar class="navbar-container" @changeComponent="handleComponentChange" ref="navbar" />
     <div class="app-container">
       <div class="app-header">
         <div class="title-icon-wrapper">
@@ -18,7 +18,7 @@
           <img
             ref="paintbrush"
             id="iconToChangeColor"
-            class="paintbrush draggable"
+            class="paintbrush magnet"
             src="../../assets/icons/logo-bg-full.png"
             alt="Icon"
           />
@@ -82,6 +82,7 @@ export default defineComponent({
       'theme',
       'themeData',
       'pidState',
+      'isCodeEditorPreview',
     ]),
     formattedTitle() {
       const title = this.currentComponent;
@@ -96,6 +97,7 @@ export default defineComponent({
     ...mapMutations(['setCurrentComponent', 'setCrazyModeEnabled']),
   },
   setup() {
+    const navbar = ref(null as any);
     const store = useStore();
     const iconMaskStyles = ref<Record<string, string>>({});
     let [firstIcon, popin, popout]: gsap.core.Timeline[] = [];
@@ -103,18 +105,7 @@ export default defineComponent({
     let input = '';
     provide('iconMaskStyles', iconMaskStyles);
 
-    const listenForKonamiCode = () => {
-      window.addEventListener('keyup', (e: KeyboardEvent) => {
-        input += '' + e.keyCode;
-        if (input === secret) {
-          // Activate Pixel Perfection
-          input = '';
-        }
-      });
-    };
-
     onMounted(async () => {
-      listenForKonamiCode();
       konamiCodeListener(() => {
         // Activate Pixel Perfection
       });
@@ -124,17 +115,14 @@ export default defineComponent({
       const animations = setupAnimations();
       const { tl, popin, popout, firstIcon } = animations;
       tl.play();
-      gsap.utils.toArray('.icon-mask').forEach((mask: any, index: number) => {
-        if (index === 0) {
-          firstIcon.play();
-        } else {
-          popin.play();
-          popout.play();
-        }
+      gsap.utils.toArray('.masked-icon').forEach((mask: any, index: number) => {
+        firstIcon.play();
+        popin.play();
+        popout.play();
       });
 
       nextTick(() => {
-        setupHoverEffects(store);
+        setupHoverEffects(store, document.body as HTMLBodyElement);
         setupDraggable(store, iconMaskStyles);
       });
     });
@@ -145,7 +133,6 @@ export default defineComponent({
       },
       store,
       iconMaskStyles,
-      listenForKonamiCode,
       secret,
       input,
       firstIcon,
@@ -158,6 +145,13 @@ export default defineComponent({
 
 <style lang="scss">
 @import './animation-keyframes.scss';
+
+:root {
+  --watercolour-gradient: linear-gradient(to right, #3f87a6, #ebf8e1, #f69c3c);
+  --dark-gradient: linear-gradient(45deg, #061a34, #1b2e4a, #2d4160, #3f5476);
+  --darkest-gradient: linear-gradient(240deg, #020a14, #0f1929, #172231, #283141);
+  --light-gradient: linear-gradient(45deg, #f5a553, #f7b062, #f9bb71, #fbc680);
+}
 
 .underline-wrapper {
   display: flex;
@@ -218,17 +212,12 @@ export default defineComponent({
   stroke: url(#gradient);
 }
 
-:root {
-  --watercolour-gradient: linear-gradient(to right, #3f87a6, #ebf8e1, #f69d3c);
-}
-
 .navbar-container {
-  width: 60px;
-  height: 100%;
-  padding: 0;
   background: linear-gradient(to bottom, #1c1c1c, #454545);
   position: relative;
   box-sizing: border-box;
+  width: 60px;
+  height: 100%;
 }
 
 .app-container {
@@ -255,7 +244,7 @@ export default defineComponent({
 }
 
 .title {
-  padding-left: 0.25rem;
+  padding-left: 0.75rem;
   padding-top: 0.1rem;
 }
 
@@ -272,17 +261,8 @@ export default defineComponent({
 }
 
 h1 {
-  position: absolute;
-  top: 0;
-  left: 0;
   padding: 0;
   margin: 0;
-  font-family: 'Raleway', sans-serif;
-  font-weight: 400;
-  color: #080808;
-  transition: all 0.4s ease;
-  -webkit-transition: all 0.4s ease;
-  letter-spacing: 0.8px;
   line-height: 1.2em;
   padding-bottom: 7.5px;
   white-space: pre-line;
@@ -307,10 +287,10 @@ h1 {
 }
 
 .paintbrush:hover {
-  cursor: pointer;
+  cursor: grab;
 }
 
 .paintbrush:active {
-  cursor: pointer;
+  cursor: grabbing;
 }
 </style>

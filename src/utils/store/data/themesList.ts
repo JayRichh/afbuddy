@@ -1,69 +1,68 @@
+import * as monaco from 'monaco-editor';
+
+type BuiltinTheme = 'vs' | 'vs-dark' | 'hc-black';
+
 export interface Theme {
-  base: string;
+  base: BuiltinTheme;
   inherit: boolean;
-  rules: Array<{
-    background?: string | null;
-    foreground?: string | null;
-    fontStyle?: string | null;
-    token: string;
-  }>;
+  rules: monaco.editor.ITokenThemeRule[];
   colors: Record<string, string>;
 }
 
 export const themeList: Record<string, string> = {
-  active4d: 'Active4D',
+  'active4d': 'Active4D',
   'all-hallows-eve': 'All Hallows Eve',
-  amy: 'Amy',
+  'amy': 'Amy',
   'birds-of-paradise': 'Birds of Paradise',
-  blackboard: 'Blackboard',
+  'blackboard': 'Blackboard',
   'brilliance-black': 'Brilliance Black',
   'brilliance-dull': 'Brilliance Dull',
   'chrome-devtools': 'Chrome DevTools',
   'clouds-midnight': 'Clouds Midnight',
-  clouds: 'Clouds',
-  cobalt: 'Cobalt',
-  cobalt2: 'Cobalt2',
-  dawn: 'Dawn',
-  dracula: 'Dracula',
-  dreamweaver: 'Dreamweaver',
-  eiffel: 'Eiffel',
+  'clouds': 'Clouds',
+  'cobalt': 'Cobalt',
+  'cobalt2': 'Cobalt2',
+  'dawn': 'Dawn',
+  'dracula': 'Dracula',
+  'dreamweaver': 'Dreamweaver',
+  'eiffel': 'Eiffel',
   'espresso-libre': 'Espresso Libre',
   'github-dark': 'GitHub Dark',
   'github-light': 'GitHub Light',
-  github: 'GitHub',
-  idle: 'IDLE',
-  katzenmilch: 'Katzenmilch',
+  'github': 'GitHub',
+  'idle': 'IDLE',
+  'katzenmilch': 'Katzenmilch',
   'kuroir-theme': 'Kuroir Theme',
-  lazy: 'LAZY',
+  'lazy': 'LAZY',
   'magicwb--amiga-': 'MagicWB (Amiga)',
   'merbivore-soft': 'Merbivore Soft',
-  merbivore: 'Merbivore',
+  'merbivore': 'Merbivore',
   'monokai-bright': 'Monokai Bright',
-  monokai: 'Monokai',
+  'monokai': 'Monokai',
   'night-owl': 'Night Owl',
-  nord: 'Nord',
+  'nord': 'Nord',
   'oceanic-next': 'Oceanic Next',
   'pastels-on-dark': 'Pastels on Dark',
   'slush-and-poppies': 'Slush and Poppies',
   'solarized-dark': 'Solarized-dark',
   'solarized-light': 'Solarized-light',
-  spacecadet: 'SpaceCadet',
-  sunburst: 'Sunburst',
+  'spacecadet': 'SpaceCadet',
+  'sunburst': 'Sunburst',
   'textmate--mac-classic-': 'Textmate (Mac Classic)',
   'tomorrow-night-blue': 'Tomorrow-Night-Blue',
   'tomorrow-night-bright': 'Tomorrow-Night-Bright',
   'tomorrow-night-eighties': 'Tomorrow-Night-Eighties',
   'tomorrow-night': 'Tomorrow-Night',
-  tomorrow: 'Tomorrow',
-  twilight: 'Twilight',
+  'tomorrow': 'Tomorrow',
+  'twilight': 'Twilight',
   'upstream-sunburst': 'Upstream Sunburst',
   'vibrant-ink': 'Vibrant Ink',
   'xcode-default': 'Xcode_default',
-  zenburnesque: 'Zenburnesque',
-  iplastic: 'iPlastic',
-  idlefingers: 'idleFingers',
-  krtheme: 'krTheme',
-  monoindustrial: 'monoindustrial',
+  'zenburnesque': 'Zenburnesque',
+  'iplastic': 'iPlastic',
+  'idlefingers': 'idleFingers',
+  'krtheme': 'krTheme',
+  'monoindustrial': 'monoindustrial',
 };
 
 export const themeNamesArray = Object.values(themeList);
@@ -914,8 +913,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: 'ffffff66',
         background: '43800033',
-        token:
-          'string.regexp.group string.regexp.group string.regexp.group string.regexp.group',
+        token: 'string.regexp.group string.regexp.group string.regexp.group string.regexp.group',
       },
       {
         foreground: '86ff00',
@@ -1719,8 +1717,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '00fff8',
         background: '00fff81a',
-        token:
-          'punctuation.section.embedded -(source string source punctuation.section.embedded)',
+        token: 'punctuation.section.embedded -(source string source punctuation.section.embedded)',
       },
       {
         foreground: '00fff8',
@@ -2326,8 +2323,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '1f1f1f',
-        token:
-          'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
+        token: 'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
       },
       {
         background: '1f1f1f',
@@ -2574,8 +2570,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: 'ffffff66',
         background: '43800033',
-        token:
-          'string.regexp.group string.regexp.group string.regexp.group string.regexp.group',
+        token: 'string.regexp.group string.regexp.group string.regexp.group string.regexp.group',
       },
       {
         foreground: '80a659',
@@ -3259,8 +3254,7 @@ export const themesArray: Record<string, Theme> = {
       {
         foreground: '56a5a4',
         background: '00fff81a',
-        token:
-          'punctuation.section.embedded -(source string source punctuation.section.embedded)',
+        token: 'punctuation.section.embedded -(source string source punctuation.section.embedded)',
       },
       {
         foreground: '56a5a4',
@@ -3686,8 +3680,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '191919',
-        token:
-          'meta.tell-block meta.tell-block meta.tell-block meta.tell-block meta.tell-block',
+        token: 'meta.tell-block meta.tell-block meta.tell-block meta.tell-block meta.tell-block',
       },
       {
         background: '1c1c1c',
@@ -3733,8 +3726,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         background: '1f1f1f',
-        token:
-          'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
+        token: 'text.xml.strict meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag meta.tag',
       },
       {
         background: '1f1f1f',
@@ -4199,8 +4191,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'e1efff',
-        token:
-          'punctuation - (punctuation.definition.string || punctuation.definition.comment)',
+        token: 'punctuation - (punctuation.definition.string || punctuation.definition.comment)',
       },
       {
         foreground: 'ff628c',
@@ -4453,8 +4444,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'e1efff',
-        token:
-          'punctuation - (punctuation.definition.string || punctuation.definition.comment)',
+        token: 'punctuation - (punctuation.definition.string || punctuation.definition.comment)',
       },
       {
         foreground: 'ff628c',
@@ -5638,8 +5628,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'eeeeee',
-        token:
-          'punctuation.definition.string.begin.json - meta.structure.dictionary.value.json',
+        token: 'punctuation.definition.string.begin.json - meta.structure.dictionary.value.json',
       },
       {
         foreground: 'eeeeee',
@@ -9557,8 +9546,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'ff5874',
-        token:
-          'meta.structure.dictionary.json meta.structure.dictionary.value constant.language',
+        token: 'meta.structure.dictionary.json meta.structure.dictionary.value constant.language',
       },
       {
         foreground: 'd6deeb',
@@ -10067,8 +10055,7 @@ export const themesArray: Record<string, Theme> = {
       },
       {
         foreground: 'cdd3de',
-        token:
-          'meta.group.braces.curly.js constant.other.object.key.js string.unquoted.label.js',
+        token: 'meta.group.braces.curly.js constant.other.object.key.js string.unquoted.label.js',
       },
       {
         foreground: 'd8dee9',
@@ -16346,6 +16333,7 @@ export const getThemes = (): Promise<{
   themeList: Record<string, string>;
 }> => {
   return new Promise((resolve) => {
+    console.log({ themesArray, themeNamesArray, themeList });
     resolve({ themesArray, themeNamesArray, themeList });
   });
 };
