@@ -33,7 +33,6 @@ export default defineComponent({
     const tooltipY = computed(() => store.state.tooltipY);
     const showTooltip = computed(() => store.state.showTooltip);
     const isCodeEditorPreview = computed(() => store.state.isCodeEditorPreview);
-
     const monacoContainerRef: Ref<HTMLDivElement | null> = ref(null);
     const editorInstance: Ref<monaco.editor.IStandaloneCodeEditor | null> = ref(null);
 

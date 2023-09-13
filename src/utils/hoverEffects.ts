@@ -161,12 +161,22 @@ export function setupHoverEffects(store: Store<State>, document: HTMLBodyElement
 
     let adjustedX = x;
     let adjustedY = y;
+    let tooltipText = '';
+    // let fontStyling = '';
 
     if (element.id === 'theme-selector') {
       adjustedX = x - element.offsetWidth / 2;
 
       const estimatedTooltipHeight = 170;
       adjustedY = y - estimatedTooltipHeight;
+    }
+
+    if (element.id === 'font-selector') {
+      const selectedFont = store.state.font;
+      tooltipText = `${selectedFont}`;
+      // fontStyling = `font-family: ${selectedFont};`;
+    } else {
+      tooltipText = element.getAttribute('tooltip-text') || '';
     }
 
     const currentTooltipX = store.state.tooltipX ?? 0;
@@ -183,21 +193,23 @@ export function setupHoverEffects(store: Store<State>, document: HTMLBodyElement
       onUpdate: () => {
         if (store.state.tooltipX !== adjustedX || store.state.tooltipY !== adjustedY) {
           store.dispatch('updateTooltip', {
-            text: isVisible ? element.getAttribute('tooltip-text') : '',
+            text: isVisible ? tooltipText : '',
             x: adjustedX,
             y: adjustedY,
             visible: isVisible,
             isCodeEditorPreview: element.id === 'theme-selector',
+            // style: fontStyling,
           });
         }
       },
       onComplete: () => {
         store.dispatch('updateTooltip', {
-          text: isVisible ? element.getAttribute('tooltip-text') : '',
+          text: isVisible ? tooltipText : '',
           x: adjustedX,
           y: adjustedY,
           visible: isVisible,
           isCodeEditorPreview: element.id === 'theme-selector',
+          // style: fontStyling,
         });
       },
     });

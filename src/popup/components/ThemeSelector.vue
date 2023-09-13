@@ -9,7 +9,7 @@
     ></Tooltip> -->
 
     <label for="font-selector" class="font-label">Select Font:</label>
-    <select id="font-selector" v-model="selectedFont" @change="applyFont">
+    <select id="font-selector" class="hover" v-model="selectedFont" @change="applyFont">
       <option
         v-for="(font, index) in fonts"
         :key="index"
@@ -53,7 +53,6 @@ import { defineComponent, onMounted, computed, ref, Ref, watch } from 'vue';
 import Tooltip from './Tooltip.vue';
 import { useStore } from 'vuex';
 import Fonts from './Fonts.vue';
-
 export default defineComponent({
   name: 'ThemeSelector',
   components: {
@@ -81,6 +80,7 @@ export default defineComponent({
       }
       await store.dispatch('applySelectedTheme');
       setDefaultTheme();
+      updateFontIndex();
     });
 
     async function applySelectedTheme() {
@@ -102,6 +102,12 @@ export default defineComponent({
         document.documentElement.style.setProperty('--editor-font', selectedFont.value);
         store.dispatch('updateFont', selectedFont.value);
       }
+    }
+
+    function updateFontIndex() {
+      const fontIndex = fonts.value.indexOf(selectedFont.value);
+      store.dispatch('updateFont', fonts.value[fontIndex]);
+      store.dispatch('updateTooltip', { text: fonts.value[fontIndex] });
     }
 
     async function setDefaultTheme() {
@@ -129,6 +135,7 @@ export default defineComponent({
       fonts,
       selectedFont,
       applyFont,
+      updateFontIndex, // Expose the new function
     };
   },
 });
