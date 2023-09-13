@@ -1,47 +1,55 @@
 import { Ref } from 'vue';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import { Store } from 'vuex';
+import state from './store/state';
+import { editorConfig as baseEditorConfig } from './config';
 
 export function createEditor(
   monacoContainer: Ref<HTMLElement | null>,
   editorInstance: Ref<monaco.editor.IStandaloneCodeEditor | null>,
-  store: any,
+  store: Store<typeof state>,
 ) {
   if (monacoContainer.value) {
-    const config = {
-      value: store.state.tooltipText,
-      language: 'javascript',
-      theme: store.state.theme,
-      fontSize: 20,
-      lineHeight: 30,
-      lineNumbers: 'off',
-      minimap: { enabled: false },
-      overviewRulerLanes: 0,
-      mouseWheelZoom: false,
-      cursorStyle: 'line',
-      cursorBlinking: 'blink',
-      renderWhitespace: 'none',
-      wordWrap: 'on',
-      automaticLayout: true,
-      folding: false,
-      readOnly: true,
-      lineDecorationsWidth: 0,
-      scrollbar: {
-        vertical: 'hidden',
-        horizontal: 'hidden',
-        useShadows: false,
-      },
-      glyphMargin: false,
-      selectionHighlight: false,
-    } as monaco.editor.IStandaloneEditorConstructionOptions;
+    const code = `const f = n => n ? n * f(n - 1) : 1, 
+fib = n => n < 2 ? n : fib(n - 1) + fib(n - 2),
+p = num => { 
+  for(let i = 2, sqrt = Math.sqrt(num); i <= sqrt; i++)
+    if(num % i === 0) return false; 
+  return num > 1;
+},
+primes = Array.from({length: 30}, (_, i) => i + 1).filter(p);
+    `;
 
-    editorInstance.value = monaco.editor.create(monacoContainer.value, config);
+    try {
+      const config: monaco.editor.IStandaloneEditorConstructionOptions = {
+        ...baseEditorConfig,
+        value: code,
+        theme: store.state.monacoTheme,
+      };
+
+      console.log('config', config, 'editorInstance', editorInstance.value);
+
+      if (!editorInstance.value) {
+        editorInstance.value = monaco.editor.create(monacoContainer.value, config);
+      }
+
+      if (store.state.themeData && Object.keys(store.state.themeData).length > 0) {
+        applyTheme(store.state.monacoTheme, store.state.themeData);
+      }
+    } catch (error) {
+      console.error('error:', error);
+    }
   }
 }
 
 export function applyTheme(theme: string, themeData: monaco.editor.IStandaloneThemeData) {
-  if (Object.keys(themeData).length > 0) {
-    monaco.editor.defineTheme(theme, themeData);
-    monaco.editor.setTheme(theme);
+  try {
+    if (Object.keys(themeData).length > 0) {
+      monaco.editor.defineTheme(theme, themeData);
+      monaco.editor.setTheme(theme);
+    }
+  } catch (error) {
+    console.error('Error in applyTheme:', error);
   }
 }
 

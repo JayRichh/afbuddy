@@ -1,4 +1,44 @@
 import { ref } from 'vue';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+
+export const editorConfig = {
+  value: '',
+  language: 'javascript',
+  theme: 'vs-dark',
+  fontSize: 16,
+  lineHeight: 16,
+  minimap: { enabled: false },
+  mouseWheelZoom: true,
+  lineNumbers: 'off',
+  cursorStyle: 'line',
+  cursorBlinking: 'blink',
+  scrollbar: {
+    vertical: 'hidden',
+    horizontal: 'hidden',
+  },
+  layoutInfo: {
+    padding: {
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+    },
+  },
+  padding: {
+    top: 0,
+    bottom: 0,
+    right: 0,
+    left: 0,
+  },
+  glyphMargin: false,
+  folding: false,
+  lineDecorationsWidth: 0,
+  lineNumbersMinChars: 0,
+  renderLineHighlight: 'none',
+  overviewRulerBorder: false,
+  scrollBeyondLastLine: false,
+  fixedOverflowWidgets: true,
+} as monaco.editor.IStandaloneEditorConstructionOptions;
 
 export interface NavItem {
   id: number | string;

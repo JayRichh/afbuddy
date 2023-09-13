@@ -1,5 +1,5 @@
 <template>
-  <div ref="tooltipRef" class="tooltip" :style="{ left: `${tooltipX}px`, top: `${tooltipY}px` }">
+  <div ref="tooltipRef" class="tooltip" :style="tooltipStyle">
     <div v-if="isCodeEditorPreview" class="code-preview">
       <div ref="monacoContainerRef" class="monaco-instance"></div>
     </div>
@@ -13,6 +13,7 @@ import { defineComponent, computed, onMounted, ref, watch, Ref } from 'vue';
 import { useStore } from 'vuex';
 import { createEditor, applyTheme } from '../../utils/editorUtils';
 import { Sine } from 'gsap';
+import * as monaco from 'monaco-editor';
 
 gsap.registerPlugin(Sine);
 
@@ -24,7 +25,7 @@ export default defineComponent({
   },
   setup(props) {
     const store = useStore();
-    const tooltipRef = ref(null);
+    const tooltipRef = ref(null as HTMLDivElement | null);
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const tooltipText = computed(() => store.state.tooltipText);
@@ -34,14 +35,16 @@ export default defineComponent({
     const isCodeEditorPreview = computed(() => store.state.isCodeEditorPreview);
 
     const monacoContainerRef: Ref<HTMLDivElement | null> = ref(null);
+    const editorInstance: Ref<monaco.editor.IStandaloneCodeEditor | null> = ref(null);
 
     const initializeEditor = () => {
+      console.log('initializeEditor', props.isCodeEditorPreview, monacoContainerRef.value);
       if (props.isCodeEditorPreview && monacoContainerRef.value) {
-        // createEditor(monacoContainerRef, store);
+        console.log('initializeEditor', monacoContainerRef.value, store, props);
+        createEditor(monacoContainerRef, editorInstance, store);
         applyTheme(props.theme, props.themeData);
       }
     };
-
     const animateTooltip = (show: boolean) => {
       if (tooltipRef.value) {
         gsap.to(tooltipRef.value, {
@@ -52,6 +55,12 @@ export default defineComponent({
         });
       }
     };
+    const tooltipStyle = computed(() => {
+      return {
+        left: `${tooltipX.value}px`,
+        top: `${tooltipY.value}px`,
+      };
+    });
 
     let debounceTimeoutId: ReturnType<typeof setTimeout>;
     watch(
@@ -65,7 +74,7 @@ export default defineComponent({
           } else if (!newVal && oldVal) {
             animateTooltip(false);
           }
-        }, 300);
+        }, 100);
       },
       { immediate: true },
     );
@@ -82,6 +91,7 @@ export default defineComponent({
       monacoContainerRef,
       isCodeEditorPreview,
       tooltipRef,
+      tooltipStyle,
     };
   },
 });
@@ -106,17 +116,14 @@ export default defineComponent({
 }
 
 .code-preview {
-  width: 400px;
-  height: 300px;
+  width: 180px;
+  height: 140px;
   position: relative;
-  left: -200px;
-  top: -150px;
+  overflow: auto;
 }
 
 .monaco-instance {
   width: 100%;
   height: 100%;
-  font-size: 20px;
-  line-height: 24px;
 }
 </style>

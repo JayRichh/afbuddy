@@ -97,7 +97,7 @@ export function setupHoverEffects(store: Store<State>, document: HTMLBodyElement
   };
 
   const updatePositionToMouse = (element: HTMLElement, event: MouseEvent) => {
-    if (!isLatched) {
+    if (!isLatched || !element) {
       return;
     }
 
@@ -153,19 +153,53 @@ export function setupHoverEffects(store: Store<State>, document: HTMLBodyElement
     const { clientX: x, clientY: y } = event;
     return x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight;
   };
-
   const dispatchUpdateTooltip = (element: HTMLElement, event: MouseEvent, isVisible: boolean) => {
     const { clientX: x, clientY: y } = event;
     if (!element) {
       return;
     }
 
-    store.dispatch('updateTooltip', {
-      text: isVisible ? element.getAttribute('tooltip-text') : '',
-      x,
-      y,
-      visible: isVisible,
-      isCodeEditorPreview: false,
+    let adjustedX = x;
+    let adjustedY = y;
+
+    if (element.id === 'theme-selector') {
+      adjustedX = x - element.offsetWidth / 2;
+
+      const estimatedTooltipHeight = 170;
+      adjustedY = y - estimatedTooltipHeight;
+    }
+
+    const currentTooltipX = store.state.tooltipX ?? 0;
+    const currentTooltipY = store.state.tooltipY ?? 0;
+
+    const diffX = adjustedX - currentTooltipX;
+    const diffY = adjustedY - currentTooltipY;
+
+    gsap.to(store.state, {
+      tooltipX: `+=${diffX}`,
+      tooltipY: `+=${diffY}`,
+      duration: 0.1,
+      ease: Sine.easeInOut,
+      onUpdate: () => {
+        if (store.state.tooltipX !== adjustedX || store.state.tooltipY !== adjustedY) {
+          store.dispatch('updateTooltip', {
+            text: isVisible ? element.getAttribute('tooltip-text') : '',
+            x: adjustedX,
+            y: adjustedY,
+            visible: isVisible,
+            isCodeEditorPreview: element.id === 'theme-selector',
+          });
+        }
+      },
+      onComplete: () => {
+        store.dispatch('updateTooltip', {
+          text: isVisible ? element.getAttribute('tooltip-text') : '',
+          x: adjustedX,
+          y: adjustedY,
+          visible: isVisible,
+          isCodeEditorPreview: element.id === 'theme-selector',
+        });
+      },
     });
   };
 
@@ -192,12 +226,12 @@ export function setupHoverEffects(store: Store<State>, document: HTMLBodyElement
           store.dispatch('applySelectedTheme');
           saveOriginalPositionIfAbsent(selectElement);
           currentElement.value = selectElement;
+          dispatchUpdateTooltip(selectElement, event as MouseEvent, true);
         }
         break;
       }
 
       case 'mousemove': {
-        // If the mouse is outside the window, reset the element to its original position
         if (isMouseOutsideWindow(event as MouseEvent)) {
           if (currentElement.value) {
             resetToOriginalPosition(currentElement.value);
