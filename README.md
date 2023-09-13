@@ -1,6 +1,6 @@
 <p align="center">
   
-  <!-- <img src="https://github.com/JayRichh/afbuddy/assets/18374849/d4187421-6c7d-457d-8505-75c7c2a5e9aa" alt="image" /> -->
+![image](https://github.com/JayRichh/afbuddy/assets/18374849/0ccc2929-b62f-40d5-905d-b1826e10f0b5)
 
 </p>
 
